@@ -67,26 +67,31 @@ function Registro({ navigation }) {
           placeholder="Nombre completo"
           onChangeText={(text) => setNombreCompleto(text)}
           style={styles.input}
+          placeholderTextColor="black" // Cambiado a negro
         />
         <TextInput
           placeholder="Teléfono"
           onChangeText={(text) => setTelefono(text)}
           style={styles.input}
+          placeholderTextColor="black" // Cambiado a negro
         />
         <TextInput
           placeholder="Dirección"
           onChangeText={(text) => setDireccion(text)}
           style={styles.input}
+          placeholderTextColor="black" // Cambiado a negro
         />
         <TextInput
           placeholder="Edad"
           onChangeText={(text) => setEdad(text)}
           style={styles.input}
+          placeholderTextColor="black" // Cambiado a negro
         />
         <TextInput
           placeholder="Correo electrónico"
           onChangeText={(text) => setEmail(text)}
           style={styles.input}
+          placeholderTextColor="black" // Cambiado a negro
         />
         <Text style={styles.sectionTitle}>Mi contraseña</Text>
         <TextInput
@@ -94,12 +99,14 @@ function Registro({ navigation }) {
           secureTextEntry
           onChangeText={(text) => setPassword(text)}
           style={styles.input}
+          placeholderTextColor="black" // Cambiado a negro
         />
         <TextInput
           placeholder="Confirmar contraseña"
           secureTextEntry
           onChangeText={(text) => setConfirmPassword(text)}
           style={styles.input}
+          placeholderTextColor="black" // Cambiado a negro
         />
         <TouchableOpacity onPress={handleRegistro} style={styles.button}>
           <Text style={styles.buttonText}>Registrarse</Text>
@@ -145,12 +152,13 @@ const styles = StyleSheet.create({
   },
   input: {
     borderWidth: 1,
-    borderColor: '#FFFFFF',
+    borderColor: 'black', // Cambiado a negro
     borderRadius: 4,
     width: 280,
     marginBottom: 10,
     padding: 8,
     backgroundColor: 'white',
+    color: 'black', // Cambiado a negro
   },
   button: {
     backgroundColor: '#2F9FFA',

@@ -87,10 +87,12 @@ const styles = StyleSheet.create({
   productoNombre: {
     fontSize: 20,
     fontWeight: 'bold',
+    color: 'black', // Letra en negro
   },
   productoDescripcion: {
     fontSize: 16,
     marginTop: 8,
+    color: 'black', // Letra en negro
   },
 });
 

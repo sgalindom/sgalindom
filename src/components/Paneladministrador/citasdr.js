@@ -177,6 +177,7 @@ const styles = StyleSheet.create({
   citaText: {
     fontSize: 14,
     marginBottom: 4,
+    color: '#000', // Color de texto negro
   },
   citaAtendidaButton: {
     backgroundColor: '#599B85',
@@ -184,9 +185,14 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: 'center',
     marginTop: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 2,
   },
   citaAtendidaButtonText: {
-    color: 'white',
+    color: '#fff',
     fontWeight: 'bold',
   },
   noCitasText: {

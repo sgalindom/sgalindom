@@ -81,7 +81,11 @@ import CuponesQRadmin from './components/Paneladministrador/cuponesqr';
 import PanelAdmin from './components/Paneladministrador/paneladmin';
 import PedidosPetShopPanel from './components/Paneladministrador/pepetshop';
 import DespachadosPetShopPanel from './components/Paneladministrador/despapetshop';
-
+import ProductosPanel from './components/Paneladministrador/productostiendaañadir';
+import Accesorios from './components/Paneladministrador/accesorios';
+import Comida from './components/Paneladministrador/coida';
+import Productos from './components/Paneladministrador/productos';
+import MisProductos from './components/Paneladministrador/misproductos';
 
 
 import ProximamentePanel from './components/proximamente';
@@ -149,6 +153,8 @@ const Stack = createNativeStackNavigator();
         <Stack.Screen name="citasbaños" component={CitasBañoPanel} />
         <Stack.Screen name="citasbañoatendidas" component={CitasBañosAtendidas} />
         <Stack.Screen name="despapetshop" component={DespachadosPetShopPanel } />
+        <Stack.Screen name="productostiendaañadir" component={ProductosPanel } />
+
         
         <Stack.Screen name="Contactanos" component={Contactonos} />
         <Stack.Screen name="ServicioFuneraria" component={ServicioFuneraria} />
@@ -157,6 +163,11 @@ const Stack = createNativeStackNavigator();
         <Stack.Screen name="CuponesQR" component={CuponesQRadmin} />
         <Stack.Screen name="paneladmin" component={PanelAdmin} />
         <Stack.Screen name="pepetshop" component={PedidosPetShopPanel} />
+        <Stack.Screen name="misproductos" component={MisProductos} />
+        <Stack.Screen name="accesorios" component={Accesorios} />
+        <Stack.Screen name="comida" component={Comida} />
+        <Stack.Screen name="productos" component={Productos} />
+        
 
 
         <Stack.Screen name="vet2" component={Vet2Screen} />

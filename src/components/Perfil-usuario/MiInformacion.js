@@ -101,14 +101,25 @@ const MiInformacion = () => {
     try {
       const user = auth().currentUser;
       const userEmail = user.email;
-      await firestore()
+      const userDocs = await firestore()
         .collection('usuarios')
         .doc(userEmail)
         .collection('datos')
-        .doc(userEmail) // Corregido para actualizar el documento correcto
-        .set({ perfilImagen: null }, { merge: true }); // Corregido para establecer el campo perfilImagen como null
-      setProfileImage(null);
-      setModalVisible(false);
+        .get();
+
+      if (!userDocs.empty) {
+        const docId = userDocs.docs[0].id;
+        await firestore()
+          .collection('usuarios')
+          .doc(userEmail)
+          .collection('datos')
+          .doc(docId)
+          .set({ perfilImagen: null }, { merge: true });
+        setProfileImage(null);
+        setModalVisible(false);
+      } else {
+        console.log('No se encontraron documentos en la colección "datos".');
+      }
     } catch (error) {
       console.error('Error al eliminar la imagen de perfil: ', error);
     }
@@ -121,14 +132,26 @@ const MiInformacion = () => {
       const storageRef = storage().ref(`perfil/${userEmail}/profileImage.jpg`);
       await storageRef.putFile(imagePath);
       const url = await storageRef.getDownloadURL();
-      await firestore()
+
+      const userDocs = await firestore()
         .collection('usuarios')
         .doc(userEmail)
         .collection('datos')
-        .doc(userEmail) // Corregido para actualizar el documento correcto
-        .set({ perfilImagen: url }, { merge: true }); // Corregido para establecer el campo perfilImagen
-      setProfileImage(url);
-      setModalVisible(false);
+        .get();
+
+      if (!userDocs.empty) {
+        const docId = userDocs.docs[0].id;
+        await firestore()
+          .collection('usuarios')
+          .doc(userEmail)
+          .collection('datos')
+          .doc(docId)
+          .set({ perfilImagen: url }, { merge: true });
+        setProfileImage(url);
+        setModalVisible(false);
+      } else {
+        console.log('No se encontraron documentos en la colección "datos".');
+      }
     } catch (error) {
       console.error('Error al subir la imagen a Firebase Storage: ', error);
     }
@@ -287,6 +310,7 @@ const styles = StyleSheet.create({
   modalItemText: {
     fontSize: 18,
     textAlign: 'center',
+    color: 'black', // Cambio del color del texto a negro
   },
 });
 

@@ -4,7 +4,7 @@ import { View, Text, StyleSheet } from 'react-native';
 const CuponesQRadmin = () => {
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>¡Hola Mundo!</Text>
+      <Text style={styles.text}>proximamente</Text>
     </View>
   );
 };

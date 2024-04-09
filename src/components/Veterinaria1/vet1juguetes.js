@@ -113,35 +113,40 @@ const Vet1Juguetes = ({ navigation }) => {
   const renderItem = ({ item }) => (
     <View style={styles.tarjeta}>
       <Image source={{ uri: item.Foto }} style={styles.imagen} />
-      <Text style={styles.nombreProducto}>{item.Nombre}</Text>
-      <Text>Descripción: {item.Descripcion}</Text>
-      <Text>Precio: {item.Precio}</Text>
-      <View style={styles.contadorContainer}>
-        <TouchableOpacity onPress={() => handleDecrementarCantidad(item.id)} style={styles.botonMasMenos}>
-          <Text style={styles.menosMasText}>-</Text>
-        </TouchableOpacity>
-        <Text style={styles.cantidadText}>{item.cantidad}</Text>
-        <TouchableOpacity onPress={() => handleIncrementarCantidad(item.id)} style={styles.botonMasMenos}>
-          <Text style={styles.menosMasText}>+</Text>
-        </TouchableOpacity>
+      <View style={styles.overlay}>
+        <Text style={styles.nombreProducto}>{item.Nombre}</Text>
+        <Text style={styles.descripcionProducto}>{item.Descripcion}</Text>
+        <Text style={styles.precioProducto}>Precio: {item.Precio}</Text>
+        <View style={styles.botonesContainer}>
+          <View style={styles.contadorContainer}>
+            <TouchableOpacity onPress={() => handleDecrementarCantidad(item.id)} style={styles.botonMasMenos}>
+              <Text style={styles.menosMasText}>-</Text>
+            </TouchableOpacity>
+            <Text style={styles.cantidadText}>{item.cantidad}</Text>
+            <TouchableOpacity onPress={() => handleIncrementarCantidad(item.id)} style={styles.botonMasMenos}>
+              <Text style={styles.menosMasText}>+</Text>
+            </TouchableOpacity>
+          </View>
+          <TouchableOpacity
+            onPress={() =>
+              handleAgregarCarrito(
+                item.id,
+                item.Nombre,
+                item.Descripcion,
+                item.cantidad,
+                item.Precio
+              )
+            }
+            style={styles.botonAgregar}
+          >
+            <Text style={styles.textoBotonAgregar}>Añadir al carrito</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-      <TouchableOpacity
-        onPress={() =>
-          handleAgregarCarrito(
-            item.id,
-            item.Nombre,
-            item.Descripcion,
-            item.cantidad,
-            item.Precio
-          )
-        }
-      >
-        <Text style={styles.botonAgregar}>Añadir al carrito</Text>
-      </TouchableOpacity>
     </View>
   );
 
-  // Actualizar el título de la pantalla con el nombre de la veterinaria
+  
   useEffect(() => {
     navigation.setOptions({ title: `Productos (${nombreVeterinaria})` });
   }, [nombreVeterinaria, navigation]);
@@ -164,52 +169,70 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    justifyContent: 'center', // Centrar los productos en la mitad de la pantalla
   },
   tarjeta: {
-    borderWidth: 1,
-    borderColor: '#CCCCCC',
     borderRadius: 8,
-    padding: 16,
     marginBottom: 16,
-    alignItems: 'center', // Centrar elementos dentro de la tarjeta
+    overflow: 'hidden', // Para recortar la imagen dentro de la tarjeta
   },
   imagen: {
-    width: 100,
-    height: 100,
+    width: '100%',
+    height: 300, // Altura ajustable según tus necesidades
     marginBottom: 8,
+  },
+  overlay: {
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    padding: 16,
   },
   nombreProducto: {
     fontWeight: 'bold',
     fontSize: 16,
-    marginBottom: 4,
+    color: 'white',
+    marginBottom: 8,
+  },
+  descripcionProducto: {
+    color: 'white',
+    marginBottom: 8,
+  },
+  precioProducto: {
+    color: 'white',
+    marginBottom: 8,
+  },
+  botonesContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
   contadorContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 8,
-    width: '50%', // Ajusta el ancho del contenedor para separar los botones más y menos
+    justifyContent: 'center',
+    backgroundColor: 'white',
+    borderRadius: 8,
   },
   cantidadText: {
-    fontSize: 24,
+    fontSize: 20,
+    paddingHorizontal: 16,
+    color: 'black',
   },
   menosMasText: {
-    fontSize: 24,
-    color: 'white',
+    fontSize: 20,
+    paddingHorizontal: 16,
+    color: '#599B85',
   },
   botonMasMenos: {
-    backgroundColor: '#599B85',
-    padding: 8,
+    backgroundColor: '#FFFFFF',
     borderRadius: 8,
-    marginHorizontal: 8, // Ajusta el espacio horizontal entre los botones
   },
   botonAgregar: {
-    backgroundColor: '#599B85',
-    padding: 12,
+    backgroundColor: '#2F9FFA',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
     borderRadius: 8,
-    alignItems: 'center',
-    marginTop: 8,
+  },
+  textoBotonAgregar: {
+    color: 'white',
+    fontWeight: 'bold',
   },
   botonMisCompras: {
     backgroundColor: '#2F9FFA',

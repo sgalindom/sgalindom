@@ -97,19 +97,26 @@ function Login({ navigation }) {
           <Image source={logoImage} style={styles.logo} />
         </View>
         <Text style={styles.welcomeText}>Bienvenido a Pet Services</Text>
-        <TextInput
-          placeholder="Correo electrónico"
-          onChangeText={(text) => setEmail(text)}
-          value={email}
-          style={styles.input}
-        />
-        <TextInput
-          placeholder="Contraseña"
-          secureTextEntry
-          onChangeText={(text) => setPassword(text)}
-          value={password}
-          style={styles.input}
-        />
+        <View style={styles.inputContainer}>
+          <Text style={styles.inputLabel}>Correo electrónico</Text>
+          <TextInput
+            placeholder="Correo electrónico"
+            onChangeText={(text) => setEmail(text)}
+            value={email}
+            style={[styles.input, { color: 'black', borderColor: 'black' }]}
+          />
+        </View>
+        <View style={styles.inputContainer}>
+          <Text style={styles.inputLabel}>Contraseña</Text>
+          <TextInput
+            style={[styles.input, { color: 'black', borderColor: 'black' }]}
+            placeholder="Contraseña"
+            secureTextEntry
+            onChangeText={(text) => setPassword(text)}
+            value={password}
+          />
+        </View>
+
         {error && <Text style={styles.errorText}>{error}</Text>}
         <TouchableOpacity onPress={handleLogin} style={styles.button}>
           <Text style={styles.buttonText}>Iniciar sesión</Text>
@@ -160,10 +167,18 @@ const styles = StyleSheet.create({
     textShadowOffset: { width: 2, height: 2 },
     textShadowRadius: 5,
   },
-  
+  inputContainer: {
+    width: '100%',
+    marginBottom: 16,
+  },
+  inputLabel: {
+    color: 'black',
+    fontWeight: 'bold',
+    fontSize: 16,
+    marginBottom: 8,
+  },
   input: {
     borderWidth: 1,
-    borderColor: '#CCCCCC',
     borderRadius: 8,
     width: '100%',
     marginBottom: 16,

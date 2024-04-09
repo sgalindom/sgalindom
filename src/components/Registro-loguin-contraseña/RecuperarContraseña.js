@@ -51,6 +51,7 @@ function RecuperarContraseña({ navigation }) {
           placeholder="Correo electrónico"
           onChangeText={(text) => setEmail(text)}
           style={styles.input}
+          placeholderTextColor="black" // Cambiado a negro
         />
         {error && <Text style={styles.errorText}>{error}</Text>}
         <TouchableOpacity onPress={handleRecuperarContraseña} style={styles.button}>
@@ -85,12 +86,13 @@ const styles = StyleSheet.create({
   },
   input: {
     borderWidth: 1,
-    borderColor: '#CCCCCC',
+    borderColor: 'black', // Cambiado a negro
     borderRadius: 8,
     width: '100%',
     marginBottom: 16,
     padding: 12,
     backgroundColor: 'white',
+    color: 'black', // Cambiado a negro
   },
   button: {
     backgroundColor: '#2F9FFA',
@@ -112,9 +114,9 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   logo: {
-    width: 200,  // Ajusta el ancho según tus necesidades
-    height: 200, // Ajusta la altura según tus necesidades
-    marginBottom: 30, // Ajusta el margen inferior según tus necesidades
+    width: 200,
+    height: 200,
+    marginBottom: 30,
   },
 });
 

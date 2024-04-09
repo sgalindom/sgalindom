@@ -23,7 +23,6 @@ const Paneladmin = () => {
     navigation.navigate('despapetshop');
   };
 
-
   const handleAppointmentsBathClick = () => {
     navigation.navigate('citasbaños');
   };
@@ -44,8 +43,16 @@ const Paneladmin = () => {
     navigation.navigate('CuponesQR');
   };
 
+  const handleProductosTiendaClick = () => {
+    navigation.navigate('productostiendaañadir');
+  };
+
+  const handleMisProductosClick = () => {
+    navigation.navigate('misproductos');
+  };
+
   return (
-    <ImageBackground source={require('../imagenes/fondoadminpanel.jpg')} style={styles.container}>
+    <ImageBackground source={require('../imagenes/fondoadminpanel.jpg')} style={styles.container} imageStyle={{ opacity: 1 }}>
       <Text style={styles.title}>Panel de Administrador</Text>
 
       <TouchableOpacity style={styles.card} onPress={handleOrdersClick}>
@@ -53,7 +60,7 @@ const Paneladmin = () => {
       </TouchableOpacity>
 
       <TouchableOpacity style={styles.card} onPress={handleDeliveredClick}>
-        <Text style={styles.cardText}>Despachados</Text>
+        <Text style={styles.cardText}>Pedidos Despachados</Text>
       </TouchableOpacity>
 
       <TouchableOpacity style={styles.card} onPress={handleAppointmentsBathClick}>
@@ -76,6 +83,14 @@ const Paneladmin = () => {
         <Text style={styles.cardText}>Cupones QR</Text>
       </TouchableOpacity>
 
+      <TouchableOpacity style={styles.card} onPress={handleProductosTiendaClick}>
+        <Text style={styles.cardText}>Añadir Productos</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity style={styles.card} onPress={handleMisProductosClick}>
+        <Text style={styles.cardText}>Mis Productos</Text>
+      </TouchableOpacity>
+
       <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
         <Text style={styles.logoutButtonText}>Cerrar Sesión</Text>
       </TouchableOpacity>
@@ -88,7 +103,6 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#F5F5F5',
     padding: 20,
   },
   title: {
@@ -96,6 +110,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     marginVertical: 20,
+    color: '#000', // Color negro
   },
   card: {
     backgroundColor: 'white',
@@ -114,6 +129,7 @@ const styles = StyleSheet.create({
   cardText: {
     fontSize: 16,
     fontWeight: 'bold',
+    color: '#000', // Color negro
   },
   logoutButton: {
     backgroundColor: '#2F9FFA',

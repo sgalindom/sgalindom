@@ -67,19 +67,19 @@ const AñadirMascota = ({ navigation }) => {
           <Picker.Item label="Gato" value="gato" />
         </Picker>
         <TextInput
-          style={styles.input}
+          style={[styles.input, { color: 'black' }]}
           placeholder="Nombre de la mascota"
           value={nombre}
           onChangeText={setNombre}
         />
         <TextInput
-          style={styles.input}
+          style={[styles.input, { color: 'black' }]}
           placeholder="Raza de la mascota"
           value={raza}
           onChangeText={setRaza}
         />
         <TextInput
-          style={styles.input}
+          style={[styles.input, { color: 'black' }]}
           placeholder={`Edad de la mascota (${unidadEdad})`}
           value={edad}
           onChangeText={setEdad}
@@ -94,14 +94,14 @@ const AñadirMascota = ({ navigation }) => {
           <Picker.Item label="Meses" value="meses" />
         </Picker>
         <TextInput
-          style={styles.input}
+          style={[styles.input, { color: 'black' }]}
           placeholder="Peso de la mascota (Kg)"
           value={peso}
           onChangeText={setPeso}
           keyboardType="numeric"
         />
         <TextInput
-          style={styles.input}
+          style={[styles.input, { color: 'black' }]}
           placeholder="Cuentanos más sobre tu mascota"
           multiline
           numberOfLines={4}
@@ -141,6 +141,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 10,
     marginBottom: 10,
+    color: 'black',
   },
   registrarButton: {
     backgroundColor: '#2AC9FA',

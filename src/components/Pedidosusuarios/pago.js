@@ -83,56 +83,67 @@ const Pago = ({ navigation }) => {
 
       if (usuarioAutenticado) {
         const usuarioRef = firestore().collection('usuarios').doc(usuarioAutenticado.email);
-        const pedidoRef = usuarioRef.collection('pedidos').doc('default');
-        const productosRef = pedidoRef.collection('productos');
-        const productosComidaRef = pedidoRef.collection('productosComida');
-        const productosAccesoriosRef = pedidoRef.collection('Accesorios');
+        const datosSnapshot = await usuarioRef.collection('datos').get();
+        
+        if (!datosSnapshot.empty) {
+          const primerDocumento = datosSnapshot.docs[0];
+          const { nombreCompleto, telefono } = primerDocumento.data();
 
-        const productosJuguetesSnapshot = await productosRef.get();
-        const productosComidaSnapshot = await productosComidaRef.get();
-        const productosAccesoriosSnapshot = await productosAccesoriosRef.get();
+          const pedidoRef = usuarioRef.collection('pedidos').doc('default');
+          const productosRef = pedidoRef.collection('productos');
+          const productosComidaRef = pedidoRef.collection('productosComida');
+          const productosAccesoriosRef = pedidoRef.collection('Accesorios');
 
-        const productosJuguetesData = productosJuguetesSnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-          esComida: false,
-          esAccesorio: false,
-        }));
+          const productosJuguetesSnapshot = await productosRef.get();
+          const productosComidaSnapshot = await productosComidaRef.get();
+          const productosAccesoriosSnapshot = await productosAccesoriosRef.get();
 
-        const productosComidaData = productosComidaSnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-          esComida: true,
-          esAccesorio: false,
-        }));
+          const productosJuguetesData = productosJuguetesSnapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+            esComida: false,
+            esAccesorio: false,
+          }));
 
-        const productosAccesoriosData = productosAccesoriosSnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-          esComida: false,
-          esAccesorio: true,
-        }));
+          const productosComidaData = productosComidaSnapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+            esComida: true,
+            esAccesorio: false,
+          }));
 
-        const productosData = [...productosJuguetesData, ...productosComidaData, ...productosAccesoriosData];
+          const productosAccesoriosData = productosAccesoriosSnapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+            esComida: false,
+            esAccesorio: true,
+          }));
 
-        const numeroSecuencial = await obtenerNumeroSecuencial();
-        const nuevoPedidoId = `000${numeroSecuencial}`.slice(-4);
+          const productosData = [...productosJuguetesData, ...productosComidaData, ...productosAccesoriosData];
 
-        const domicilioRef = firestore().collection('Administradores').doc('animalzone@gmail.com').collection('pedidospetshop').doc(nuevoPedidoId);
+          const numeroSecuencial = await obtenerNumeroSecuencial();
+          const nuevoPedidoId = `000${numeroSecuencial}`.slice(-4);
 
-        await domicilioRef.set({
-          usuario: usuarioAutenticado.email,
-          productos: productosData,
-          total: parseFloat(totalPagar),
-        });
+          const domicilioRef = firestore().collection('Administradores').doc('animalzone@gmail.com').collection('pedidospetshop').doc(nuevoPedidoId);
 
-        await limpiarProductos();
+          await domicilioRef.set({
+            usuario: usuarioAutenticado.email,
+            nombreCompleto: nombreCompleto,
+            telefono: telefono,
+            productos: productosData,
+            total: parseFloat(totalPagar),
+          });
 
-        navigation.navigate('vet1');
-        Alert.alert(
-          'Pedido realizado',
-          'Gracias por tu pedido. Se ha procesado correctamente. Serás contactado vía WhatsApp para confirmar tu pedido.'
-        );
+          await limpiarProductos();
+
+          navigation.navigate('vet1');
+          Alert.alert(
+            'Pedido realizado',
+            'Gracias por tu pedido. Se ha procesado correctamente. Serás contactado vía WhatsApp para confirmar tu pedido.'
+          );
+        } else {
+          Alert.alert('Error', 'No se encontraron datos de usuario. Por favor, actualiza tu información de contacto antes de realizar el pedido.');
+        }
       }
     } catch (error) {
       console.error('Error al procesar el pedido:', error);
@@ -162,37 +173,6 @@ const Pago = ({ navigation }) => {
     });
   };
 
-  const handleEliminarProducto = async (id, precioUnitario, cantidad, esComida, esAccesorio) => {
-    try {
-      const usuarioAutenticado = auth().currentUser;
-
-      if (usuarioAutenticado) {
-        const usuarioRef = firestore().collection('usuarios').doc(usuarioAutenticado.email);
-        const pedidoRef = usuarioRef.collection('pedidos').doc('default');
-        const productosRef = esComida
-          ? pedidoRef.collection('productosComida').doc(id)
-          : esAccesorio
-            ? pedidoRef.collection('Accesorios').doc(id)
-            : pedidoRef.collection('productos').doc(id);
-
-        await productosRef.delete();
-
-        setPedidos((prevPedidos) =>
-          prevPedidos.filter((producto) => producto.id !== id)
-        );
-
-        setTotalPagar((prevTotal) => {
-          const precioTotalProducto = parseFloat(precioUnitario.replace(/[^0-9.]/g, '')) * cantidad;
-          return (prevTotal - precioTotalProducto).toFixed(3);
-        });
-
-        Alert.alert('Éxito', 'Producto eliminado correctamente');
-      }
-    } catch (error) {
-      console.error('Error al eliminar el producto:', error);
-    }
-  };
-
   const obtenerNumeroSecuencial = async () => {
     try {
       const numeroSecuencialRef = firestore().collection('Administradores').doc('animalzone@gmail.com').collection('secuenciapepetshop').doc('Secuencial');
@@ -214,11 +194,11 @@ const Pago = ({ navigation }) => {
 
   const renderItem = ({ item }) => (
     <View style={styles.itemContainer}>
-      <Text>Nombre del Producto: {item.nombre}</Text>
+      <Text style={styles.texto}>Nombre del Producto: {item.nombre}</Text>
       {item.precioUnitario && typeof item.precioUnitario === 'number' && (
-        <Text>Precio por unidad: {item.precioUnitario}</Text>
+        <Text style={styles.texto}>Precio por unidad: {item.precioUnitario}</Text>
       )}
-      <Text>Cantidad: {item.cantidad}</Text>
+      <Text style={styles.texto}>Cantidad: {item.cantidad}</Text>
       <TouchableOpacity
         onPress={() => handleEliminarProducto(item.id, item.precioUnitario, item.cantidad, item.esComida, item.esAccesorio)}
         style={styles.botonEliminar}
@@ -264,6 +244,7 @@ const styles = StyleSheet.create({
   titulo: {
     fontSize: 20,
     fontWeight: 'bold',
+    color: '#000', // Letra en negro
   },
   itemContainer: {
     borderWidth: 1,
@@ -282,6 +263,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 8,
+    color: '#000', // Letra en negro
   },
   botonHacerPedido: {
     backgroundColor: '#599B85',
@@ -303,6 +285,9 @@ const styles = StyleSheet.create({
   textoBotonEliminar: {
     color: 'white',
     fontWeight: 'bold',
+  },
+  texto: {
+    color: '#000', // Letra en negro
   },
 });
 

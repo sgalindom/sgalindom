@@ -90,6 +90,13 @@ const PedidosPetShopPanel = () => {
     }
   };
 
+  const renderUsuarioInfo = (nombre, telefono) => (
+    <View style={styles.usuarioInfoContainer}>
+      <Text style={styles.usuarioInfoText}>Nombre: {nombre}</Text>
+      <Text style={styles.usuarioInfoText}>Teléfono: {telefono}</Text>
+    </View>
+  );
+
   const renderProducto = (producto) => (
     <View style={styles.productoCard}>
       <Text style={styles.productoText}>Nombre: {producto.nombre}</Text>
@@ -103,6 +110,7 @@ const PedidosPetShopPanel = () => {
     <View style={styles.card}>
       <Text style={styles.cardTitle}>Pedido ID: {item.id}</Text>
       <Text style={styles.cardText}>Usuario: {item.usuario}</Text>
+      {renderUsuarioInfo(item.nombreCompleto, item.telefono)}
       <Text style={styles.cardText}>Total: ${item.total}</Text>
 
       <Text style={styles.subTitle}>Productos:</Text>
@@ -146,6 +154,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 16,
+    color: '#000', // Color negro
   },
   card: {
     backgroundColor: '#FFFFFF',
@@ -163,15 +172,18 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 8,
+    color: '#000', // Color negro
   },
   cardText: {
     fontSize: 16,
     marginBottom: 4,
+    color: '#000', // Color negro
   },
   subTitle: {
     fontSize: 16,
     fontWeight: 'bold',
     marginVertical: 8,
+    color: '#000', // Color negro
   },
   productoCard: {
     backgroundColor: '#F0F0F0',
@@ -182,6 +194,7 @@ const styles = StyleSheet.create({
   productoText: {
     fontSize: 14,
     marginBottom: 4,
+    color: '#000', // Color negro
   },
   despachadoButton: {
     backgroundColor: '#599B85',
@@ -199,6 +212,15 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     marginTop: 20,
+    color: '#000', // Color negro
+  },
+  usuarioInfoContainer: {
+    marginTop: 8,
+  },
+  usuarioInfoText: {
+    fontSize: 16,
+    marginBottom: 4,
+    color: '#000', // Color negro
   },
 });
 

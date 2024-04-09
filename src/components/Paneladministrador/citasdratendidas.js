@@ -99,6 +99,7 @@ const styles = StyleSheet.create({
   citaText: {
     fontSize: 14,
     marginBottom: 4,
+    color: 'black', // Cambiar el color del texto a negro
   },
   noCitasText: {
     fontSize: 18,
@@ -107,5 +108,6 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
 });
+
 
 export default CitasDrAtendidas;

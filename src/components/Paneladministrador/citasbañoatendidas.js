@@ -95,12 +95,14 @@ const styles = StyleSheet.create({
   citaText: {
     fontSize: 14,
     marginBottom: 4,
+    color: '#000', // Color negro
   },
   noCitasText: {
     fontSize: 18,
     fontWeight: 'bold',
     textAlign: 'center',
     marginTop: 20,
+    color: '#000', // Color negro
   },
 });
 

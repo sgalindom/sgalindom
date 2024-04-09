@@ -71,16 +71,19 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 10,
+    color: 'black',
   },
   heading: {
     fontSize: 18,
     fontWeight: 'bold',
     marginTop: 15,
+    color:'black',
   },
   paragraph: {
     fontSize: 16,
     marginTop: 5,
     marginBottom: 10,
+    color:'black',
   },
   thankYou: {
     fontSize: 18,

@@ -28,12 +28,12 @@ const MainPanel = ({ navigation }) => {
               .collection('usuarios')
               .doc(userEmail)
               .collection('datos')
-              .doc(docId)
+              .doc(docId) 
               .get();
 
             if (userDoc.exists) {
               const userData = userDoc.data();
-              const nombreCompleto = userData?.nombreCompleto || 'Usuario';
+              const nombreCompleto = userData?.nombreCompleto || 'usuario';
               setUserName(nombreCompleto);
             } else {
               console.log('No se encontró el documento con el ID:', docId);

@@ -160,12 +160,14 @@ const styles = StyleSheet.create({
     marginLeft: 8,
     marginRight: 8,
     textAlign: 'center',
+    color: 'black', // Letra en negro
   },
   servicioDescription: {
     fontSize: 14,
     marginVertical: 8,
     marginLeft: 8,
     marginRight: 8,
+    color: 'black', // Letra en negro
   },
   calificarButton: {
     backgroundColor: '#2AC9FA',

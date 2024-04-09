@@ -177,6 +177,7 @@ const styles = StyleSheet.create({
   citaText: {
     fontSize: 14,
     marginBottom: 4,
+    color: '#000', // Color negro
   },
   citaAtendidaButton: {
     backgroundColor: '#599B85',
@@ -194,6 +195,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     marginTop: 20,
+    color: '#000', // Color negro
   },
 });
 

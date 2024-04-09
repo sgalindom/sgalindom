@@ -109,15 +109,18 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 8,
+    color: 'black', // Aquí cambiamos el color del texto a negro
   },
   cardText: {
     fontSize: 16,
     marginBottom: 4,
+    color: 'black', // Aquí cambiamos el color del texto a negro
   },
   subTitle: {
     fontSize: 16,
     fontWeight: 'bold',
     marginVertical: 8,
+    color: 'black', // Aquí cambiamos el color del texto a negro
   },
   productoCard: {
     backgroundColor: '#F0F0F0',
@@ -128,12 +131,14 @@ const styles = StyleSheet.create({
   productoText: {
     fontSize: 14,
     marginBottom: 4,
+    color: 'black', // Aquí cambiamos el color del texto a negro
   },
   noPedidosText: {
     fontSize: 18,
     fontWeight: 'bold',
     textAlign: 'center',
     marginTop: 20,
+    color: 'black', // Aquí cambiamos el color del texto a negro
   },
 });
 

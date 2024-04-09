@@ -221,7 +221,7 @@ const Vet1CitasDrScreen = () => {
                   onPress={() => handleHourPress(hour)}
                   disabled={horasOcupadas.includes(hour)}
                 >
-                  <Text>{hour}:00</Text>
+                  <Text style={{ color: 'black' }}>{hour}:00</Text>
                 </TouchableOpacity>
               ))}
             </View>
@@ -236,7 +236,7 @@ const Vet1CitasDrScreen = () => {
             value={userData ? userData.nombreCompleto : ''}
             onChangeText={(text) => setFullName(text)}
             placeholder="Nombre completo"
-            style={styles.textInput}
+            style={[styles.textInput, { color: 'black' }]}
             editable={false}
           />
           <TextInput
@@ -244,7 +244,7 @@ const Vet1CitasDrScreen = () => {
             onChangeText={(text) => setPhoneNumber(text)}
             placeholder="Número de teléfono"
             keyboardType="phone-pad"
-            style={styles.textInput}
+            style={[styles.textInput, { color: 'black' }]}
             editable={false}
           />
         </View>
@@ -300,7 +300,7 @@ const Vet1CitasDrScreen = () => {
             onChangeText={(text) => setDescription(text)}
             multiline={true}
             numberOfLines={4}
-            style={styles.textInput}
+            style={[styles.textInput, { color: 'black' }]}
           />
         </View>
 
@@ -338,6 +338,7 @@ const styles = {
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 8,
+    color:'black',
   },
   horaOption: {
     borderWidth: 1,
@@ -355,7 +356,7 @@ const styles = {
   },
   genderButton: {
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: 'black',
     borderRadius: 5,
     padding: 8,
     width: '48%',
@@ -363,13 +364,15 @@ const styles = {
   },
   genderButtonText: {
     textAlign: 'center',
+    color:'black',
   },
   textInput: {
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: 'black',
     borderRadius: 5,
     padding: 8,
     marginBottom: 8,
+    color: 'black',
   },
   buttonContainer: {
     marginTop: 16,

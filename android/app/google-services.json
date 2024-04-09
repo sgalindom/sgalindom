@@ -12,7 +12,20 @@
           "package_name": "com.petsservices"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "273923140034-l1gj35sf1vau6o7nlafoetopvkb032li.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.petsservices",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "273923140034-t2scom2bamihapkdpt5t2dpf902j3qnj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyCB_V9xz4vNeFU2IptHxbxVEqRcxyYaGJI"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "273923140034-9454dec5tra05r39a0qdrlj7n0n33433.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
