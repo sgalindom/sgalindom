@@ -4,9 +4,9 @@ import { useNavigation } from '@react-navigation/native';
 
 const VeterinariaScreen = () => {
   const navigation = useNavigation();
-  const doctorImage = require('../imagenes/medicosandes.jpg');
-  const ubicacionImage = require('../imagenes/ubicacion.jpg');
-  const backgroundImage = require('../imagenes/color.jpg');
+  const doctorImage = require('../../imagenes/medicosandes.jpg');
+  const ubicacionImage = require('../../imagenes/ubicacion.jpg');
+  const backgroundImage = require('../../imagenes/color.jpg');
 
   const sharedButtonStyle = {
     backgroundColor: '#2AC9FA',

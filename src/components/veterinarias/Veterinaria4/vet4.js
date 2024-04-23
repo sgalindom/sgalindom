@@ -12,62 +12,62 @@ const CustomButton = ({ title, onPress }) => {
   );
 };
 
-const Vet5Screen = () => {
+const Vet4Screen = () => {
   const handleLocationPress = () => {
-    Linking.openURL('https://www.google.com/maps/place/CONSULTORIO+VETERINARIO+ANIMAL+LIFE/@7.1148435,-73.1082411,15z/data=!4m2!3m1!1s0x0:0x1f9c0647df18fb63?sa=X&ved=2ahUKEwjrzJTAsKaEAxVMRjABHUjmB0EQ_BJ6BAhBEAA');
+    Linking.openURL('https://www.google.com/maps/place/Veterinaria+Mascotas+Gold+Palmas/@7.119392,-73.1120545,15z/data=!4m6!3m5!1s0x8e683f53146aa403:0xb99b81f8a334828d!8m2!3d7.119392!4d-73.1120545!16s%2Fg%2F11js9plw6y?entry=ttu');
   };
 
   const handleWhatsAppPress = () => {
-    Linking.openURL('https://api.whatsapp.com/send?phone=573178870731');
+    Linking.openURL('https://api.whatsapp.com/send?phone=573187070209');
   };
 
   const handleCallPress = () => {
-    Linking.openURL('tel:+573178870731');
+    Linking.openURL('tel:+573187070209');
   };
 
   const handleLinkPress = () => {
-    Linking.openURL('https://www.facebook.com/animallifebucaramanga/?locale=es_LA');
+    Linking.openURL('https://veterinariamascotasgold.com/');
   };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <ImageBackground
-        source={require('../imagenes/fondovet4.jpg')}
+        source={require('../../imagenes/fondovet4.jpg')}
         style={styles.imageBackground}
       >
         <View style={styles.content}>
           {/* Imagen del logo de la veterinaria */}
           <Image
-            source={require('../imagenes/animallife.jpg')}
+            source={require('../../imagenes/mascotasgold.png')}
             style={styles.image}
           />
-          <Text style={styles.title}>Consultorio Vet Animal Life</Text>
-          <Text style={styles.subtitle}>Somos un equipo veterinario experto en el cuidado de su mascota, teniendo conocimiento de varios ambitos medicos veterinarios. </Text>
+          <Text style={styles.title}>Mascotas Gold</Text>
+          <Text style={styles.subtitle}>Los amamos tanto como tú, por eso te brindamos un servicio profesional, transparente, ágil y confiable con equipos de alta tecnología. </Text>
           <View style={styles.card}>
             <Text style={styles.sectionTitle}>SERVICIOS</Text>
             <View style={styles.listItem}>
               <Text style={styles.bullet}>•</Text>
-              <Text style={styles.listItemText}>Consulta Veterinaria🐩🐈</Text>
+              <Text style={styles.listItemText}>Consulta Veterinaria</Text>
             </View>
             <View style={styles.listItem}>
               <Text style={styles.bullet}>•</Text>
-              <Text style={styles.listItemText}>Hospitalización 🏥</Text>
+              <Text style={styles.listItemText}>Vacunación</Text>
             </View>
             <View style={styles.listItem}>
               <Text style={styles.bullet}>•</Text>
-              <Text style={styles.listItemText}>Laboratorio 🔬</Text>
+              <Text style={styles.listItemText}>Cirugía</Text>
             </View>
             <View style={styles.listItem}>
               <Text style={styles.bullet}>•</Text>
-              <Text style={styles.listItemText}>Ecografía💻</Text>
+              <Text style={styles.listItemText}>Desparasitación</Text>
             </View>
             <View style={styles.listItem}>
               <Text style={styles.bullet}>•</Text>
-              <Text style={styles.listItemText}>Peluquería ✂🐩</Text>
+              <Text style={styles.listItemText}>Rayos X Digital</Text>
             </View>
             <View style={styles.listItem}>
               <Text style={styles.bullet}>•</Text>
-              <Text style={styles.listItemText}>Petshop 🐕</Text>
+              <Text style={styles.listItemText}>Transporte De Mascotas</Text>
             </View>
           </View>
           {/* Botones separados */}
@@ -175,4 +175,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Vet5Screen;
+export default Vet4Screen;

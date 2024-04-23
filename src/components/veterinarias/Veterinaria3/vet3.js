@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Button, Linking, ScrollView, ImageBackground, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { View, Text, Linking, ScrollView, ImageBackground, StyleSheet, Image, TouchableOpacity } from 'react-native';
 
 // Componente de botón genérico
 const CustomButton = ({ title, onPress }) => {
@@ -12,62 +12,61 @@ const CustomButton = ({ title, onPress }) => {
   );
 };
 
-const Vet4Screen = () => {
+const Vet3Screen = () => {
   const handleLocationPress = () => {
-    Linking.openURL('https://www.google.com/maps/place/Veterinaria+Mascotas+Gold+Palmas/@7.119392,-73.1120545,15z/data=!4m6!3m5!1s0x8e683f53146aa403:0xb99b81f8a334828d!8m2!3d7.119392!4d-73.1120545!16s%2Fg%2F11js9plw6y?entry=ttu');
+    Linking.openURL('https://www.google.com/maps/place/Veterinaria+TU+MASCOTA+SPA/@7.1124864,-73.1079304,15z/data=!4m2!3m1!1s0x0:0x8e4e471f0d26a4db?sa=X&ved=2ahUKEwie_8P6g5eEAxV5RDABHQMXCvUQ_BJ6BAgKEAA');
   };
 
   const handleWhatsAppPress = () => {
-    Linking.openURL('https://api.whatsapp.com/send?phone=573187070209');
+    Linking.openURL('https://api.whatsapp.com/send?phone=573215576418');
   };
 
   const handleCallPress = () => {
-    Linking.openURL('tel:+573187070209');
+    Linking.openURL('tel:+573215576418');
   };
 
   const handleLinkPress = () => {
-    Linking.openURL('https://veterinariamascotasgold.com/');
+    Linking.openURL('https://linkr.bio/Tumascotaspa.co');
   };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <ImageBackground
-        source={require('../imagenes/fondovet4.jpg')}
+        source={require('../../imagenes/fondovet4.jpg')}
         style={styles.imageBackground}
       >
         <View style={styles.content}>
-          {/* Imagen del logo de la veterinaria */}
           <Image
-            source={require('../imagenes/mascotasgold.png')}
+            source={require('../../imagenes/tumascotaspa.png')}
             style={styles.image}
           />
-          <Text style={styles.title}>Mascotas Gold</Text>
-          <Text style={styles.subtitle}>Los amamos tanto como tú, por eso te brindamos un servicio profesional, transparente, ágil y confiable con equipos de alta tecnología. </Text>
+          <Text style={styles.title}>TU MASCOTA SPA</Text>
+          <Text style={styles.subtitle}>¡Tú dales amor, nosotros nos encargamos del resto! 🌟</Text>
           <View style={styles.card}>
             <Text style={styles.sectionTitle}>SERVICIOS</Text>
             <View style={styles.listItem}>
               <Text style={styles.bullet}>•</Text>
-              <Text style={styles.listItemText}>Consulta Veterinaria</Text>
+              <Text style={styles.listItemText}>PET SHOP</Text>
             </View>
             <View style={styles.listItem}>
               <Text style={styles.bullet}>•</Text>
-              <Text style={styles.listItemText}>Vacunación</Text>
+              <Text style={styles.listItemText}>BAÑO Y PELUQUERÍA</Text>
             </View>
             <View style={styles.listItem}>
               <Text style={styles.bullet}>•</Text>
-              <Text style={styles.listItemText}>Cirugía</Text>
+              <Text style={styles.listItemText}>VETERINARÍA</Text>
             </View>
             <View style={styles.listItem}>
               <Text style={styles.bullet}>•</Text>
-              <Text style={styles.listItemText}>Desparasitación</Text>
+              <Text style={styles.listItemText}>Accesorios para todos los peludos</Text>
             </View>
             <View style={styles.listItem}>
               <Text style={styles.bullet}>•</Text>
-              <Text style={styles.listItemText}>Rayos X Digital</Text>
+              <Text style={styles.listItemText}>Envíos a todo el país 🇨🇴</Text>
             </View>
             <View style={styles.listItem}>
               <Text style={styles.bullet}>•</Text>
-              <Text style={styles.listItemText}>Transporte De Mascotas</Text>
+              <Text style={styles.listItemText}>Cra. 36 # 52-135, Bucaramanga, Santander 680003</Text>
             </View>
           </View>
           {/* Botones separados */}
@@ -175,4 +174,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Vet4Screen;
+export default Vet3Screen;

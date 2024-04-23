@@ -12,37 +12,37 @@ const CustomButton = ({ title, onPress }) => {
   );
 };
 
-const Vet7Screen = () => {
+const Vet6Screen = () => {
   const handleLocationPress = () => {
-    Linking.openURL('https://www.google.com/maps/place/Centro+Veterinario+DR.+Animals/@7.0873576,-73.1063881,15z/data=!4m2!3m1!1s0x0:0x4d22d16d58aad5df?sa=X&ved=2ahUKEwiWj8ivs6aEAxWMbDABHemUB40Q_BJ6BAgQEAA');
+    Linking.openURL('https://www.google.com/maps/place/Tienda+de+Mascotas+Mawi/@7.0663759,-73.1682523,15z/data=!4m2!3m1!1s0x0:0x5a38c0903429fe21?sa=X&ved=2ahUKEwj0obmrsqaEAxW7SzABHehIBZ4Q_BJ6BAgREAA');
   };
 
   const handleWhatsAppPress = () => {
-    Linking.openURL('https://api.whatsapp.com/send?phone=573188523994');
+    Linking.openURL('https://api.whatsapp.com/send?phone=573125000627');
   };
 
   const handleCallPress = () => {
-    Linking.openURL('tel:+573188523994');
+    Linking.openURL('tel:+573125000627');
   };
 
   const handleLinkPress = () => {
-    Linking.openURL('https://www.facebook.com/CentroveterinarioDRanimals/');
+    Linking.openURL('https://tiendademascotasmawi.com/?gad_source=1&gclid=Cj0KCQiAoKeuBhCoARIsAB4WxtfzhGnjew8m7jju3KCJ_qQTm9KPu6pamUlBWTYfxdl712YGmwkl7jkaAnp4EALw_wcB');
   };
 
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
       <ImageBackground
-        source={require('../imagenes/fondovet4.jpg')}
+        source={require('../../imagenes/fondovet4.jpg')}
         style={styles.container}
       >
         <View style={styles.content}>
           {/* Imagen del logo de la veterinaria */}
           <Image
-            source={require('../imagenes/dranimal.jpg')}
+            source={require('../../imagenes/mawi.png')}
             style={styles.image}
           />
-          <Text style={styles.title}>Dr Animals Clinica Veterinario</Text>
-          <Text style={styles.subtitle}>Dr. Animals: Cuidado integral para tus mascotas. Expertos en salud animal y amor incondicional. ¡Bienvenidos a nuestra familia! 🐾</Text>
+          <Text style={styles.title}>Tienda de Mascotas Mawi</Text>
+          <Text style={styles.subtitle}>Somos una tienda de servicios y productos veterinarios para tú mascota. Ofrecemos un acompañamiento ético y profesional con sentido humano, calidad y política de precios justos.</Text>
           <View style={styles.card}>
             <Text style={styles.sectionTitle}>SERVICIOS</Text>
             <View style={styles.listItem}>
@@ -174,4 +174,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Vet7Screen;
+export default Vet6Screen;

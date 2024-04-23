@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Linking, ScrollView, ImageBackground, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { View, Text, Button, Linking, ImageBackground, StyleSheet, Image, TouchableOpacity, ScrollView } from 'react-native';
 
 // Componente de botón genérico
 const CustomButton = ({ title, onPress }) => {
@@ -12,61 +12,62 @@ const CustomButton = ({ title, onPress }) => {
   );
 };
 
-const Vet3Screen = () => {
+const Vet7Screen = () => {
   const handleLocationPress = () => {
-    Linking.openURL('https://www.google.com/maps/place/Veterinaria+TU+MASCOTA+SPA/@7.1124864,-73.1079304,15z/data=!4m2!3m1!1s0x0:0x8e4e471f0d26a4db?sa=X&ved=2ahUKEwie_8P6g5eEAxV5RDABHQMXCvUQ_BJ6BAgKEAA');
+    Linking.openURL('https://www.google.com/maps/place/Centro+Veterinario+DR.+Animals/@7.0873576,-73.1063881,15z/data=!4m2!3m1!1s0x0:0x4d22d16d58aad5df?sa=X&ved=2ahUKEwiWj8ivs6aEAxWMbDABHemUB40Q_BJ6BAgQEAA');
   };
 
   const handleWhatsAppPress = () => {
-    Linking.openURL('https://api.whatsapp.com/send?phone=573215576418');
+    Linking.openURL('https://api.whatsapp.com/send?phone=573188523994');
   };
 
   const handleCallPress = () => {
-    Linking.openURL('tel:+573215576418');
+    Linking.openURL('tel:+573188523994');
   };
 
   const handleLinkPress = () => {
-    Linking.openURL('https://linkr.bio/Tumascotaspa.co');
+    Linking.openURL('https://www.facebook.com/CentroveterinarioDRanimals/');
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView contentContainerStyle={styles.scrollContainer}>
       <ImageBackground
-        source={require('../imagenes/fondovet4.jpg')}
-        style={styles.imageBackground}
+        source={require('../../imagenes/fondovet4.jpg')}
+        style={styles.container}
       >
         <View style={styles.content}>
+          {/* Imagen del logo de la veterinaria */}
           <Image
-            source={require('../imagenes/tumascotaspa.png')}
+            source={require('../../imagenes/dranimal.jpg')}
             style={styles.image}
           />
-          <Text style={styles.title}>TU MASCOTA SPA</Text>
-          <Text style={styles.subtitle}>¡Tú dales amor, nosotros nos encargamos del resto! 🌟</Text>
+          <Text style={styles.title}>Dr Animals Clinica Veterinario</Text>
+          <Text style={styles.subtitle}>Dr. Animals: Cuidado integral para tus mascotas. Expertos en salud animal y amor incondicional. ¡Bienvenidos a nuestra familia! 🐾</Text>
           <View style={styles.card}>
             <Text style={styles.sectionTitle}>SERVICIOS</Text>
             <View style={styles.listItem}>
               <Text style={styles.bullet}>•</Text>
-              <Text style={styles.listItemText}>PET SHOP</Text>
+              <Text style={styles.listItemText}>Vacunas</Text>
             </View>
             <View style={styles.listItem}>
               <Text style={styles.bullet}>•</Text>
-              <Text style={styles.listItemText}>BAÑO Y PELUQUERÍA</Text>
+              <Text style={styles.listItemText}>Medicamentos</Text>
             </View>
             <View style={styles.listItem}>
               <Text style={styles.bullet}>•</Text>
-              <Text style={styles.listItemText}>VETERINARÍA</Text>
+              <Text style={styles.listItemText}>Accesorios</Text>
             </View>
             <View style={styles.listItem}>
               <Text style={styles.bullet}>•</Text>
-              <Text style={styles.listItemText}>Accesorios para todos los peludos</Text>
+              <Text style={styles.listItemText}>Concentrados</Text>
             </View>
             <View style={styles.listItem}>
               <Text style={styles.bullet}>•</Text>
-              <Text style={styles.listItemText}>Envíos a todo el país 🇨🇴</Text>
+              <Text style={styles.listItemText}>Alimentos</Text>
             </View>
             <View style={styles.listItem}>
               <Text style={styles.bullet}>•</Text>
-              <Text style={styles.listItemText}>Cra. 36 # 52-135, Bucaramanga, Santander 680003</Text>
+              <Text style={styles.listItemText}>Petshop </Text>
             </View>
           </View>
           {/* Botones separados */}
@@ -81,11 +82,10 @@ const Vet3Screen = () => {
 };
 
 const styles = StyleSheet.create({
-  container: {
+  scrollContainer: {
     flexGrow: 1,
-    justifyContent: "center"
   },
-  imageBackground: {
+  container: {
     flex: 1,
     resizeMode: "cover",
     justifyContent: "center"
@@ -174,4 +174,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Vet3Screen;
+export default Vet7Screen;

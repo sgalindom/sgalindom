@@ -19,7 +19,7 @@ import Notificaciones from './components/Notificaciones/notificaciones';
 import CalificacionPanel from './components/Calificanos/calificacion';
 
 // Importaciones relacionadas con Adiestramiento
-import Adiestramiento from './components/Adiestramiento/Adiestramiento';
+import Badiegard from './components/badieguar';
 
 // Importaciones relacionadas con Paseo de Perros
 import PaquetesPaseos from './components/Paseoperros/PaquetesPaseos';
@@ -35,35 +35,35 @@ import pago from './components/Pedidosusuarios/pago';
 
 // Importaciones relacionadas con Veterinaria 1
 import bveterinaria from './components/bveterinaria';
-import Vet1Screen from './components/Veterinaria1/vet1';
-import petshop from './components/Veterinaria1/petshop';
-import baño from './components/Veterinaria1/baño';
-import domicilio from './components/Veterinaria1/vet1dr';
-import vet1juguetes from './components/Veterinaria1/vet1juguetes';
-import Vet1Comida from './components/Veterinaria1/vet1comida';
-import vet1accesorios from './components/Veterinaria1/vet1accesorios';
-import vet1calificacion from './components/Veterinaria1/vet1calificacion';
-import Vet1DrScreen from './components/Veterinaria1/vet1dr';
-import Vet1BañoCitasScreen from './components/Veterinaria1/vet1bañocita';
+import Vet1Screen from './components/veterinarias/Veterinaria1/vet1';
+import petshop from './components/veterinarias/Veterinaria1/petshop';
+import baño from './components/veterinarias/Veterinaria1/baño';
+import domicilio from './components/veterinarias/Veterinaria1/vet1dr';
+import vet1juguetes from './components/veterinarias/Veterinaria1/vet1juguetes';
+import Vet1Comida from './components/veterinarias/Veterinaria1/vet1comida';
+import vet1accesorios from './components/veterinarias/Veterinaria1/vet1accesorios';
+import vet1calificacion from './components/veterinarias/Veterinaria1/vet1calificacion';
+import Vet1DrScreen from './components/veterinarias/Veterinaria1/vet1dr';
+import Vet1BañoCitasScreen from './components/veterinarias/Veterinaria1/vet1bañocita';
 import CitasBañoPanel from './components/Paneladministrador/citasbaños';
 import CitasDrPanel from './components/Paneladministrador/citasdr';
-import Vet1CitasDrScreen from './components/Veterinaria1/vet1citasdr';
+import Vet1CitasDrScreen from './components/veterinarias/Veterinaria1/vet1citasdr';
 import CitasDrAtendidas from './components/Paneladministrador/citasdratendidas';
 import CitasBañosAtendidas from './components/Paneladministrador/citasbañoatendidas';
 
 // Importaciones relacionadas con Veterinaria 2
-import Vet2Screen from './components/Veterinaria2/vet2';
-import Vet2ServiciosMedicos from './components/Veterinaria2/vet2serviciosmedicos';
-import Vet2Consultas from './components/Veterinaria2/vet2consultas';
+import Vet2Screen from './components/veterinarias/Veterinaria2/vet2';
+import Vet2ServiciosMedicos from './components/veterinarias/Veterinaria2/vet2serviciosmedicos';
+import Vet2Consultas from './components/veterinarias/Veterinaria2/vet2consultas';
 
 
-import Vet3Screen from './components/Veterinaria3/vet3';
-import Vet4Screen from './components/Veterinaria4/vet4';
-import Vet5Screen from './components/Veterinaria5/vet5';
-import Vet6Screen from './components/Veterinaria6/vet6';
-import Vet7Screen from './components/Veterinaria7/vet7';
-import Vet8Screen from './components/Veterinaria8/vet8';
-import Vet9Screen from './components/Veterinaria9/vet9';
+import Vet3Screen from './components/veterinarias/Veterinaria3/vet3';
+import Vet4Screen from './components/veterinarias/Veterinaria4/vet4';
+import Vet5Screen from './components/veterinarias/Veterinaria5/vet5';
+import Vet6Screen from './components/veterinarias/Veterinaria6/vet6';
+import Vet7Screen from './components/veterinarias/Veterinaria7/vet7';
+import Vet8Screen from './components/veterinarias/Veterinaria8/vet8';
+import Vet9Screen from './components/veterinarias/Veterinaria9/vet9';
 
 
 
@@ -90,6 +90,12 @@ import MisProductos from './components/Paneladministrador/misproductos';
 
 import ProximamentePanel from './components/proximamente';
 
+
+// Importaciones relacionadas con el Panel Adiestramiento y Guarderia Adieguar
+import AdieguarScreen from './components/Adiestramiento/Adieguar1/Adieguar1';
+
+
+
 const Stack = createNativeStackNavigator();
 
   function App() {
@@ -114,7 +120,7 @@ const Stack = createNativeStackNavigator();
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="Registro" component={Registro} />
         <Stack.Screen name="MainPanel" component={MainPanel} />
-        <Stack.Screen name="Adiestramiento" component={Adiestramiento} />
+       
         <Stack.Screen name="MiPerfil" component={MiPerfil} />
         <Stack.Screen name="RecuperarContraseña" component={RecuperarContraseña} />
         <Stack.Screen name="vercupones" component={VerCupones} />
@@ -186,6 +192,10 @@ const Stack = createNativeStackNavigator();
 
 
         <Stack.Screen name="proximamente" component={ProximamentePanel} />
+
+
+        <Stack.Screen name="badieguar" component={Badiegard} />
+        <Stack.Screen name="Adieguar1" component={AdieguarScreen} />
 
       </Stack.Navigator>
     </NavigationContainer>

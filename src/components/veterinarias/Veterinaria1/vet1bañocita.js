@@ -201,7 +201,7 @@ const Vet1CitasScreen = () => {
   const horasDisponibles = Array.from({ length: 8 }, (_, index) => 9 + index);
 
   return (
-    <ImageBackground source={require('../imagenes/fondocitabaño.jpg')} style={styles.backgroundImage}>
+    <ImageBackground source={require('../../imagenes/fondocitabaño.jpg')} style={styles.backgroundImage}>
       <ScrollView contentContainerStyle={styles.container}>
         <View style={styles.calendarContainer}>
           <Calendar

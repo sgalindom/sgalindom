@@ -96,7 +96,7 @@ function Login({ navigation }) {
         <View style={styles.logoContainer}>
           <Image source={logoImage} style={styles.logo} />
         </View>
-        <Text style={styles.welcomeText}>Bienvenido a Pet Services</Text>
+        <Text style={styles.welcomeText}>Bienvenido</Text>
         <View style={styles.inputContainer}>
           <Text style={styles.inputLabel}>Correo electrónico</Text>
           <TextInput
@@ -150,7 +150,7 @@ const styles = StyleSheet.create({
     paddingTop: 50,
   },
   logoContainer: {
-    marginBottom: 20,
+    marginBottom: 3, // Aumenta el margen inferior del contenedor de logo
     alignItems: 'center',
   },
   logo: {
@@ -162,14 +162,14 @@ const styles = StyleSheet.create({
     fontSize: 30,
     fontWeight: 'bold',
     color: '#FFFFFF',
-    marginBottom: 10,
+    marginBottom: 2, // Aumenta el margen inferior del texto de bienvenida
     textShadowColor: 'rgba(0, 0, 0, 0.75)',
     textShadowOffset: { width: 2, height: 2 },
     textShadowRadius: 5,
   },
   inputContainer: {
     width: '100%',
-    marginBottom: 16,
+    marginBottom: 2, // Aumenta el margen inferior del contenedor de entrada
   },
   inputLabel: {
     color: 'black',
@@ -181,7 +181,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 8,
     width: '100%',
-    marginBottom: 16,
+    marginBottom: 2, // Aumenta el margen inferior del campo de entrada
     padding: 12,
     backgroundColor: 'white',
     color: 'black',
@@ -191,7 +191,7 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 8,
     width: '100%',
-    marginVertical: 10,
+    marginVertical: 1, // Aumenta el margen vertical del botón
   },
   buttonText: {
     color: '#FFFFFF',
@@ -200,7 +200,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   registerButton: {
-    marginTop: 10,
+    marginTop: 1, // Aumenta el margen superior del botón de registro
   },
   registerButtonText: {
     color: '#FFFFFF',
@@ -211,7 +211,7 @@ const styles = StyleSheet.create({
     textShadowRadius: 5,
   },
   enlaceRecuperarContraseña: {
-    marginTop: 10,
+    marginTop: 1, // Aumenta el margen superior del enlace de recuperación de contraseña
   },
   enlaceRecuperarContraseñaTexto: {
     color: '#FFFFFF',
@@ -225,7 +225,7 @@ const styles = StyleSheet.create({
     color: 'red',
     fontWeight: 'bold',
     fontSize: 14,
-    marginBottom: 10,
+    marginBottom: 1, // Aumenta el margen inferior del texto de error
   },
   loadingContainer: {
     flex: 1,
@@ -233,5 +233,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 });
+
 
 export default Login;

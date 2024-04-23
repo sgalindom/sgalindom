@@ -4,8 +4,8 @@ import { Linking, useNavigation } from '@react-navigation/native';
 
 const BañoScreen = () => {
   const navigation = useNavigation();
-  const bañoImage = require('../imagenes/baño2.jpg');
-  const fondoImage = require('../imagenes/fondopanelbaño.jpg');
+  const bañoImage = require('../../imagenes/baño2.jpg');
+  const fondoImage = require('../../imagenes/fondopanelbaño.jpg');
 
   return (
     <ImageBackground source={fondoImage} style={styles.backgroundImage}>

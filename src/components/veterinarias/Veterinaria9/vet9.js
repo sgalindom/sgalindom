@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Button, Linking, ImageBackground, StyleSheet, Image, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, Linking, ImageBackground, StyleSheet, Image, TouchableOpacity, ScrollView } from 'react-native';
 
 // Componente de botón genérico
 const CustomButton = ({ title, onPress }) => {
@@ -12,37 +12,37 @@ const CustomButton = ({ title, onPress }) => {
   );
 };
 
-const Vet6Screen = () => {
+const Vet9Screen = () => {
   const handleLocationPress = () => {
-    Linking.openURL('https://www.google.com/maps/place/Tienda+de+Mascotas+Mawi/@7.0663759,-73.1682523,15z/data=!4m2!3m1!1s0x0:0x5a38c0903429fe21?sa=X&ved=2ahUKEwj0obmrsqaEAxW7SzABHehIBZ4Q_BJ6BAgREAA');
+    Linking.openURL('https://www.google.com/maps/place/CA%C3%91AVERAL+PETS/@7.0713728,-73.1070283,15z/data=!4m6!3m5!1s0x8e683f267d66de01:0xfd609859b83e50d3!8m2!3d7.0713728!4d-73.1070283!16s%2Fg%2F11f7qvtqmq?entry=ttu');
   };
 
   const handleWhatsAppPress = () => {
-    Linking.openURL('https://api.whatsapp.com/send?phone=573125000627');
+    Linking.openURL('https://api.whatsapp.com/send?phone=573117231760');
   };
 
   const handleCallPress = () => {
-    Linking.openURL('tel:+573125000627');
+    Linking.openURL('tel:+573117231760');
   };
 
   const handleLinkPress = () => {
-    Linking.openURL('https://tiendademascotasmawi.com/?gad_source=1&gclid=Cj0KCQiAoKeuBhCoARIsAB4WxtfzhGnjew8m7jju3KCJ_qQTm9KPu6pamUlBWTYfxdl712YGmwkl7jkaAnp4EALw_wcB');
+    Linking.openURL('https://www.facebook.com/vetcanaveralpets/?locale=es_LA');
   };
 
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
       <ImageBackground
-        source={require('../imagenes/fondovet4.jpg')}
+        source={require('../../imagenes/fondovet4.jpg')}
         style={styles.container}
       >
         <View style={styles.content}>
           {/* Imagen del logo de la veterinaria */}
           <Image
-            source={require('../imagenes/mawi.png')}
+            source={require('../../imagenes/petscañaveral.jpg')}
             style={styles.image}
           />
-          <Text style={styles.title}>Tienda de Mascotas Mawi</Text>
-          <Text style={styles.subtitle}>Somos una tienda de servicios y productos veterinarios para tú mascota. Ofrecemos un acompañamiento ético y profesional con sentido humano, calidad y política de precios justos.</Text>
+          <Text style={styles.title}>Veterinaria Cañaveral Pets </Text>
+          <Text style={styles.subtitle}>Somos una empresa con más 20 años de experiencia al cuidado y salud de tu mascota.</Text>
           <View style={styles.card}>
             <Text style={styles.sectionTitle}>SERVICIOS</Text>
             <View style={styles.listItem}>
@@ -174,4 +174,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Vet6Screen;
+export default Vet9Screen;

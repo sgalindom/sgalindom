@@ -5,7 +5,7 @@ const PaquetesPaseos = ({ navigation }) => {
   const diarioImage = require('../imagenes/Diario.jpg');
   const semanalImage = require('../imagenes/semanal.jpg');
   const mensualImage = require('../imagenes/mensual.jpg');
-  const fondoPaquetesImage = require('../imagenes/fondopaquetes.jpg');
+  const fondoPaquetesImage = require('../imagenes/fondopanelbaño.jpg');
 
   const sharedButtonStyle = {
     backgroundColor: '#2F9FFA',

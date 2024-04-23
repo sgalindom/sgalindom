@@ -12,7 +12,7 @@ const CustomButton = ({ title, onPress }) => {
   );
 };
 
-const Vet9Screen = () => {
+const AdieguarScreen = () => {
   const handleLocationPress = () => {
     Linking.openURL('https://www.google.com/maps/place/CA%C3%91AVERAL+PETS/@7.0713728,-73.1070283,15z/data=!4m6!3m5!1s0x8e683f267d66de01:0xfd609859b83e50d3!8m2!3d7.0713728!4d-73.1070283!16s%2Fg%2F11f7qvtqmq?entry=ttu');
   };
@@ -32,13 +32,13 @@ const Vet9Screen = () => {
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
       <ImageBackground
-        source={require('../imagenes/fondovet4.jpg')}
+        source={require('../../imagenes/fondovet4.jpg')}
         style={styles.container}
       >
         <View style={styles.content}>
           {/* Imagen del logo de la veterinaria */}
           <Image
-            source={require('../imagenes/petscañaveral.jpg')}
+            source={require('../../imagenes/petscañaveral.jpg')}
             style={styles.image}
           />
           <Text style={styles.title}>Veterinaria Cañaveral Pets </Text>
@@ -174,4 +174,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Vet9Screen;
+export default AdieguarScreen;

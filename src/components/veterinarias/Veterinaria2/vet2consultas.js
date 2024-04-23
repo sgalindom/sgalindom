@@ -4,11 +4,11 @@ import { useNavigation } from '@react-navigation/native';
 
 const Vet2Consultas = () => {
   const navigation = useNavigation();
-  const backgroundImage = require('../imagenes/fondomain.jpg');
-  const medico1Image = require('../imagenes/veterinaria2.jpg');
-  const medico2Image = require('../imagenes/veterinaria2.jpg');
-  const medico3Image = require('../imagenes/veterinaria2.jpg');
-  const medico4Image = require('../imagenes/veterinaria2.jpg');
+  const backgroundImage = require('../../imagenes/fondomain.jpg');
+  const medico1Image = require('../../imagenes/veterinaria2.jpg');
+  const medico2Image = require('../../imagenes/veterinaria2.jpg');
+  const medico3Image = require('../../imagenes/veterinaria2.jpg');
+  const medico4Image = require('../../imagenes/veterinaria2.jpg');
 
   const medicos = [
     { id: 1, nombre: 'Dr. Juan Pérez', especialidad: 'Médico General', caracteristicas: 'Experiencia en atención primaria' },

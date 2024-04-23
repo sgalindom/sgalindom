@@ -5,7 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 const Vet2ServiciosMedicos = () => {
   const navigation = useNavigation();
 
-  const backgroundImage = require('../imagenes/fondomain.jpg');
+  const backgroundImage = require('../../imagenes/fondomain.jpg');
   const whatsappNumber = '+573212016821';
 
   const goToEspecialistas = () => {
