@@ -1,11 +1,15 @@
 import React from 'react';
-import { View, Text, ImageBackground, Image, TouchableOpacity, StyleSheet } from 'react-native';
-import { Linking, useNavigation } from '@react-navigation/native';
+import { View, Text, ImageBackground, Image, TouchableOpacity, StyleSheet, Linking } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
 const BañoScreen = () => {
   const navigation = useNavigation();
   const bañoImage = require('../../imagenes/baño2.jpg');
   const fondoImage = require('../../imagenes/fondopanelbaño.jpg');
+
+  const llamarVeterinaria = () => {
+    Linking.openURL('tel:+573202212377');
+  };
 
   return (
     <ImageBackground source={fondoImage} style={styles.backgroundImage}>
@@ -18,7 +22,7 @@ const BañoScreen = () => {
         <TouchableOpacity style={styles.agendarButton} onPress={() => navigation.navigate('vet1bañocita')}>
           <Text style={styles.buttonText}>Agendar Cita</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.llamarButton} onPress={() => Linking.openURL('tel:+573202212377')}>
+        <TouchableOpacity style={styles.llamarButton} onPress={llamarVeterinaria}>
           <Text style={styles.buttonText}>Llamar a la Veterinaria</Text>
         </TouchableOpacity>
       </View>

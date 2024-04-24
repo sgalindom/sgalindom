@@ -45,7 +45,7 @@ const Badiegard = () => {
   }, [selectedBarrio]);
 
   const handleExplorarPress = (veterinariaId) => {
-    navigation.navigate(`Adieguar${veterinariaId}`);
+    navigation.navigate(`${veterinariaId}`);
   };
 
   const openModal = () => {

@@ -13,11 +13,11 @@ const CalificacionPanel = () => {
   const user = auth().currentUser;
 
   const [preguntas, setPreguntas] = useState([
-    { pregunta: '¿Cómo calificarías la calidad del servicio?', respuesta: 3 },
-    { pregunta: '¿Qué tan satisfecho estás con la atención al cliente?', respuesta: 3 },
+    { pregunta: '¿Cómo calificarías la app', respuesta: 3 },
+    { pregunta: '¿Qué tan satisfecho estás con los servicios ofrecidos?', respuesta: 3 },
     { pregunta: '¿Cómo evalúas la eficiencia en la entrega de servicios?', respuesta: 3 },
-    { pregunta: '¿Qué tan probable es que recomiendes nuestro servicio a otros?', respuesta: 3 },
-    { pregunta: '¿En general, cómo calificarías tu experiencia con nosotros?', respuesta: 3 },
+    { pregunta: '¿Qué tan probable es que recomiendes nuestra app a otros?', respuesta: 3 },
+    { pregunta: '¿En general, cómo calificarías tu experiencia con la app y con nuestros sociosx?', respuesta: 3 },
   ]);
 
   const [respuestas, setRespuestas] = useState([3, 3, 3, 3, 3]);

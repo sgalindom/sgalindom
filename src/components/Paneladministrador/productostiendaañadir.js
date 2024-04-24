@@ -93,7 +93,7 @@ const ProductosPanel = () => {
               <Text style={[styles.checkboxText, { color: categoria === 'Comida' ? '#FFFFFF' : '#FFFFFF' }]}>Comida</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => setCategoria('Productos')} style={[styles.checkbox, { backgroundColor: categoria === 'Productos' ? '#2F9FFA' : '#000000' }]}>
-              <Text style={[styles.checkboxText, { color: categoria === 'Productos' ? '#FFFFFF' : '#FFFFFF' }]}>Productos</Text>
+              <Text style={[styles.checkboxText, { color: categoria === 'Productos' ? '#FFFFFF' : '#FFFFFF' }]}>juguetes</Text>
             </TouchableOpacity>
           </View>
 
