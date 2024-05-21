@@ -1,4 +1,4 @@
-import React from 'react';
+  import React from 'react';
 import { View, Text, Image, StyleSheet, ImageBackground } from 'react-native';
 
 const ProximamentePanel = () => {
