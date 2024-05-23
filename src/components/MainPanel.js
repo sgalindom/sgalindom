@@ -9,6 +9,10 @@ const MainPanel = ({ navigation }) => {
   const [currentServiceIndex, setCurrentServiceIndex] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
   const slideAnim = useRef(new Animated.Value(0)).current;
+  const fadeAnim = useRef(new Animated.Value(1)).current;
+  const [foodProducts, setFoodProducts] = useState([]);
+  const [accessoryProducts, setAccessoryProducts] = useState([]);
+  const [allProductProducts, setProductProducts] = useState([]); // Corregido
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -79,10 +83,10 @@ const MainPanel = ({ navigation }) => {
   const tips = [
     { id: 1, text: 'Consejo 1: Mantén a tu mascota hidratada en todo momento.' },
     { id: 2, text: 'Consejo 2: Asegúrate de que tu mascota haga ejercicio regularmente.' },
-    { id: 3, text: 'Consejo 3: Proporciona a tu mascota una alimentación equilibrada.' },
-    { id: 4, text: 'Consejo 4: Realiza visitas veterinarias de forma periódica.' },
-    { id: 5, text: 'Consejo 5: Cuida la higiene de tu mascota regularmente.' },
-    { id: 6, text: 'Consejo 6: Identifica a tu mascota con collar y microchip.' },
+    { id: 3, text: 'Proporciona a tu mascota una alimentación equilibrada.' },
+    { id: 4, text: 'Realiza visitas veterinarias de forma periódica.' },
+    { id: 5, text: 'Cuida la higiene de tu mascota regularmente.' },
+    { id: 6, text: 'Identifica a tu mascota con collar y microchip.' },
     { id: 7, text: 'Dedica tiempo al entrenamiento y socialización.' },
     { id: 8, text: 'Proporciona un ambiente seguro en tu hogar.' },
     { id: 9, text: 'Brinda juguetes interactivos para estimular a tu mascota.' },
@@ -95,308 +99,323 @@ const MainPanel = ({ navigation }) => {
   useEffect(() => {
     if (services.length > 0) {
       const intervalId = setInterval(() => {
-        setCurrentServiceIndex(prevIndex => (prevIndex + 1) % services.length);
-        Animated.timing(slideAnim, {
-          toValue: 1,
-          duration: 500,
-          useNativeDriver: true,
-          easing: Easing.inOut(Easing.ease),
-        }).start(() => {
-          slideAnim.setValue(0);
-        });
-      }, 3000);
+        Animated.sequence([
+          Animated.timing(fadeAnim, {
+            toValue: 0,
+            duration: 500,
+            useNativeDriver: true,
+          }),
+          Animated.timing(slideAnim, {
+            toValue: -300,
+            duration: 500,
+            useNativeDriver: true,
+            easing: Easing.inOut(Easing.ease),
+          }),
+          Animated.timing(slideAnim, {
+            toValue: 300,
+            duration: 0,
+            useNativeDriver: true,
+          }),
+          Animated.timing(slideAnim, {
+            toValue: 0,
+            duration: 500,
+            useNativeDriver: true,
+            easing: Easing.inOut(Easing.ease),
+          }),
+          Animated.timing(fadeAnim, {
+            toValue: 1,
+            duration: 500,
+            useNativeDriver: true,
+          }),
+        ]).start();
+
+        setTimeout(() => {
+          setCurrentServiceIndex(prevIndex => (prevIndex + 1) % services.length);
+        }, 500); // Change the service index after the fade-out animation
+      }, 4000);
 
       return () => clearInterval(intervalId);
     }
-  }, [slideAnim, services.length]);
+  }, [slideAnim, fadeAnim, services.length]);
 
-  const currentService = services[currentServiceIndex];
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const foodProductsRefs = [1, 2, 3].map(async (vetId) => {
+          const vetFoodProductsRef = firestore()
+            .collection('Veterinarias')
+            .doc(vetId.toString())
+            .collection('Comida');
+
+          const snapshot = await vetFoodProductsRef.get();
+
+          return snapshot.docs.map(doc => ({
+            id: doc.id,
+            vetId: vetId,
+            ...doc.data(),
+          }));
+        });
+
+        const foodProductsData = await Promise.all(foodProductsRefs);
+        const allFoodProducts = foodProductsData.reduce((acc, val) => acc.concat(val), []);
+        setFoodProducts(allFoodProducts);
+
+        const accessoryProductsRefs = [1, 2, 3].map(async (vetId) => {
+          const vetAccessoryProductsRef = firestore()
+            .collection('Veterinarias')
+            .doc(vetId.toString())
+            .collection('Accesorios');
+
+          const snapshot = await vetAccessoryProductsRef.get();
+
+          return snapshot.docs.map(doc => ({
+            id: doc.id,
+            vetId: vetId, ...doc.data(),
+          }));
+        });
+
+        const accessoryProductsData = await Promise.all(accessoryProductsRefs);
+        const allAccessoryProducts = accessoryProductsData.reduce((acc, val) => acc.concat(val), []);
+        setAccessoryProducts(allAccessoryProducts);
+
+        const productProductsRefs = [1, 2, 3].map(async (vetId) => {
+          const vetProductProductsRef = firestore()
+            .collection('Veterinarias')
+            .doc(vetId.toString())
+            .collection('Productos');
+
+          const snapshot = await vetProductProductsRef.get();
+
+          return snapshot.docs.map(doc => ({
+            id: doc.id,
+            vetId: vetId, ...doc.data(),
+          }));
+        });
+
+        const productProductsData = await Promise.all(productProductsRefs);
+        const allProductProducts = productProductsData.reduce((acc, val) => acc.concat(val), []);
+        setProductProducts(allProductProducts);
+      } catch (error) {
+        console.error('Error fetching products:', error);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
+  const handleProductPress = (productId, vetId, productType) => {
+    let route = '';
+    switch (productType) {
+      case 'comida':
+        route = vetId === 1 ? 'vet1comida' : 'vet3comida';
+        break;
+      case 'accesorios':
+        route = vetId === 1 ? 'vet1accesorios' : 'vet3accesorios';
+        break;
+      case 'productos':
+        route = vetId === 1 ? 'vet1productos' : 'vet3productos';
+        break;
+      default:
+        console.error('Tipo de producto no reconocido');
+        break;
+    }
+  
+    if (route !== '') {
+      navigation.navigate(route);
+    } else {
+      console.error('Ruta de navegación no válida');
+    }
+  };
 
   const slide = slideAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0, -300],
+    inputRange: [-300, 0, 300],
+    outputRange: [-300, 0, 300],
   });
-
-  const handleServicePress = () => {
-    navigation.navigate(currentService.route);
-  };
-
-  const comidaPanels = {
-    1: 'vet1comida',
-    2: 'vet2comida',
-    3: 'vet3comida',
-    4: 'vet4comida',
-    5: 'vet5comida',
-  };
-
-  const juguetePanels = {
-    1: 'vet1juguete',
-    2: 'vet2juguete',
-    3: 'vet3juguete',
-    4: 'vet4juguete',
-    5: 'vet5juguete',
-  };
-
-  const accesoriosPanels = {
-    1: 'vet1accesorios',
-    2: 'vet2accesorios',
-    3: 'vet3accesorios',
-    4: 'vet4accesorios',
-    5: 'vet5accesorios',
-  };
-
-  const paseosPanels = {
-    1: 'vet1paseos',
-    2: 'vet2paseos',
-    3: 'vet3paseos',
-    4: 'vet4paseos',
-    5: 'vet5paseos',
-  };
-
-  const adiestramientoPanels = {
-    1: 'vet1adiestramiento',
-    2: 'vet2adiestramiento',
-    3: 'vet3adiestramiento',
-    4: 'vet4adiestramiento',
-    5: 'vet5adiestramiento',
-  };
-
-  const handleComidaPress = (index) => {
-    const panelName = comidaPanels[index];
-    navigation.navigate(panelName);
-  };
-
-  const handleJuguetePress = (index) => {
-    const panelName = juguetePanels[index];
-    navigation.navigate(panelName);
-  };
-
-  const handleAccesoriosPress = (index) => {
-    const panelName = accesoriosPanels[index];
-    navigation.navigate(panelName);
-  };
-
-  const handlePaseosPress = (index) => {
-    const panelName = paseosPanels[index];
-    navigation.navigate(panelName);
-  };
-
-  const handleAdiestramientoPress = (index) => {
-    const panelName = adiestramientoPanels[index];
-    navigation.navigate(panelName);
-  };
 
   return (
     <ImageBackground source={require('./imagenes/fondomain.jpg')} style={styles.backgroundImage}>
-      <View style={styles.container}>
+      <ScrollView contentContainerStyle={styles.container}>
         <Image source={require('./imagenes/fondoperfil.jpg')} style={styles.headerImage} />
+
         <View style={styles.searchContainer}>
           <TextInput
             style={styles.searchInput}
             placeholder="¿En qué podemos ayudarte hoy?"
             value={searchQuery}
             onChangeText={setSearchQuery}
+            placeholderTextColor="#000000"
           />
         </View>
 
-        <ScrollView contentContainerStyle={styles.scrollContainer}>
-          {services.length > 0 && (
-            <Animated.View style={[styles.serviceCard, { transform: [{ translateX: slide }] }]}>
-              <TouchableOpacity onPress={handleServicePress}>
-                <Image source={currentService.image} style={styles.serviceImage} />
-                <Text style={styles.serviceTitle}>{currentService.title}</Text>
-              </TouchableOpacity>
-            </Animated.View>
-          )}
-
-          <View style={styles.tipCard}>
-            <Text style={styles.tipText}>{tips[currentServiceIndex % tips.length].text}</Text>
-          </View>
-
-          <Text style={styles.sectionTitle}>Comida</Text>
-          <ScrollView horizontal contentContainerStyle={styles.foodScrollContainer}>
-            {[...Array(5)].map((_, index) => (
-              <TouchableOpacity key={index} onPress={() => handleComidaPress(index + 1)}>
-                <View style={styles.foodCard}>
-                  <Image source={require('./imagenes/comida.jpg')} style={styles.foodImage} />
-                  <Text style={styles.foodTitle}>Comida</Text>
-                </View>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
-
-          <Text style={styles.sectionTitle}>Juguetes</Text>
-          <ScrollView horizontal contentContainerStyle={styles.foodScrollContainer}>
-            {[...Array(5)].map((_, index) => (
-              <TouchableOpacity key={index} onPress={() => handleJuguetePress(index + 1)}>
-                <View style={styles.foodCard}>
-                  <Image source={require('./imagenes/juguete-para-perro-puppis-con-sonido.png')} style={styles.foodImage} />
-                  <Text style={styles.foodTitle}>Juguete</Text>
-                </View>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
-
-          <Text style={styles.sectionTitle}>Accesorios</Text>
-          <ScrollView horizontal contentContainerStyle={styles.foodScrollContainer}>
-            {[...Array(5)].map((_, index) => (
-              <TouchableOpacity key={index} onPress={() => handleAccesoriosPress(index + 1)}>
-                <View style={styles.foodCard}>
-                  <Image source={require('./imagenes/toypingui.jpg')} style={styles.foodImage} />
-                  <Text style={styles.foodTitle}>Accesorios</Text>
-                </View>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
-
-          <Text style={styles.sectionTitle}>Paseos</Text>
-          <ScrollView horizontal contentContainerStyle={styles.foodScrollContainer}>
-            {[...Array(5)].map((_, index) => (
-              <TouchableOpacity key={index} onPress={() => handlePaseosPress(index + 1)}>
-                <View style={styles.foodCard}>
-                  <Image source={require('./imagenes/paseos.jpg')} style={styles.foodImage} />
-                  <Text style={styles.foodTitle}>Paseos</Text>
-                </View>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
-
-          <Text style={styles.sectionTitle}>Adiestramiento</Text>
-          <ScrollView horizontal contentContainerStyle={styles.foodScrollContainer}>
-            {[...Array(5)].map((_, index) => (
-              <TouchableOpacity key={index} onPress={() => handleAdiestramientoPress(index + 1)}>
-                <View style={styles.foodCard}>
-                  <Image source={require('./imagenes/adiestramiento.jpg')} style={styles.foodImage} />
-                  <Text style={styles.foodTitle}>Adiestramiento</Text>
-                </View>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
-
-        </ScrollView>
-
-        <TouchableOpacity
-          style={styles.profileBar}
-          onPress={() => navigation.navigate('MiPerfil')}
-        >
-          <Text style={styles.profileText}>MI PERFIL</Text>
+        {services.length > 0 && (
+          <View style={styles.serviceCardContainer}>
+            <Animated.View style={[styles.serviceContainer, { transform: [{ translateY: slideAnim }], opacity: fadeAnim }]}>
+        <TouchableOpacity onPress={() => navigation.navigate(services[currentServiceIndex].route)}>
+          <ImageBackground source={services[currentServiceIndex].image} style={styles.serviceImage}>
+            <Text style={styles.serviceTitle}>{services[currentServiceIndex].title}</Text>
+          </ImageBackground>
         </TouchableOpacity>
-      </View>
+      </Animated.View>
+          </View>
+        )}
+
+        <View style={styles.tipCard}>
+          <Text style={styles.tipText}>{tips[currentServiceIndex % tips.length].text}</Text>
+        </View>
+
+        {/* Productos de comida */}
+        <View style={styles.productContainer}>
+          <Text style={styles.productTitle}>Productos de Comida</Text>
+          <ScrollView horizontal={true}>
+            {foodProducts.map(product => (
+              <TouchableOpacity key={product.id} style={styles.productCard} onPress={() => handleProductPress(product.id, product.vetId)}>
+                <Image source={{ uri: product.Foto }} style={styles.productImage} />
+                <Text style={styles.productName}>{product.Nombre}</Text>
+                <Text style={styles.productPrice}>{product.Precio}</Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </View>
+
+        {/* Productos de accesorios */}
+        <View style={styles.productContainer}>
+          <Text style={styles.productTitle}>Productos de Accesorios</Text>
+          <ScrollView horizontal={true}>
+            {accessoryProducts.map(product => (
+              <TouchableOpacity key={product.id} style={styles.productCard} onPress={() => handleProductPress(product.id, product.vetId)}>
+                <Image source={{ uri: product.Foto }} style={styles.productImage} />
+                <Text style={styles.productName}>{product.Nombre}</Text>
+                <Text style={styles.productPrice}>{product.Precio}</Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </View>
+
+      </ScrollView>
+
+      <TouchableOpacity
+        style={styles.profileBar}
+        onPress={() => navigation.navigate('MiPerfil')}
+      >
+        <Text style={styles.profileText}>MI PERFIL</Text>
+      </TouchableOpacity>
     </ImageBackground>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  backgroundImage: {
     flex: 1,
+    resizeMode: 'cover',
   },
-  scrollContainer: {
+  container: {
     flexGrow: 1,
-    backgroundColor: 'rgba(255,255,255,0.7)',
-    padding: 16,
-    alignItems: 'center',
   },
   headerImage: {
     width: '100%',
     height: 150,
   },
   searchContainer: {
-    backgroundColor: '#fff',
-    padding: 5,
-    borderRadius: 10,
-    margin: 16,
-    elevation: 5,
-    width: '90%',
+    padding: 10,
   },
   searchInput: {
-    fontSize: 16,
+    height: 40,
+    paddingHorizontal: 10,
+    color: '#000000',
+    backgroundColor: '#f5f5f5',
   },
-  contentContainer: {
-    flex: 1,
-    justifyContent: 'center',
+  serviceCardContainer: {
     alignItems: 'center',
   },
   serviceCard: {
-    width: '90%',
-    backgroundColor: 'white',
-    borderRadius: 8,
-    overflow: 'hidden',
-    elevation: 5,
+    width: 300,
+    height: 200,
+    marginVertical: 10,
     alignItems: 'center',
-    padding: 10,
-    marginBottom: 20,
-    borderWidth: 1,
-    borderColor: '#ccc',
   },
   serviceImage: {
-    height: 100,
-    width: '10%',
+    width: 380,
+    height: 150,
     resizeMode: 'cover',
+    borderRadius: 5,
+    borderColor: 'gray',
+    borderWidth: 1,
   },
   serviceTitle: {
-    fontSize: 16,
-    fontWeight: 'normal',
-    marginVertical: 8,
-    color: 'black',
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#fff',
     textAlign: 'center',
+    textShadowColor: 'rgba(0, 0, 0, 0.75)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 2,
   },
   tipCard: {
-    width: '90%',
-    backgroundColor: '#2F9FFA',
-    borderRadius: 8,
-    marginBottom: 24,
-    padding: 16,
-    elevation: 5,
+    backgroundColor: '#f9f9f9',
+    padding: 15,
+    borderRadius: 5,
+    margin: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 2,
   },
   tipText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: 'white',
-    textAlign: 'center',
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginVertical: 16,
-    textAlign: 'center',
-    color: 'black',
-  },
-  foodScrollContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-  },
-  foodCard: {
-    alignItems: 'center',
-    marginHorizontal: 10,
-  },
-  foodImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 10,
-  },
-  foodTitle: {
     fontSize: 16,
-    fontWeight: 'normal',
-    color: 'black',
-    marginTop: 5,
+    textAlign: 'center',
+    color: '#333',
   },
   profileBar: {
-    backgroundColor: 'white',
-    paddingVertical: 10,
+    backgroundColor: '#333',
+    padding: 10,
     alignItems: 'center',
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
   },
   profileText: {
+    color: '#fff',
     fontSize: 18,
-    fontWeight: 'normal',
-    color: 'black',
+    fontWeight: 'bold',
   },
-  backgroundImage: {
-    flex: 1,
+  productContainer: {
+    marginTop: 20,
+    marginLeft: 20,
+  },
+  productTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  productCard: {
+    marginRight: 10,
+    alignItems: 'center',
+    backgroundColor: '#ffffff',
+    borderRadius: 10,
+    padding: 10,
+    width: 150,
+    height: 200,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 3,
+  },
+  productImage: {
+    width: 120,
+    height: 120,
     resizeMode: 'cover',
+    borderRadius: 10,
+    marginBottom: 10,
+  },
+  productName: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 5,
+  },
+  productPrice: {
+    fontSize: 12,
+    color: '#888',
+    textAlign: 'center',
   },
 });
 
