@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ImageBackground, Image } from 'react-native';
 import auth from '@react-native-firebase/auth';
+import Icon from 'react-native-vector-icons/FontAwesome5';
 
 const MiPerfil = ({ navigation }) => {
   const goToMiInformacion = () => {
@@ -30,104 +31,117 @@ const MiPerfil = ({ navigation }) => {
   const handleCerrarSesion = async () => {
     try {
       await auth().signOut();
-      // Navega a la pantalla de inicio de sesión después de cerrar sesión
       navigation.navigate('Login');
     } catch (error) {
       console.error('Error al cerrar sesión', error);
     }
   };
 
-  const renderOption = (imageSource, text, onPress) => (
+  const renderOption = (iconName, text, onPress) => (
     <TouchableOpacity style={styles.option} onPress={onPress} key={text}>
-      <View style={styles.rowContainer}>
-        <Image source={imageSource} style={styles.icon} />
-        <Text style={styles.optionText}>{text}</Text>
-      </View>
-      <View style={styles.separator}></View>
+      <Icon name={iconName} size={24} color="#000000" style={styles.icon} />
+      <Text style={styles.optionText}>{text}</Text>
     </TouchableOpacity>
   );
 
   return (
-    <ImageBackground
-      source={require('../imagenes/fondoadminpanel.jpg')} // Fondo de pantalla
-      style={styles.backgroundImage}
-    >
-      <Image source={require('../imagenes/fondoperfil.jpg')} style={styles.headerImage} />
-
-      <ScrollView contentContainerStyle={styles.container}>
-        {renderOption(require('../imagenes/informacion.png'), 'Mi Perfil', goToMiInformacion)}
-        {renderOption(require('../imagenes/mascotas.png'), 'Mis Mascotas', goToMisMascotas)}
-        {renderOption(require('../imagenes/cupones.png'), 'Cupones', goToCupones)}
-        {renderOption(require('../imagenes/notificaciones.png'), 'Notificaciones', goToNotificaciones)}
-        {renderOption(require('../imagenes/politicas.png'), 'Políticas', goToPolíticas)}
-        {renderOption(require('../imagenes/calificar.png'), 'Calificanos', goToCalificar)}
-        
-        {/* Botón de cerrar sesión */}
-        <TouchableOpacity style={styles.logoutButton} onPress={handleCerrarSesion}>
-          <Text style={styles.logoutButtonText}>Cerrar Sesión</Text>
-        </TouchableOpacity>
-      </ScrollView>
-    </ImageBackground>
+    <View style={styles.container}>
+      <ImageBackground
+        source={require('../imagenes/fondoadminpanel.jpg')}
+        style={styles.backgroundImage}
+      >
+        <Image source={require('../imagenes/fondoperfil.jpg')} style={styles.logo} />
+        <ScrollView contentContainerStyle={styles.contentContainer}>
+          <View style={styles.innerContainer}>
+            <Text style={styles.title}>Mi Perfil</Text>
+            {renderOption('user', 'Mi Información', goToMiInformacion)}
+            {renderOption('paw', 'Mis Mascotas', goToMisMascotas)}
+            {renderOption('ticket-alt', 'Cupones', goToCupones)}
+            {renderOption('bell', 'Notificaciones', goToNotificaciones)}
+            {renderOption('file-alt', 'Políticas', goToPolíticas)}
+            {renderOption('star', 'Calificanos', goToCalificar)}
+            <TouchableOpacity style={styles.logoutButton} onPress={handleCerrarSesion}>
+              <Text style={styles.logoutButtonText}>Cerrar Sesión</Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </ImageBackground>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingVertical: 40,
+    flex: 1,
   },
   backgroundImage: {
     flex: 1,
     resizeMode: 'cover',
     justifyContent: 'center',
   },
-  headerImage: {
+  logo: {
     width: '100%',
-    height: 150, // Ajusta la altura según tus preferencias
+    height: 150,
+  },
+  contentContainer: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 40,
+    paddingHorizontal: 20,
+  },
+  innerContainer: {
+    width: '100%',
+    maxWidth: 400,
+    backgroundColor: '#FFFFFF',
+    padding: 20,
+    borderRadius: 20,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  title: {
+    fontSize: 32,
+    fontWeight: 'bold',
+    color: 'black',
+    marginBottom: 20,
+    textAlign: 'center',
   },
   option: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 20,
-    width: '80%', // O ajusta según tus preferencias
-  },
-  rowContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'flex-start',
     width: '100%',
+    marginBottom: 15,
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    borderRadius: 10,
+    backgroundColor: '#F3F3F3',
   },
   icon: {
-    width: 30,
-    height: 30,
-    marginRight: 10,
+    marginRight: 15,
   },
   optionText: {
     color: 'black',
-    fontSize: 20,
-    fontWeight: '400',
-    textAlignVertical: 'center',
-  },
-  separator: {
-    height: 1,
-    backgroundColor: 'black',
-    width: '80%',
-    alignSelf: 'center',
-    marginVertical: 10,
+    fontSize: 18, // Reducido el tamaño de la fuente
   },
   logoutButton: {
-    backgroundColor: '#2F9FFA',
-    padding: 12,
-    borderRadius: 8,
-    width: '80%',
-    alignItems: 'center',
+    backgroundColor: '#FF6F61',
+    paddingVertical: 15,
+    paddingHorizontal: 30,
+    borderRadius: 10,
     marginTop: 20,
+    alignItems: 'center',
   },
   logoutButtonText: {
     color: '#FFFFFF',
+    fontSize: 20,
     fontWeight: 'bold',
-    fontSize: 16,
   },
 });
 

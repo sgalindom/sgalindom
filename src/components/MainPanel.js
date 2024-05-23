@@ -3,6 +3,9 @@
   import { useFocusEffect } from '@react-navigation/native';
   import auth from '@react-native-firebase/auth';
   import firestore from '@react-native-firebase/firestore';
+  import Icon from 'react-native-vector-icons/Ionicons';
+  
+
 
   const MainPanel = ({ navigation }) => {
     const [userName, setUserName] = useState('');
@@ -104,12 +107,12 @@
           Animated.sequence([
             Animated.timing(fadeAnim, {
               toValue: 0,
-              duration: 500, // Disminuí la duración de la animación de desvanecimiento
+              duration: 100, // Reduje la duración de la animación de desvanecimiento a 100ms
               useNativeDriver: true,
             }),
             Animated.timing(slideAnim, {
               toValue: -300,
-              duration: 1500, // Mantuve la duración del desplazamiento
+              duration: 500, // Reduje la duración del desplazamiento a 500ms
               useNativeDriver: true,
               easing: Easing.inOut(Easing.ease),
             }),
@@ -120,27 +123,25 @@
             }),
             Animated.timing(slideAnim, {
               toValue: 0,
-              duration: 1500, // Mantuve la duración del desplazamiento
+              duration: 500, // Reduje la duración del desplazamiento a 500ms
               useNativeDriver: true,
               easing: Easing.inOut(Easing.ease),
             }),
             Animated.timing(fadeAnim, {
               toValue: 1,
-              duration: 500, // Disminuí la duración de la animación de desvanecimiento
+              duration: 100, // Reduje la duración de la animación de desvanecimiento a 100ms
               useNativeDriver: true,
             }),
           ]).start();
     
           setTimeout(() => {
             setCurrentServiceIndex(prevIndex => (prevIndex + 1) % services.length);
-          }, 500); // Mantuve el tiempo entre cada cambio de servicio a 500ms
+          }, 1000); // Reduje el tiempo entre cada cambio de servicio a 1000ms (1 segundo)
         }, 8000); // Mantuve el tiempo total entre cada cambio de servicio a 8 segundos
     
         return () => clearInterval(intervalId);
       }
     }, [slideAnim, fadeAnim, services.length]);
-    
-    
 
     useEffect(() => {
       const fetchProducts = async () => {
@@ -287,8 +288,18 @@
     return (
       <ImageBackground source={require('./imagenes/fondomain.jpg')} style={styles.backgroundImage}>
         <ScrollView contentContainerStyle={styles.container}>
-          <Image source={require('./imagenes/fondoperfil.jpg')} style={styles.headerImage} />
-
+          <View style={styles.headerContainer}>
+            <Image source={require('./imagenes/fondoperfil.jpg')} style={styles.headerImage} />
+            {/* Ícono de perfil en la esquina superior izquierda de la imagen */}
+            <View style={styles.profileIconContainer}>
+              <TouchableOpacity onPress={() => navigation.navigate('MiPerfil')}>
+                <View style={styles.profileIconCircle}>
+                  <Icon name="person" size={30} color="#fff" />
+                </View>
+              </TouchableOpacity>
+            </View>
+          </View>
+    
           <View style={styles.searchContainer}>
             <TextInput
               style={styles.searchInput}
@@ -298,16 +309,16 @@
               placeholderTextColor="#000000"
             />
           </View>
-
+    
           {services.length > 0 && (
             <View style={styles.serviceCardContainer}>
               <Animated.View style={[styles.serviceContainer, { transform: [{ translateY: slideAnim }], opacity: fadeAnim }]}>
-          <TouchableOpacity onPress={() => navigation.navigate(services[currentServiceIndex].route)}>
-            <ImageBackground source={services[currentServiceIndex].image} style={styles.serviceImage}>
-              <Text style={styles.serviceTitle}>{services[currentServiceIndex].title}</Text>
-            </ImageBackground>
-          </TouchableOpacity>
-        </Animated.View>
+                <TouchableOpacity onPress={() => navigation.navigate(services[currentServiceIndex].route)}>
+                  <ImageBackground source={services[currentServiceIndex].image} style={styles.serviceImage}>
+                    <Text style={styles.serviceTitle}>{services[currentServiceIndex].title}</Text>
+                  </ImageBackground>
+                </TouchableOpacity>
+              </Animated.View>
             </View>
           )}
     
@@ -317,21 +328,26 @@
     
           {/* Productos de comida */}
           <View style={styles.productContainer}>
+            <View style={styles.productTitleContainer}>
+              <Icon name="cart" size={24} color="#000" style={{ marginRight: 5 }} />
             <Text style={styles.productTitle}>Productos de Comida</Text>
+          </View>
             <ScrollView horizontal={true}>
-              {foodProducts.map(product => (
-                <TouchableOpacity key={product.id} style={styles.productCard} onPress={() => handleProductPress(product.id, product.vetId, 'comida')}>
+             {foodProducts.map(product => (
+              <TouchableOpacity key={product.id} style={styles.productCard} onPress={() => handleProductPress(product.id, product.vetId, 'comida')}>
                   <Image source={{ uri: product.Foto }} style={styles.productImage} />
-                  <Text style={styles.productName}>{product.Nombre}</Text>
-                  <Text style={styles.productPrice}>${product.Precio}</Text>
-                </TouchableOpacity>
-              ))}
+                    <Text style={styles.productName}>{product.Nombre}</Text>
+                    <Text style={styles.productPrice}>${product.Precio}</Text>
+              </TouchableOpacity>
+               ))}
             </ScrollView>
           </View>
-    
-          {/* Productos de accesorios */}
+
           <View style={styles.productContainer}>
-            <Text style={styles.productTitle}>Productos de Accesorios</Text>
+            <View style={styles.productTitleContainer}>
+              <Icon name="cart" size={24} color="#000" style={{ marginRight: 5 }} />
+              <Text style={styles.productTitle}>Productos de Accesorios</Text>
+            </View>
             <ScrollView horizontal={true}>
               {accessoryProducts.map(product => (
                 <TouchableOpacity key={product.id} style={styles.productCard} onPress={() => handleProductPress(product.id, product.vetId, 'accesorios')}>
@@ -342,10 +358,12 @@
               ))}
             </ScrollView>
           </View>
-    
-          {/* Productos */}
+
           <View style={styles.productContainer}>
-            <Text style={styles.productTitle}>Productos</Text>
+            <View style={styles.productTitleContainer}>
+              <Icon name="cart" size={24} color="#000" style={{ marginRight: 5 }} />
+              <Text style={styles.productTitle}>Productos</Text>
+            </View>
             <ScrollView horizontal={true}>
               {allProductProducts.map(product => (
                 <TouchableOpacity key={product.id} style={styles.productCard} onPress={() => handleProductPress(product.id, product.vetId, 'productos')}>
@@ -356,10 +374,12 @@
               ))}
             </ScrollView>
           </View>
-    
-          {/* Veterinarias */}
+
           <View style={styles.veterinariasContainer}>
-            <Text style={styles.veterinariasTitle}>Veterinarias</Text>
+            <View style={styles.veterinariasTitleContainer}>
+              <Icon name="paw" size={24} color="#000" style={{ marginRight: 5 }} />
+              <Text style={styles.veterinariasTitle}>Veterinarias</Text>
+            </View>
             <ScrollView horizontal={true}>
               {veterinarias.map(vet => (
                 <TouchableOpacity key={vet.id} style={styles.veterinariaCard} onPress={() => handleVetPress(vet.id)}>
@@ -369,10 +389,12 @@
               ))}
             </ScrollView>
           </View>
-    
-          {/* Guarderías y Adiestramiento */}
+
           <View style={styles.guarderiasAdiestramientoContainer}>
-            <Text style={styles.guarderiasAdiestramientoTitle}>Guarderías y Adiestramiento</Text>
+            <View style={styles.guarderiasAdiestramientoTitleContainer}>
+              <Icon name="home" size={24} color="#000" style={{ marginRight: 5 }} />
+              <Text style={styles.guarderiasAdiestramientoTitle}>Guarderías y Adiestramiento</Text>
+            </View>
             <ScrollView horizontal={true}>
               {guarderiasAdiestramiento.map(guarderia => (
                 <TouchableOpacity key={guarderia.id} style={styles.guarderiaAdiestramientoCard} onPress={() => handleGuarderiaAdiestramientoPress(guarderia.id)}>
@@ -383,13 +405,6 @@
             </ScrollView>
           </View>
         </ScrollView>
-    
-        <TouchableOpacity
-          style={styles.profileBar}
-          onPress={() => navigation.navigate('MiPerfil')}
-        >
-          <Text style={styles.profileText}>MI PERFIL</Text>
-        </TouchableOpacity>
       </ImageBackground>
     );
   };
@@ -402,9 +417,29 @@
     container: {
       flexGrow: 1,
     },
+    headerContainer: {
+      position: 'relative',
+    },
     headerImage: {
       width: '100%',
       height: 150,
+    },
+    profileIconContainer: {
+      position: 'absolute',
+      top: 10,
+      left: 10,
+      backgroundColor: '#FF5733', // Color de fondo vibrante
+      borderRadius: 30,
+      padding: 5,
+      elevation: 3,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.2,
+      shadowRadius: 5,
+    },
+    profileIconCircle: {
+      backgroundColor: 'transparent',
+      borderRadius: 30,
     },
     searchContainer: {
       padding: 10,
@@ -418,19 +453,14 @@
     serviceCardContainer: {
       alignItems: 'center',
     },
-    serviceCard: {
-      width: 300,
-      height: 200,
-      marginVertical: 10,
-      alignItems: 'center',
+    serviceContainer: {
+      width: '100%',
     },
     serviceImage: {
-      width: 380,
-      height: 150,
-      resizeMode: 'cover',
-      borderRadius: 5,
-      borderColor: 'gray',
-      borderWidth: 1,
+      width: '100%',
+      height: 200,
+      justifyContent: 'center',
+      alignItems: 'center',
     },
     serviceTitle: {
       fontSize: 24,
@@ -457,20 +487,23 @@
       textAlign: 'center',
       color: '#333',
     },
-
-
-
-
-
     productContainer: {
       marginVertical: 10,
+    },
+    productTitleContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: 5,
+    },
+    productTitleIcon: {
+      marginRight: 5,
     },
     productTitle: {
       fontSize: 20,
       fontWeight: 'bold',
       paddingHorizontal: 10,
       marginBottom: 5,
-      color: '#000000', // Color negro para el título
+      color: '#000000',
     },
     productCard: {
       width: 150,
@@ -493,7 +526,7 @@
       fontSize: 14,
       fontWeight: 'bold',
       marginTop: 5,
-      color: '#000000', // Color negro para el nombre del producto
+      color: '#000000',
     },
     productPrice: {
       fontSize: 12,
@@ -503,12 +536,20 @@
     veterinariasContainer: {
       marginVertical: 10,
     },
+    veterinariasTitleContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: 5,
+    },
+    veterinariasTitleIcon: {
+      marginRight: 5,
+    },
     veterinariasTitle: {
       fontSize: 20,
       fontWeight: 'bold',
       paddingHorizontal: 10,
       marginBottom: 5,
-      color: '#000000', // Color negro para el título
+      color: '#000000',
     },
     veterinariaCard: {
       width: 150,
@@ -531,17 +572,26 @@
       fontSize: 14,
       fontWeight: 'bold',
       marginTop: 5,
-      color: '#000000', // Color negro para el nombre de la veterinaria
+      color: '#000000',
     },
+  
     guarderiasAdiestramientoContainer: {
       marginVertical: 10,
+    },
+    guarderiasAdiestramientoTitleContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: 5,
+    },
+    guarderiasAdiestramientoTitleIcon: {
+      marginRight: 5,
     },
     guarderiasAdiestramientoTitle: {
       fontSize: 20,
       fontWeight: 'bold',
       paddingHorizontal: 10,
       marginBottom: 5,
-      color: '#000000', // Color negro para el título
+      color: 'black',
     },
     guarderiaAdiestramientoCard: {
       width: 150,
@@ -564,26 +614,8 @@
       fontSize: 14,
       fontWeight: 'bold',
       marginTop: 5,
-      color: '#000000', // Color negro para el nombre de la guardería/adiestramiento
-    },
-
-
-
-    
-    profileBar: {
-      position: 'absolute',
-      bottom: 20,
-      alignSelf: 'center',
-      backgroundColor: '#0066cc',
-      paddingHorizontal: 20,
-      paddingVertical: 10,
-      borderRadius: 30,
-    },
-    profileText: {
-      color: '#ffffff',
-      fontSize: 16,
-      fontWeight: 'bold',
+      color: '#000000',
     },
   });
-
+  
   export default MainPanel;

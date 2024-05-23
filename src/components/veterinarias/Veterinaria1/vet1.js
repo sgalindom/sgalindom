@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Image, ScrollView, ImageBackground, Linking } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 const VeterinariaScreen = () => {
   const navigation = useNavigation();
@@ -9,20 +10,6 @@ const VeterinariaScreen = () => {
   const petShopImage = require('../../imagenes/petshop.jpg');
   const ubicacionImage = require('../../imagenes/ubicacion.jpg');
   const backgroundImage = require('../../imagenes/color.jpg');
-  
-
-  const sharedCardStyle = {
-    borderRadius: 8,
-    overflow: 'hidden',
-    margin: 16,
-    width: 180,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 2,
-    elevation: 2,
-    backgroundColor: 'white',
-  };
 
   const goToDomicilio = () => {
     navigation.navigate('vet1dr');
@@ -45,68 +32,46 @@ const VeterinariaScreen = () => {
     navigation.navigate('vet1calificacion');
   };
 
-  const renderCalificarButton = () => (
-    <TouchableOpacity
-      style={[styles.calificarButton, { marginTop: 20, width: '40%' }]}
-      onPress={handleCalificar}
-    >
-      <Text style={styles.calificarButtonText}>Califícanos</Text>
-    </TouchableOpacity>
-  );
-
   return (
     <ImageBackground source={backgroundImage} style={styles.backgroundImage}>
       <ScrollView contentContainerStyle={styles.container}>
-        <Text style={styles.title}>Conoce los servicios de Animal Zone</Text>
-        <View style={styles.row}>
-          <TouchableOpacity
-            style={[styles.servicioCard, sharedCardStyle]}
-            onPress={goToDomicilio}
-          >
-            <View style={styles.imageContainer}>
-              <Image source={doctorImage} style={styles.servicioImage} />
-            </View>
-            <Text style={styles.servicioTitle}>Consulta Medica</Text>
-            <Text style={styles.servicioDescription}>Consulta médica para tu mascota en casa.</Text>
+        <View style={styles.header}>
+          <Text style={styles.title}>¡Bienvenido a Animal Zone!</Text>
+          <Text style={styles.subtitle}>Descubre nuestros servicios</Text>
+        </View>
+        <View style={styles.servicesContainer}>
+          <TouchableOpacity style={styles.serviceCard} onPress={goToDomicilio}>
+            <Image source={doctorImage} style={styles.serviceImage} />
+            <Text style={styles.serviceTitle}>Consulta Médica</Text>
+            <Text style={styles.serviceDescription}>Consulta médica para tu mascota en casa.</Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.servicioCard, sharedCardStyle]}
-            onPress={goToPetShop}
-          >
-            <View style={styles.imageContainer}>
-              <Image source={petShopImage} style={styles.servicioImage} />
-            </View>
-            <Text style={styles.servicioTitle}>Explorar Pet Shop</Text>
-            <Text style={styles.servicioDescription}>Encuentra productos y accesorios para tu mascota.</Text>
+          <TouchableOpacity style={styles.serviceCard} onPress={goToBañado}>
+            <Image source={bañadoImage} style={styles.serviceImage} />
+            <Text style={styles.serviceTitle}>Servicio de Bañado</Text>
+            <Text style={styles.serviceDescription}>Baño y cuidado higiénico para tu mascota.</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.serviceCard} onPress={goToPetShop}>
+            <Image source={petShopImage} style={styles.serviceImage} />
+            <Text style={styles.serviceTitle}>Pet Shop</Text>
+            <Text style={styles.serviceDescription}>Encuentra productos y accesorios para tu mascota.</Text>
           </TouchableOpacity>
         </View>
-        <View style={styles.row}>
-          <TouchableOpacity
-            style={[styles.servicioCard, sharedCardStyle]}
-            onPress={goToBañado}
-          >
-            <View style={styles.imageContainer}>
-              <Image source={bañadoImage} style={styles.servicioImage} />
-            </View>
-            <Text style={styles.servicioTitle}>Servicio de Bañado de perros</Text>
-            <Text style={styles.servicioDescription}>Baño y cuidado higiénico para tu mascota.</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.servicioCard, sharedCardStyle, styles.ubicanosCard]}
-            onPress={goToUbicanos}
-          >
-            <View style={styles.imageContainer}>
-              <Image source={ubicacionImage} style={styles.servicioImage} />
-            </View>
-            <Text style={styles.servicioTitle}>Ubícanos</Text>
-            <Text style={styles.servicioDescription}>Encuéntranos en el mapa y visítanos.</Text>
+        <View style={styles.locationContainer}>
+          <TouchableOpacity style={styles.locationCard} onPress={goToUbicanos}>
+            <Image source={ubicacionImage} style={styles.locationImage} />
+            <Text style={styles.locationTitle}>Ubícanos</Text>
+            <Text style={styles.locationDescription}>Encuentra nuestra ubicación y visítanos.</Text>
           </TouchableOpacity>
         </View>
-        {renderCalificarButton()}
+        <TouchableOpacity style={styles.rateButton} onPress={handleCalificar}>
+          <Icon name="star" size={24} color="white" />
+          <Text style={styles.rateButtonText}>Califica nuestro servicio</Text>
+        </TouchableOpacity>
       </ScrollView>
     </ImageBackground>
   );
 };
+
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
@@ -116,78 +81,97 @@ const styles = StyleSheet.create({
     flex: 1,
     resizeMode: 'cover',
     justifyContent: 'center',
-    backgroundColor: '#2AC9FA',
+  },
+  header: {
+    alignItems: 'center',
+    marginTop: 60,
   },
   title: {
-    fontSize: 24,
+    fontSize: 36,
     fontWeight: 'bold',
-    color: 'white',
-    marginTop: 20,
+    color: 'black',
     marginBottom: 10,
     textAlign: 'center',
   },
-  row: {
+  subtitle: {
+    fontSize: 18,
+    color: 'black',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  servicesContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    padding: 16,
+    justifyContent: 'space-around',
+    marginBottom: 40,
   },
-  servicioCard: {
-    borderRadius: 8,
-    overflow: 'hidden',
-    margin: 16,
-    width: 180,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 2,
-    elevation: 2,
-    backgroundColor: 'white',
+  serviceCard: {
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.7)',
+    borderRadius: 10,
+    padding: 20,
+    width: '30%',
   },
-  imageContainer: {
-    width: '100%',
-    aspectRatio: 16 / 9,
-    overflow: 'hidden',
+  serviceImage: {
+    width: 100,
+    height: 100,
+    marginBottom: 10,
   },
-  servicioImage: {
-    width: '100%',
-    height: '100%',
-    resizeMode: 'cover',
-  },
-  servicioTitle: {
-    fontSize: 16,
+  serviceTitle: {
+    fontSize: 18,
     fontWeight: 'bold',
-    marginVertical: 8,
-    marginLeft: 8,
-    marginRight: 8,
     textAlign: 'center',
-    color: 'black', // Letra en negro
+    marginBottom: 5,
+    color: 'black',
   },
-  servicioDescription: {
-    fontSize: 14,
-    marginVertical: 8,
-    marginLeft: 8,
-    marginRight: 8,
-    color: 'black', // Letra en negro
-  },
-  calificarButton: {
-    backgroundColor: '#2AC9FA',
-    padding: 10,
-    borderRadius: 8,
-    width: '40%',
-    alignSelf: 'center',
-    marginTop: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.5,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  calificarButtonText: {
-    color: 'white',
-    fontWeight: 'bold',
+  serviceDescription: {
     fontSize: 14,
     textAlign: 'center',
+    color: 'black',
   },
-});
-
-export default VeterinariaScreen;
+  locationContainer: {
+  alignItems: 'center',
+  marginBottom: 40,
+  },
+  locationCard: {
+  alignItems: 'center',
+  backgroundColor: 'rgba(255, 255, 255, 0.7)',
+  borderRadius: 10,
+  padding: 20,
+  width: '80%',
+  },
+  locationImage: {
+  width: 120,
+  height: 120,
+  marginBottom: 20,
+  },
+  locationTitle: {
+  fontSize: 24,
+  fontWeight: 'bold',
+  color: '#2AC9FA',
+  marginBottom: 10,
+  textAlign: 'center',
+  },
+  locationDescription: {
+  fontSize: 16,
+  textAlign: 'center',
+  color: 'black',
+  },
+  rateButton: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'center',
+  backgroundColor: '#2AC9FA',
+  borderRadius: 25,
+  paddingVertical: 15,
+  paddingHorizontal: 30,
+  marginBottom: 60,
+  },
+  rateButtonText: {
+  fontSize: 18,
+  fontWeight: 'bold',
+  color: 'white',
+  marginLeft: 10,
+  },
+  });
+  
+  export default VeterinariaScreen;

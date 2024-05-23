@@ -1,19 +1,12 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, ImageBackground } from 'react-native';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 const PaquetesPaseos = ({ navigation }) => {
   const diarioImage = require('../imagenes/Diario.jpg');
   const semanalImage = require('../imagenes/semanal.jpg');
   const mensualImage = require('../imagenes/mensual.jpg');
   const fondoPaquetesImage = require('../imagenes/fondopanelbaño.jpg');
-
-  const sharedButtonStyle = {
-    backgroundColor: '#2F9FFA',
-    padding: 10,
-    borderRadius: 4,
-    width: 280,
-    margin: 10,
-  };
 
   const navigateToSolicitudPaseo = (paquete) => {
     navigation.navigate('SolicitudPaseo', { paquete });
@@ -22,42 +15,33 @@ const PaquetesPaseos = ({ navigation }) => {
   return (
     <ImageBackground source={fondoPaquetesImage} style={styles.backgroundImage}>
       <ScrollView contentContainerStyle={styles.container}>
-        <Text style={styles.title}>Elige un paquete de paseos:</Text>
-        <TouchableOpacity
-          style={styles.paqueteCard}
-          onPress={() => navigateToSolicitudPaseo('Diario')}
-        >
+        <Text style={styles.title}>Descubre nuestros paquetes de paseos</Text>
+        <TouchableOpacity style={styles.paqueteCard} onPress={() => navigateToSolicitudPaseo('Diario')}>
           <Image source={diarioImage} style={styles.paqueteImage} />
-          <Text style={styles.paqueteTitle}>Paquete Diario</Text>
-          <Text style={styles.paqueteDescription}>Paseos diarios para tu perro.</Text>
-          <Text style={styles.paquetePrice}>$12.000 por día</Text>
-          <TouchableOpacity style={sharedButtonStyle} onPress={() => navigateToSolicitudPaseo('Diario')}>
-            <Text style={styles.solicitarButtonText}>Solicitar</Text>
-          </TouchableOpacity>
+          <View style={styles.paqueteInfo}>
+            <Text style={styles.paqueteTitle}>Paseos Diarios</Text>
+            <Text style={styles.paqueteDescription}>¡Haz feliz a tu perro todos los días!</Text>
+            <Text style={styles.paquetePrice}>$12.000 por día</Text>
+          </View>
+          <Icon name="arrow-forward" size={20} color="#2F9FFA" style={styles.icon} />
         </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.paqueteCard}
-          onPress={() => navigateToSolicitudPaseo('Semanal')}
-        >
+        <TouchableOpacity style={styles.paqueteCard} onPress={() => navigateToSolicitudPaseo('Semanal')}>
           <Image source={semanalImage} style={styles.paqueteImage} />
-          <Text style={styles.paqueteTitle}>Paquete Semanal</Text>
-          <Text style={styles.paqueteDescription}>Paseos semanales para tu perro.</Text>
-          <Text style={styles.paquetePrice}>$60.000 por semana</Text>
-          <TouchableOpacity style={sharedButtonStyle} onPress={() => navigateToSolicitudPaseo('Semanal')}>
-            <Text style={styles.solicitarButtonText}>Solicitar</Text>
-          </TouchableOpacity>
+          <View style={styles.paqueteInfo}>
+            <Text style={styles.paqueteTitle}>Paseos Semanales</Text>
+            <Text style={styles.paqueteDescription}>Diversión asegurada para tu amigo peludo</Text>
+            <Text style={styles.paquetePrice}>$60.000 por semana</Text>
+          </View>
+          <Icon name="arrow-forward" size={20} color="#2F9FFA" style={styles.icon} />
         </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.paqueteCard}
-          onPress={() => navigateToSolicitudPaseo('Mensual')}
-        >
+        <TouchableOpacity style={styles.paqueteCard} onPress={() => navigateToSolicitudPaseo('Mensual')}>
           <Image source={mensualImage} style={styles.paqueteImage} />
-          <Text style={styles.paqueteTitle}>Paquete Mensual</Text>
-          <Text style={styles.paqueteDescription}>Paseos mensuales para tu perro.</Text>
-          <Text style={styles.paquetePrice}>$240.000 por mes</Text>
-          <TouchableOpacity style={sharedButtonStyle} onPress={() => navigateToSolicitudPaseo('Mensual')}>
-            <Text style={styles.solicitarButtonText}>Solicitar</Text>
-          </TouchableOpacity>
+          <View style={styles.paqueteInfo}>
+            <Text style={styles.paqueteTitle}>Paseos Mensuales</Text>
+            <Text style={styles.paqueteDescription}>Para tener a tu perro siempre feliz y activo</Text>
+            <Text style={styles.paquetePrice}>$240.000 por mes</Text>
+          </View>
+          <Icon name="arrow-forward" size={20} color="#2F9FFA" style={styles.icon} />
         </TouchableOpacity>
       </ScrollView>
     </ImageBackground>
@@ -74,20 +58,25 @@ const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
     alignItems: 'center',
-    backgroundColor: 'transparent', 
+    backgroundColor: 'transparent',
+    paddingVertical: 20,
   },
   title: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: 'bold',
-    marginVertical: 20,
-    color: 'white',
+    marginBottom: 20,
+    color: 'black',
+    textAlign: 'center',
   },
   paqueteCard: {
     backgroundColor: 'rgba(255, 255, 255, 0.9)',
     borderRadius: 8,
     padding: 16,
-    margin: 16,
-    width: 320,
+    marginVertical: 10,
+    width: '90%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
@@ -95,30 +84,33 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   paqueteImage: {
-    width: 290,
-    height: 260,
+    width: 120,
+    height: 120,
     resizeMode: 'cover',
     borderRadius: 8,
-    marginBottom: 10,
+    marginRight: 20,
+  },
+  paqueteInfo: {
+    flex: 1,
   },
   paqueteTitle: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: 'bold',
+    marginBottom: 5,
+    color: '#333', // Color de texto cambiado
   },
   paqueteDescription: {
     fontSize: 16,
-    marginTop: 8,
+    marginBottom: 5,
+    color: '#555', // Color de texto cambiado
   },
   paquetePrice: {
     fontSize: 18,
     fontWeight: 'bold',
-    marginTop: 10,
+    color: '#2F9FFA', // Color de texto cambiado
   },
-  solicitarButtonText: {
-    color: 'white',
-    fontWeight: 'bold',
-    fontSize: 16,
-    textAlign: 'center',
+  icon: {
+    marginLeft: 'auto',
   },
 });
 

@@ -83,13 +83,13 @@ android {
         versionName "1.0"
     }
     signingConfigs {
-        debug {
-            storeFile file('debug.keystore')
-            storePassword 'android'
-            keyAlias 'androiddebugkey'
-            keyPassword 'android'
-        }
+    release {
+        keyAlias 'sgalindomapps'
+        keyPassword 'tigrillo2612'
+        storeFile file('tigrillo2612.jks')
+        storePassword 'tigrillo2612'
     }
+}
     buildTypes {
         debug {
             signingConfig signingConfigs.debug
@@ -120,3 +120,4 @@ dependencies {
 
 apply from: file("../../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesAppBuildGradle(project)
 apply plugin: 'com.google.gms.google-services'
+apply from: "../../node_modules/react-native-vector-icons/fonts.gradle"

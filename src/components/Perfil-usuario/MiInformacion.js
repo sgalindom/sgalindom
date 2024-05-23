@@ -1,18 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ImageBackground,
-  ScrollView,
-  TouchableOpacity,
-  Image,
-  Modal,
-} from 'react-native';
+import { View, Text, StyleSheet, ImageBackground, ScrollView, TouchableOpacity, Image, Modal } from 'react-native';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import storage from '@react-native-firebase/storage';
 import ImageCropPicker from 'react-native-image-crop-picker';
+import Icon from 'react-native-vector-icons/FontAwesome5';
 
 const MiInformacion = () => {
   const [userData, setUserData] = useState(null);
@@ -179,11 +171,23 @@ const MiInformacion = () => {
             {userData ? (
               <View>
                 <Text style={styles.title}>Mi Información</Text>
-                <Text style={styles.userInfo}><Text style={styles.bold}>Nombre Completo:</Text> {userData.nombreCompleto}</Text>
-                <Text style={styles.userInfo}><Text style={styles.bold}>Edad:</Text> {userData.edad}</Text>
-                <Text style={styles.userInfo}><Text style={styles.bold}>Dirección:</Text> {userData.direccion}</Text>
-                <Text style={styles.userInfo}><Text style={styles.bold}>Teléfono:</Text> {userData.telefono}</Text>
-                <Text style={styles.userInfo}><Text style={styles.bold}></Text> {userData.barrio}</Text>
+                <View style={styles.userInfoRow}>
+                  <Icon name="user" size={20} color="black" style={styles.icon} />
+                  <Text style={styles.userInfo}><Text style={styles.bold}>Nombre Completo:</Text> {userData.nombreCompleto}</Text>
+                </View>
+                <View style={styles.userInfoRow}>
+                  <Icon name="calendar-alt" size={20} color="black" style={styles.icon} />
+                  <Text style={styles.userInfo}><Text style={styles.bold}>Edad:</Text> {userData.edad}</Text>
+                </View>
+                <View style={styles.userInfoRow}>
+                  <Icon name="map-marker-alt" size={20} color="black" style={styles.icon} />
+                  <Text style={styles.userInfo}><Text style={styles.bold}>Dirección:</Text> {userData.direccion}</Text>
+                </View>
+                <View style={styles.userInfoRow}>
+                  <Icon name="phone" size={20} color="black" style={styles.icon} />
+                  <Text style={styles.userInfo}><Text style={styles.bold}>Teléfono:</Text> {userData.telefono}</Text>
+                </View>
+                
               </View>
             ) : (
               <Text style={styles.infoText}>Cargando...</Text>
@@ -235,7 +239,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
     overflow: 'hidden',
-    backgroundColor: '#fffFFF', // Color de fondo azul pastel
+    backgroundColor: '#fff', // Color de fondo blanco
   },
   scrollContainer: {
     flexGrow: 1,
@@ -254,6 +258,13 @@ const styles = StyleSheet.create({
     color: 'black',
     textAlign: 'center',
   },
+  userInfoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  icon: {
+    marginRight: 10,
+  },
   userInfo: {
     fontSize: 18,
     marginVertical: 5,
@@ -271,15 +282,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   profileImage: {
-    width: 150, // Aumentando el tamaño del círculo de la imagen de perfil
-    height: 150, // Aumentando el tamaño del círculo de la imagen de perfil
-    borderRadius: 75, // Aumentando el tamaño del círculo de la imagen de perfil
+    width: 150,
+    height: 150,
+    borderRadius: 75,
     marginVertical: 10,
   },
   profileImagePlaceholder: {
-    width: 150, // Aumentando el tamaño del círculo de la imagen de perfil
-    height: 150, // Aumentando el tamaño del círculo de la imagen de perfil
-    borderRadius: 75, // Aumentando el tamaño del círculo de la imagen de perfil
+    width: 150,
+    height: 150,
+    borderRadius: 75,
     backgroundColor: 'lightgray',
     justifyContent: 'center',
     alignItems: 'center',
@@ -310,7 +321,7 @@ const styles = StyleSheet.create({
   modalItemText: {
     fontSize: 18,
     textAlign: 'center',
-    color: 'black', // Cambio del color del texto a negro
+    color: 'black',
   },
 });
 

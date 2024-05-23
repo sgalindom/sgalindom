@@ -1,24 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, Button, Alert, ImageBackground, TextInput } from 'react-native';
-import { Card, RadioButton } from 'react-native-paper';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, ScrollView, ImageBackground, TextInput, TouchableOpacity } from 'react-native';
+import { RadioButton } from 'react-native-paper';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
+import Icon from 'react-native-vector-icons/FontAwesome';
 import { useNavigation } from '@react-navigation/native';
-
-// Importa la imagen de fondo
-import FondoImage from '../imagenes/fondomain.jpg';
 
 const CalificacionPanel = () => {
   const navigation = useNavigation();
   const user = auth().currentUser;
-
-  const [preguntas, setPreguntas] = useState([
-    { pregunta: '¿Cómo calificarías la app', respuesta: 3 },
-    { pregunta: '¿Qué tan satisfecho estás con los servicios ofrecidos?', respuesta: 3 },
-    { pregunta: '¿Cómo evalúas la eficiencia en la entrega de servicios?', respuesta: 3 },
-    { pregunta: '¿Qué tan probable es que recomiendes nuestra app a otros?', respuesta: 3 },
-    { pregunta: '¿En general, cómo calificarías tu experiencia con la app y con nuestros sociosx?', respuesta: 3 },
-  ]);
 
   const [respuestas, setRespuestas] = useState([3, 3, 3, 3, 3]);
   const [recomendacion, setRecomendacion] = useState('');
@@ -37,57 +27,50 @@ const CalificacionPanel = () => {
   const enviarCalificacion = async () => {
     try {
       if (user) {
-        // Guardar en Firebase
         await firestore().collection('Calificaciones').add({
           timestamp: firestore.FieldValue.serverTimestamp(),
           usuarioCorreo: user.email,
-          respuestas: respuestas.map((respuesta, index) => ({
-            pregunta: preguntas[index].pregunta,
-            respuesta: respuesta,
-          })),
-          recomendacion: recomendacion, // Agregar la recomendación
+          // Guardar solo la respuesta seleccionada
+          respuestas: respuestas.map((respuesta, index) => (index === respuestas[index] ? respuesta : null)),
+          recomendacion: recomendacion,
         });
-
-        // Actualiza el estado para mostrar el panel de agradecimiento
         setCalificacionEnviada(true);
       } else {
-        // Si el usuario no está autenticado, puedes manejarlo de alguna manera.
-        Alert.alert('Usuario no autenticado', 'Inicia sesión para enviar una calificación.', [{ text: 'OK' }]);
+        alert('Usuario no autenticado, inicia sesión para enviar una calificación.');
       }
     } catch (error) {
       console.error('Error al enviar la calificación:', error);
-      Alert.alert('Error', 'Hubo un problema al enviar la calificación. Inténtalo de nuevo más tarde.', [{ text: 'OK' }]);
+      alert('Hubo un problema al enviar la calificación. Inténtalo de nuevo más tarde.');
     }
   };
 
   const volverAMiPerfil = () => {
-    // Navegar de vuelta al panel anterior (MiPerfil.js)
     navigation.goBack();
   };
 
   return (
-    // Utiliza ImageBackground para agregar una imagen de fondo
-    <ImageBackground source={FondoImage} style={styles.backgroundImage} resizeMode="cover">
-      <ScrollView contentContainerStyle={styles.scrollViewContainer}>
-        <View style={styles.container}>
-          <Text style={styles.title}>Calificación</Text>
+    <ImageBackground source={require('../imagenes/fondomain.jpg')} style={styles.backgroundImage}>
+      <ScrollView contentContainerStyle={styles.container}>
+        <View style={styles.contentContainer}>
+          <Text style={styles.title}>Califica tu experiencia</Text>
           {!calificacionEnviada ? (
             <>
-              {preguntas.map((pregunta, index) => (
-                <Card key={index} style={styles.card}>
-                  <Card.Content>
-                    <Text style={styles.preguntaText}>{pregunta.pregunta}</Text>
-                    <RadioButton.Group
-                      onValueChange={(value) => handleRadioButtonChange(index, value)}
-                      value={respuestas[index]}
+              <View style={styles.preguntaContainer}>
+                <Text style={styles.preguntaText}>¿Cómo calificarías la app?</Text>
+                <View style={styles.radioButtons}>
+                  {[1, 2, 3, 4, 5].map((value) => (
+                    <TouchableOpacity
+                      key={value}
+                      style={[styles.radioButton, { backgroundColor: respuestas[0] === value ? '#007BFF' : 'transparent' }]}
+                      onPress={() => handleRadioButtonChange(0, value)}
                     >
-                      {[1, 2, 3, 4, 5].map((option) => (
-                        <RadioButton.Item key={option} label={option.toString()} value={option} />
-                      ))}
-                    </RadioButton.Group>
-                  </Card.Content>
-                </Card>
-              ))}
+                      <Text style={styles.radioButtonText}>{value}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </View>
+              {/* Repite esto para las demás preguntas */}
+              {/* Agrega un campo de texto para la recomendación */}
               <TextInput
                 style={styles.recomendacionInput}
                 placeholder="Escribe aquí tu recomendación..."
@@ -95,12 +78,20 @@ const CalificacionPanel = () => {
                 onChangeText={handleRecomendacionChange}
                 value={recomendacion}
               />
-              <Button title="Enviar" onPress={enviarCalificacion} color="#007BFF" />
+              {/* Botón de enviar */}
+              <TouchableOpacity style={styles.enviarButton} onPress={enviarCalificacion}>
+                <Text style={styles.enviarButtonText}>Enviar Calificación</Text>
+              </TouchableOpacity>
             </>
           ) : (
+            // Mensaje de agradecimiento si la calificación ya fue enviada
             <View style={styles.agradecimientoContainer}>
+              <Icon name="check-circle" size={50} color="#4BB543" />
               <Text style={styles.agradecimientoText}>¡Gracias por tu calificación!</Text>
-              <Button title="Volver a Mi Perfil" onPress={volverAMiPerfil} color="#007BFF" />
+              {/* Botón para volver al perfil */}
+              <TouchableOpacity style={styles.volverButton} onPress={volverAMiPerfil}>
+                <Text style={styles.volverButtonText}>Volver a Mi Perfil</Text>
+              </TouchableOpacity>
             </View>
           )}
         </View>
@@ -110,30 +101,48 @@ const CalificacionPanel = () => {
 };
 
 const styles = StyleSheet.create({
-  scrollViewContainer: {
-    flexGrow: 1,
-  },
   container: {
-    flex: 1,
-    padding: 20,
+    flexGrow: 1,
     justifyContent: 'center',
+    alignItems: 'center',
+  },
+  contentContainer: {
+    backgroundColor: 'rgba(255, 255, 255, 0.8)', // Fondo blanco semitransparente
+    borderRadius: 20,
+    padding: 20,
+    width: '90%',
   },
   title: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: 'bold',
     marginBottom: 20,
     color: 'black', // Título en negro
     textAlign: 'center',
   },
-  card: {
+  preguntaContainer: {
     marginBottom: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.8)',
-    borderRadius: 10,
   },
   preguntaText: {
-    fontSize: 16,
+    fontSize: 18,
     marginBottom: 10,
     color: 'black', // Texto en negro
+  },
+  radioButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  radioButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#007BFF',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  radioButtonText: {
+    fontSize: 18,
+    color: 'black',
   },
   recomendacionInput: {
     height: 100,
@@ -141,17 +150,44 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 10,
     marginBottom: 20,
+    borderWidth: 1,
+    borderColor: 'gray', // Cambia el color del borde según tus preferencias
+  },
+
+  enviarButton: {
+    backgroundColor: '#007BFF', // Color azul
+    alignItems: 'center',
+    padding: 15,
+    borderRadius: 8,
+    marginTop: 10,
+  },
+  enviarButtonText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: 'white', // Texto en blanco
   },
   agradecimientoContainer: {
     alignItems: 'center',
   },
   agradecimientoText: {
-    fontSize: 18,
+    fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 10,
+    marginBottom: 20,
     color: 'black', // Texto en negro
   },
-  // Agrega un estilo para la imagen de fondo
+  volverButton: {
+    backgroundColor: '#007BFF', // Color azul
+    alignItems: 'center',
+    padding: 15,
+    borderRadius: 8,
+    marginTop: 10,
+  },
+  volverButtonText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: 'white', // Texto en blanco
+  },
+  // Estilo para la imagen de fondo
   backgroundImage: {
     flex: 1,
     justifyContent: 'center',

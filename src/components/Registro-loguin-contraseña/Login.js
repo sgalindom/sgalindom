@@ -9,9 +9,11 @@ import {
   StyleSheet,
   Dimensions,
   ActivityIndicator,
+  Animated,
 } from 'react-native';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 const backgroundImage = require('../imagenes/Login.jpg');
 const logoImage = require('../imagenes/logo_2.png');
@@ -21,6 +23,8 @@ function Login({ navigation }) {
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [buttonScale] = useState(new Animated.Value(1));
+  const [hidePassword, setHidePassword] = useState(true); // Estado para ocultar/mostrar la contraseña
 
   useEffect(() => {
     const unsubscribe = auth().onAuthStateChanged(async (user) => {
@@ -82,6 +86,21 @@ function Login({ navigation }) {
     navigation.navigate('RecuperarContraseña');
   };
 
+  const animateButton = () => {
+    Animated.sequence([
+      Animated.timing(buttonScale, {
+        toValue: 0.95,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+      Animated.timing(buttonScale, {
+        toValue: 1,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  };
+
   if (isLoading) {
     return (
       <View style={styles.loadingContainer}>
@@ -92,41 +111,54 @@ function Login({ navigation }) {
 
   return (
     <ImageBackground source={backgroundImage} style={styles.backgroundImage}>
-      <View style={styles.container}>
-        <View style={styles.logoContainer}>
-          <Image source={logoImage} style={styles.logo} />
-        </View>
-        <Text style={styles.welcomeText}>Bienvenido</Text>
-        <View style={styles.inputContainer}>
-          <Text style={styles.inputLabel}>Correo electrónico</Text>
-          <TextInput
-            placeholder="Correo electrónico"
-            onChangeText={(text) => setEmail(text)}
-            value={email}
-            style={[styles.input, { color: 'black', borderColor: 'black' }]}
-          />
-        </View>
-        <View style={styles.inputContainer}>
-          <Text style={styles.inputLabel}>Contraseña</Text>
-          <TextInput
-            style={[styles.input, { color: 'black', borderColor: 'black' }]}
-            placeholder="Contraseña"
-            secureTextEntry
-            onChangeText={(text) => setPassword(text)}
-            value={password}
-          />
-        </View>
+      <View style={styles.overlay}>
+        <View style={styles.container}>
+          <View style={styles.logoContainer}>
+            <Image source={logoImage} style={styles.logo} />
+          </View>
+          <Text style={styles.welcomeText}>Bienvenido</Text>
+          <View style={styles.inputContainer}>
+            <Icon name="envelope" size={20} color="gray" style={styles.icon} />
+            <TextInput
+              placeholder="Correo electrónico"
+              onChangeText={(text) => setEmail(text)}
+              value={email}
+              style={styles.input}
+            />
+          </View>
+          <View style={styles.inputContainer}>
+            <Icon name="lock" size={20} color="gray" style={styles.icon} />
+            <TextInput
+              placeholder="Contraseña"
+              secureTextEntry={hidePassword} // Usar el estado para determinar si se oculta o muestra la contraseña
+              onChangeText={(text) => setPassword(text)}
+              value={password}
+              style={styles.input}
+            />
+            <TouchableOpacity
+              onPress={() => setHidePassword(!hidePassword)} // Alternar el estado al presionar el botón
+              style={styles.eyeIconContainer}
+            >
+              <Icon name={hidePassword ? 'eye' : 'eye-slash'} size={20} color="gray" />
+            </TouchableOpacity>
+          </View>
 
-        {error && <Text style={styles.errorText}>{error}</Text>}
-        <TouchableOpacity onPress={handleLogin} style={styles.button}>
-          <Text style={styles.buttonText}>Iniciar sesión</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={handleRecuperarContraseña} style={styles.enlaceRecuperarContraseña}>
-          <Text style={styles.enlaceRecuperarContraseñaTexto}>¿Olvidaste tu contraseña?</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate('Registro')} style={styles.registerButton}>
-          <Text style={styles.registerButtonText}>¿No tienes una cuenta? Regístrate</Text>
-        </TouchableOpacity>
+          {error && <Text style={styles.errorText}>{error}</Text>}
+          <Animated.View style={{ transform: [{ scale: buttonScale }] }}>
+            <TouchableOpacity
+              onPress={() => { handleLogin(); animateButton(); }}
+              style={styles.button}
+            >
+              <Text style={styles.buttonText}>Iniciar sesión</Text>
+            </TouchableOpacity>
+          </Animated.View>
+          <TouchableOpacity onPress={handleRecuperarContraseña} style={styles.enlaceRecuperarContraseña}>
+            <Text style={styles.enlaceRecuperarContraseñaTexto}>¿Olvidaste tu contraseña?</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate('Registro')} style={styles.registerButton}>
+            <Text style={styles.registerButtonText}>¿No tienes una cuenta? Regístrate</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </ImageBackground>
   );
@@ -142,97 +174,116 @@ const styles = StyleSheet.create({
     height: windowHeight,
     resizeMode: 'cover',
   },
-  container: {
+  overlay: {
     flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
     alignItems: 'center',
-    justifyContent: 'flex-start',
+  },
+  container: {
+    width: '90%',
+    alignItems: 'center',
+    justifyContent: 'center',
     padding: 24,
     paddingTop: 50,
+    borderRadius: 10,
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 10,
   },
   logoContainer: {
-    marginBottom: 3, // Aumenta el margen inferior del contenedor de logo
+    marginBottom: 30,
     alignItems: 'center',
   },
   logo: {
-    width: 250,
-    height: 250,
+    width: 150,
+    height: 150,
     resizeMode: 'contain',
   },
   welcomeText: {
     fontSize: 30,
     fontWeight: 'bold',
-    color: '#FFFFFF',
-    marginBottom: 2, // Aumenta el margen inferior del texto de bienvenida
-    textShadowColor: 'rgba(0, 0, 0, 0.75)',
-    textShadowOffset: { width: 2, height: 2 },
-    textShadowRadius: 5,
+    color: '#333',
+    marginBottom: 20,
+    textAlign: 'center',
   },
   inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
     width: '100%',
-    marginBottom: 2, // Aumenta el margen inferior del contenedor de entrada
+    marginBottom: 20,
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    backgroundColor: 'white',
+    borderWidth: 1,
+    borderColor: '#ccc', // Color del borde del cuadro de entrada
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+    elevation: 5,
   },
-  inputLabel: {
-    color: 'black',
-    fontWeight: 'bold',
-    fontSize: 16,
-    marginBottom: 8,
+  icon: {
+    marginRight: 10,
   },
   input: {
-    borderWidth: 1,
-    borderRadius: 8,
-    width: '100%',
-    marginBottom: 2, // Aumenta el margen inferior del campo de entrada
-    padding: 12,
-    backgroundColor: 'white',
-    color: 'black',
+    flex: 1,
+    height: 40,
+    paddingLeft: 10,
   },
   button: {
     backgroundColor: '#2F9FFA',
     padding: 12,
-    borderRadius: 8,
+    borderRadius: 10,
     width: '100%',
-    marginVertical: 1, // Aumenta el margen vertical del botón
+    marginVertical: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 10,
   },
   buttonText: {
     color: '#FFFFFF',
     fontWeight: 'bold',
     fontSize: 16,
-    textAlign: 'center',
   },
   registerButton: {
-    marginTop: 1, // Aumenta el margen superior del botón de registro
+    marginTop: 20,
   },
   registerButtonText: {
-    color: '#FFFFFF',
+    color: '#2F9FFA',
     fontWeight: 'bold',
     fontSize: 16,
-    textShadowColor: 'rgba(0, 0, 0, 0.75)',
-    textShadowOffset: { width: 2, height: 2 },
-    textShadowRadius: 5,
   },
   enlaceRecuperarContraseña: {
-    marginTop: 1, // Aumenta el margen superior del enlace de recuperación de contraseña
+    marginTop: 10,
   },
   enlaceRecuperarContraseñaTexto: {
-    color: '#FFFFFF',
+    color: '#2F9FFA',
     fontWeight: 'bold',
     fontSize: 16,
-    textShadowColor: 'rgba(0, 0, 0, 0.75)',
-    textShadowOffset: { width: 2, height: 2 },
-    textShadowRadius: 5,
   },
   errorText: {
     color: 'red',
     fontWeight: 'bold',
     fontSize: 14,
-    marginBottom: 1, // Aumenta el margen inferior del texto de error
+    marginBottom: 20,
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
+  eyeIconContainer: {
+    position: 'absolute',
+    right: 10,
+  },
 });
-
 
 export default Login;

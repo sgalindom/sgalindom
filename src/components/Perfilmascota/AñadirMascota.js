@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TextInput, TouchableOpacity, ImageBackground } 
 import { Picker } from '@react-native-picker/picker';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 const AñadirMascota = ({ navigation }) => {
   const [nombre, setNombre] = useState('');
@@ -18,15 +19,12 @@ const AñadirMascota = ({ navigation }) => {
 
   const registrarMascota = async () => {
     if (userEmail && nombre && raza && edad && peso) {
-      // Obtener la referencia a la colección de mascotas específica del usuario
       const mascotasRef = firestore().collection(`usuarios/${userEmail}/mascotas`);
 
       try {
-        // Obtener la última mascota para determinar el próximo ID
         const ultimaMascota = await mascotasRef.orderBy('id', 'desc').limit(1).get();
         const ultimoID = ultimaMascota.docs.length > 0 ? ultimaMascota.docs[0].data().id : 0;
         
-        // Crear la nueva mascota con el próximo ID secuencial
         const nuevoID = ultimoID + 1;
 
         const nuevaMascota = {
@@ -34,12 +32,11 @@ const AñadirMascota = ({ navigation }) => {
           nombre: nombre,
           raza: raza,
           edad: unidadEdad === 'años' ? Number(edad) : `(${Number(edad)} meses)`,
-          peso: Number(peso),
+          peso: peso, // Mantengo el peso tal como lo ingresó el usuario
           descripcion: descripcion,
           tipo: tipoMascota,
         };
 
-        // Agregar la mascota a la colección
         await mascotasRef.doc(nuevoID.toString()).set(nuevaMascota);
 
         console.log('Mascota registrada con ID: ', nuevoID, ' y nombre: ', nuevaMascota.nombre);
@@ -58,56 +55,77 @@ const AñadirMascota = ({ navigation }) => {
     >
       <View style={styles.formContainer}>
         <Text style={styles.title}>Conozcamos a tu mascota</Text>
-        <Picker
-          selectedValue={tipoMascota}
-          onValueChange={(itemValue, itemIndex) => setTipoMascota(itemValue)}
-          style={styles.input}
-        >
-          <Picker.Item label="Perro" value="perro" />
-          <Picker.Item label="Gato" value="gato" />
-        </Picker>
-        <TextInput
-          style={[styles.input, { color: 'black' }]}
-          placeholder="Nombre de la mascota"
-          value={nombre}
-          onChangeText={setNombre}
-        />
-        <TextInput
-          style={[styles.input, { color: 'black' }]}
-          placeholder="Raza de la mascota"
-          value={raza}
-          onChangeText={setRaza}
-        />
-        <TextInput
-          style={[styles.input, { color: 'black' }]}
-          placeholder={`Edad de la mascota (${unidadEdad})`}
-          value={edad}
-          onChangeText={setEdad}
-          keyboardType="numeric"
-        />
-        <Picker
-          selectedValue={unidadEdad}
-          onValueChange={(itemValue, itemIndex) => setUnidadEdad(itemValue)}
-          style={styles.input}
-        >
-          <Picker.Item label="Años" value="años" />
-          <Picker.Item label="Meses" value="meses" />
-        </Picker>
-        <TextInput
-          style={[styles.input, { color: 'black' }]}
-          placeholder="Peso de la mascota (Kg)"
-          value={peso}
-          onChangeText={setPeso}
-          keyboardType="numeric"
-        />
-        <TextInput
-          style={[styles.input, { color: 'black' }]}
-          placeholder="Cuentanos más sobre tu mascota"
-          multiline
-          numberOfLines={4}
-          value={descripcion}
-          onChangeText={setDescripcion}
-        />
+        <View style={styles.inputContainer}>
+          <Icon name="paw" size={20} color="black" style={styles.icon} />
+          <Picker
+            selectedValue={tipoMascota}
+            onValueChange={(itemValue, itemIndex) => setTipoMascota(itemValue)}
+            style={[styles.input, { color: 'black' }]}
+          >
+            <Picker.Item label="Perro" value="perro" />
+            <Picker.Item label="Gato" value="gato" />
+          </Picker>
+        </View>
+        <View style={styles.inputContainer}>
+          <Icon name="user" size={20} color="black" style={styles.icon} />
+          <TextInput
+            style={[styles.input, { color: 'black' }]}
+            placeholder="Nombre de la mascota"
+            value={nombre}
+            onChangeText={setNombre}
+          />
+        </View>
+        <View style={styles.inputContainer}>
+          <Icon name="book" size={20} color="black" style={styles.icon} />
+          <TextInput
+            style={[styles.input, { color: 'black' }]}
+            placeholder="Raza de la mascota"
+            value={raza}
+            onChangeText={setRaza}
+          />
+        </View>
+        <View style={styles.inputContainer}>
+          <Icon name="calendar" size={20} color="black" style={styles.icon} />
+          <TextInput
+            style={[styles.input, { color: 'black' }]}
+            placeholder={`Edad de la mascota (${unidadEdad})`}
+            value={edad}
+            onChangeText={setEdad}
+            keyboardType="numeric"
+          />
+        </View>
+        <View style={styles.inputContainer}>
+          <Icon name="clock-o" size={20} color="black" style={styles.icon} />
+          <Picker
+            selectedValue={unidadEdad}
+            onValueChange={(itemValue, itemIndex) => setUnidadEdad(itemValue)}
+            style={[styles.input, { color: 'black' }]}
+          >
+            <Picker.Item label="Años" value="años" />
+            <Picker.Item label="Meses" value="meses" />
+          </Picker>
+        </View>
+        <View style={styles.inputContainer}>
+          <Icon name="balance-scale" size={20} color="black" style={styles.icon} />
+          <TextInput
+            style={[styles.input, { color: 'black' }]}
+            placeholder="Peso de la mascota (Kg)"
+            value={peso}
+            onChangeText={setPeso}
+            keyboardType="numeric"
+          />
+        </View>
+        <View style={styles.inputContainer}>
+          <Icon name="comment" size={20} color="black" style={styles.icon} />
+          <TextInput
+            style={[styles.input, { color: 'black' }]}
+            placeholder="Cuentanos más sobre tu mascota"
+            multiline
+            numberOfLines={4}
+            value={descripcion}
+            onChangeText={setDescripcion}
+          />
+        </View>
         <TouchableOpacity style={styles.registrarButton} onPress={registrarMascota}>
           <Text style={styles.registrarButtonText}>Registrar Mascota</Text>
         </TouchableOpacity>
@@ -133,21 +151,31 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 20,
     color: 'black',
+    textAlign: 'center',
+  },
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
   },
   input: {
+    flex: 1,
     fontSize: 18,
     borderWidth: 1,
     borderColor: 'gray',
     borderRadius: 8,
     padding: 10,
-    marginBottom: 10,
     color: 'black',
+  },
+  icon: {
+    marginRight: 10,
   },
   registrarButton: {
     backgroundColor: '#2AC9FA',
     alignItems: 'center',
-    padding: 10,
+    padding: 15, // Aumenté el padding para que el botón sea más grande
     borderRadius: 8,
+    marginTop: 20,
   },
   registrarButtonText: {
     fontSize: 18,

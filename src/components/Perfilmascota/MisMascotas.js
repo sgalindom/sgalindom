@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ImageBackground, FlatList, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, ImageBackground, TouchableOpacity, Alert, FlatList } from 'react-native';
+import Icon from 'react-native-vector-icons/FontAwesome';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 
@@ -12,29 +13,14 @@ const MisMascotas = ({ navigation }) => {
     const fetchMascotas = async () => {
       try {
         if (userEmail) {
-          const mascotasRef = firestore()
-            .collection(`usuarios/${userEmail}/mascotas`);
-
-          const querySnapshot = await mascotasRef.get();
-
-          if (!querySnapshot.empty) {
-            const nuevasMascotas = querySnapshot.docs.map((doc) => {
-              const data = doc.data();
-              return {
-                id: doc.id,
-                nombre: data.nombre,
-                edad: data.edad,
-                peso: data.peso,
-                raza: data.raza,
-                descripcion: data.descripcion,  // Incluye el campo descripcion
-                imageUri: data.imageUri,
-              };
+          const mascotasRef = firestore().collection(`usuarios/${userEmail}/mascotas`);
+          mascotasRef.onSnapshot(querySnapshot => {
+            const nuevasMascotas = [];
+            querySnapshot.forEach(doc => {
+              nuevasMascotas.push({ id: doc.id, ...doc.data() });
             });
-
             setMascotas(nuevasMascotas);
-          } else {
-            setMascotas([]);
-          }
+          });
         }
       } catch (error) {
         console.error('Error al obtener las mascotas: ', error);
@@ -44,10 +30,24 @@ const MisMascotas = ({ navigation }) => {
     fetchMascotas();
 
     return () => {
-      // Limpieza cuando el componente se desmonta
-      // Se puede omitir si no se necesita hacer algo específico al desmontar el componente
+      // Limpiar el listener al desmontar el componente
+      if (userEmail) {
+        const mascotasRef = firestore().collection(`usuarios/${userEmail}/mascotas`);
+        mascotasRef.onSnapshot(() => {}); // Detener el listener
+      }
     };
   }, [userEmail]);
+
+  const renderItem = ({ item }) => (
+    <TouchableOpacity
+      style={styles.mascotaCard}
+      onPress={() => {
+        navigation.navigate('DetalleMascota', { mascota: item });
+      }}
+    >
+      <Text style={styles.mascotaNombre}>{item.nombre}</Text>
+    </TouchableOpacity>
+  );
 
   return (
     <ImageBackground
@@ -59,16 +59,7 @@ const MisMascotas = ({ navigation }) => {
         <FlatList
           data={mascotas}
           keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              style={styles.mascotaCard}
-              onPress={() => {
-                navigation.navigate('DetalleMascota', { mascota: item });
-              }}
-            >
-              <Text style={styles.mascotaNombre}>{item.nombre}</Text>
-            </TouchableOpacity>
-          )}
+          renderItem={renderItem}
         />
       ) : (
         <Text style={styles.noMascotasText}>No tienes mascotas registradas.</Text>

@@ -11,11 +11,12 @@ import {
   Alert,
 } from 'react-native';
 import auth from '@react-native-firebase/auth';
+import Icon from 'react-native-vector-icons/FontAwesome5';
 
 const backgroundImage = require('../imagenes/recontraseña.jpg');
 const logoImage = require('../imagenes/logo_2.png');
 
-function RecuperarContraseña({ navigation }) {
+const RecuperarContraseña = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
 
@@ -47,12 +48,15 @@ function RecuperarContraseña({ navigation }) {
       <View style={styles.container}>
         <Image source={logoImage} style={styles.logo} />
         <Text style={styles.title}>Recuperar Contraseña</Text>
-        <TextInput
-          placeholder="Correo electrónico"
-          onChangeText={(text) => setEmail(text)}
-          style={styles.input}
-          placeholderTextColor="black" // Cambiado a negro
-        />
+        <View style={styles.inputContainer}>
+          <Icon name="envelope" size={20} color="black" style={styles.icon} />
+          <TextInput
+            placeholder="Correo electrónico"
+            onChangeText={(text) => setEmail(text)}
+            style={styles.input}
+            placeholderTextColor="black"
+          />
+        </View>
         {error && <Text style={styles.errorText}>{error}</Text>}
         <TouchableOpacity onPress={handleRecuperarContraseña} style={styles.button}>
           <Text style={styles.buttonText}>Recuperar Contraseña</Text>
@@ -60,7 +64,7 @@ function RecuperarContraseña({ navigation }) {
       </View>
     </ImageBackground>
   );
-}
+};
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
@@ -84,22 +88,31 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     marginBottom: 30,
   },
-  input: {
-    borderWidth: 1,
-    borderColor: 'black', // Cambiado a negro
-    borderRadius: 8,
-    width: '100%',
-    marginBottom: 16,
-    padding: 12,
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderBottomWidth: 1,
+    borderBottomColor: '#FFFFFF',
+    paddingBottom: 5,
+    marginBottom: 20,
     backgroundColor: 'white',
-    color: 'black', // Cambiado a negro
+    borderRadius: 25,
+    paddingHorizontal: 20,
+  },
+  input: {
+    flex: 1,
+    fontSize: 16,
+    color: 'black',
+    marginLeft: 10,
+  },
+  icon: {
+    marginRight: 10,
   },
   button: {
     backgroundColor: '#2F9FFA',
-    padding: 12,
-    borderRadius: 8,
+    padding: 15,
+    borderRadius: 25,
     width: '100%',
-    marginVertical: 10,
   },
   buttonText: {
     color: '#FFFFFF',
