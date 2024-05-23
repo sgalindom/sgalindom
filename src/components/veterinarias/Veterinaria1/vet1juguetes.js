@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, FlatList, Image, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, FlatList, ImageBackground, Alert } from 'react-native';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 const Vet1Juguetes = ({ navigation }) => {
   const [productos, setProductos] = useState([]);
@@ -23,11 +24,11 @@ const Vet1Juguetes = ({ navigation }) => {
           const nombreVeterinaria = veterinariaSnapshot.exists ? veterinariaSnapshot.data().Nombre : '';
           setNombreVeterinaria(nombreVeterinaria);
 
-          // Obtener productos
+          // Obtener productos de juguetes
           const productosSnapshot = await firestore()
             .collection('Veterinarias')
             .doc('1') // Puedes cambiar '1' por el ID de la veterinaria correspondiente
-            .collection('Productos')
+            .collection('Productos') // Cambia a la colección correspondiente para productos de juguetes
             .get();
 
           const productosData = productosSnapshot.docs.map((doc) => ({
@@ -39,7 +40,7 @@ const Vet1Juguetes = ({ navigation }) => {
           setProductos(productosData);
         }
       } catch (error) {
-        console.error('Error al obtener productos:', error);
+        console.error('Error al obtener productos de juguetes:', error);
       }
     };
 
@@ -54,7 +55,7 @@ const Vet1Juguetes = ({ navigation }) => {
         if (user) {
           const usuarioRef = firestore().collection('usuarios').doc(user.email);
           const pedidoRef = usuarioRef.collection('pedidos').doc('default');
-          const productoRef = pedidoRef.collection('productos').doc(id);
+          const productoRef = pedidoRef.collection('Juguetes').doc(id); // Cambia a la colección correspondiente para productos de juguetes
 
           // Obtener la cantidad actual del producto
           const productoActual = await productoRef.get();
@@ -112,56 +113,56 @@ const Vet1Juguetes = ({ navigation }) => {
 
   const renderItem = ({ item }) => (
     <View style={styles.tarjeta}>
-      <Image source={{ uri: item.Foto }} style={styles.imagen} />
+      <ImageBackground source={{ uri: item.Foto }} style={styles.imagen}>
+        <TouchableOpacity
+          onPress={() =>
+            handleAgregarCarrito(
+              item.id,
+              item.Nombre,
+              item.Descripcion,
+              item.cantidad,
+              item.Precio
+            )
+          }
+          style={styles.botonAgregar}
+        >
+          <Icon name="cart" size={24} color="white" />
+          <Text style={styles.textoBotonAgregar}>Añadir</Text>
+        </TouchableOpacity>
+      </ImageBackground>
       <View style={styles.overlay}>
         <Text style={styles.nombreProducto}>{item.Nombre}</Text>
         <Text style={styles.descripcionProducto}>{item.Descripcion}</Text>
         <Text style={styles.precioProducto}>Precio: {item.Precio}</Text>
         <View style={styles.botonesContainer}>
-          <View style={styles.contadorContainer}>
-            <TouchableOpacity onPress={() => handleDecrementarCantidad(item.id)} style={styles.botonMasMenos}>
-              <Text style={styles.menosMasText}>-</Text>
-            </TouchableOpacity>
-            <Text style={styles.cantidadText}>{item.cantidad}</Text>
-            <TouchableOpacity onPress={() => handleIncrementarCantidad(item.id)} style={styles.botonMasMenos}>
-              <Text style={styles.menosMasText}>+</Text>
-            </TouchableOpacity>
-          </View>
-          <TouchableOpacity
-            onPress={() =>
-              handleAgregarCarrito(
-                item.id,
-                item.Nombre,
-                item.Descripcion,
-                item.cantidad,
-                item.Precio
-              )
-            }
-            style={styles.botonAgregar}
-          >
-            <Text style={styles.textoBotonAgregar}>Añadir al carrito</Text>
+          <TouchableOpacity onPress={() => handleDecrementarCantidad(item.id)} style={styles.botonMasMenos}>
+            <Icon name="remove" size={20} color="#599B85" />
+          </TouchableOpacity>
+          <Text style={styles.cantidadText}>{item.cantidad}</Text>
+          <TouchableOpacity onPress={() => handleIncrementarCantidad(item.id)} style={styles.botonMasMenos}>
+            <Icon name="add" size={20} color="#599B85" />
           </TouchableOpacity>
         </View>
       </View>
     </View>
   );
 
-  
   useEffect(() => {
-    navigation.setOptions({ title: `Productos (${nombreVeterinaria})` });
+    navigation.setOptions({ title: `Productos Juguetes (${nombreVeterinaria})` });
   }, [nombreVeterinaria, navigation]);
 
   return (
-    <View style={styles.container}>
+    <ImageBackground source={require('../../imagenes/fondomain.jpg')} style={styles.container}>
       <FlatList
         data={productos}
         renderItem={renderItem}
         keyExtractor={(item) => item.id.toString()}
       />
       <TouchableOpacity onPress={handleNavegarPago} style={styles.botonMisCompras}>
-        <Text>Mis Pedidos</Text>
+        <Icon name="cart" size={24} color="white" />
+        <Text style={styles.textoBotonMisCompras}>Mis Pedidos</Text>
       </TouchableOpacity>
-    </View>
+    </ImageBackground>
   );
 };
 
@@ -169,16 +170,20 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
+    resizeMode: 'cover',
+    justifyContent: 'center',
   },
   tarjeta: {
     borderRadius: 8,
     marginBottom: 16,
-    overflow: 'hidden', // Para recortar la imagen dentro de la tarjeta
+    overflow: 'hidden',
   },
   imagen: {
     width: '100%',
-    height: 300, // Altura ajustable según tus necesidades
+    height: 200,
     marginBottom: 8,
+    justifyContent: 'flex-end',
+    alignItems: 'flex-end',
   },
   overlay: {
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
@@ -201,38 +206,29 @@ const styles = StyleSheet.create({
   botonesContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  contadorContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'white',
-    borderRadius: 8,
+    justifyContent: 'flex-end',
   },
   cantidadText: {
     fontSize: 20,
     paddingHorizontal: 16,
-    color: 'black',
-  },
-  menosMasText: {
-    fontSize: 20,
-    paddingHorizontal: 16,
-    color: '#599B85',
+    color: 'white',
   },
   botonMasMenos: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 8,
+    backgroundColor: 'transparent',
+    paddingHorizontal: 8,
   },
   botonAgregar: {
     backgroundColor: '#2F9FFA',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
+    padding: 8,
     borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexDirection: 'row',
   },
   textoBotonAgregar: {
     color: 'white',
     fontWeight: 'bold',
+    marginLeft: 4,
   },
   botonMisCompras: {
     backgroundColor: '#2F9FFA',
@@ -240,6 +236,13 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: 'center',
     marginTop: 16,
+    flexDirection: 'row',
+    justifyContent: 'center',
+  },
+  textoBotonMisCompras: {
+    color: 'white',
+    fontWeight: 'bold',
+    marginLeft: 8,
   },
 });
 

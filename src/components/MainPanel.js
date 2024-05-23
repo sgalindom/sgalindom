@@ -88,19 +88,19 @@
     const tips = [
       { id: 1, text: 'Consejo 1: Mantén a tu mascota hidratada en todo momento.' },
       { id: 2, text: 'Consejo 2: Asegúrate de que tu mascota haga ejercicio regularmente.' },
-      { id: 3, text: 'Proporciona a tu mascota una alimentación equilibrada.' },
-      { id: 4, text: 'Realiza visitas veterinarias de forma periódica.' },
-      { id: 5, text: 'Cuida la higiene de tu mascota regularmente.' },
-      { id: 6, text: 'Identifica a tu mascota con collar y microchip.' },
-      { id: 7, text: 'Dedica tiempo al entrenamiento y socialización.' },
-      { id: 8, text: 'Proporciona un ambiente seguro en tu hogar.' },
-      { id: 9, text: 'Brinda juguetes interactivos para estimular a tu mascota.' },
-      { id: 10, text: 'Asegúrate de que tu mascota descanse adecuadamente.' },
-      { id: 11, text: 'Estimula mentalmente a tu mascota con juegos y desafíos.' },
-      { id: 12, text: 'Fomenta la interacción social con otras mascotas.' },
-      { id: 13, text: 'Supervisa a tu mascota al aire libre para prevenir riesgos.' },
+      { id: 3, text: 'Consejo 3: Proporciona a tu mascota una alimentación equilibrada.' },
+      { id: 4, text: 'Consejo 4: Realiza visitas veterinarias de forma periódica.' },
+      { id: 5, text: 'Consejo 5: Cuida la higiene de tu mascota regularmente.' },
+      { id: 6, text: 'Consejo 6: Identifica a tu mascota con collar y microchip.' },
+      { id: 7, text: 'Consejo 7: Dedica tiempo al entrenamiento y socialización.' },
+      { id: 8, text: 'Consejo 8: Proporciona un ambiente seguro en tu hogar.' },
+      { id: 9, text: 'Consejo 9: Brinda juguetes interactivos para estimular a tu mascota.' },
+      { id: 10, text: 'Consejo 10: Asegúrate de que tu mascota descanse adecuadamente.' },
+      { id: 11, text: 'Consejo 11: Estimula mentalmente a tu mascota con juegos y desafíos.' },
+      { id: 12, text: 'Consejo 12: Fomenta la interacción social con otras mascotas.' },
+      { id: 13, text: 'Consejo 13: Supervisa a tu mascota al aire libre para prevenir riesgos.' },
     ];
-
+    
     useEffect(() => {
       if (services.length > 0) {
         const intervalId = setInterval(() => {
@@ -410,12 +410,9 @@
   };
 
   const styles = StyleSheet.create({
-    backgroundImage: {
-      flex: 1,
-      resizeMode: 'cover',
-    },
     container: {
       flexGrow: 1,
+      fontFamily: 'Roboto', // Aplicar la fuente Roboto
     },
     headerContainer: {
       position: 'relative',
@@ -426,11 +423,12 @@
     },
     profileIconContainer: {
       position: 'absolute',
-      top: 10,
-      left: 10,
-      backgroundColor: '#FF5733', // Color de fondo vibrante
+      top: 20, // Ajusta la posición superior según sea necesario
+      left: 20, // Ajusta la posición izquierda según sea necesario
+      zIndex: 1, // Asegura que el botón esté sobre el contenido
+      backgroundColor: '#2F9FFA', // Color de fondo vibrante
       borderRadius: 30,
-      padding: 5,
+      padding: 10,
       elevation: 3,
       shadowColor: '#000',
       shadowOffset: { width: 0, height: 2 },
@@ -449,6 +447,7 @@
       paddingHorizontal: 10,
       color: '#000000',
       backgroundColor: '#f5f5f5',
+      fontFamily: 'Roboto', // Aplicar la fuente Roboto
     },
     serviceCardContainer: {
       alignItems: 'center',
@@ -464,12 +463,12 @@
     },
     serviceTitle: {
       fontSize: 24,
-      fontWeight: 'bold',
       color: '#fff',
       textAlign: 'center',
       textShadowColor: 'rgba(0, 0, 0, 0.75)',
       textShadowOffset: { width: 1, height: 1 },
       textShadowRadius: 2,
+      fontFamily: 'Roboto', // Aplicar la fuente Roboto
     },
     tipCard: {
       backgroundColor: '#f9f9f9',
@@ -486,6 +485,7 @@
       fontSize: 16,
       textAlign: 'center',
       color: '#333',
+      fontFamily: 'Roboto', // Aplicar la fuente Roboto
     },
     productContainer: {
       marginVertical: 10,
@@ -500,10 +500,10 @@
     },
     productTitle: {
       fontSize: 20,
-      fontWeight: 'bold',
       paddingHorizontal: 10,
       marginBottom: 5,
       color: '#000000',
+      fontFamily: 'Roboto', // Aplicar la fuente Roboto
     },
     productCard: {
       width: 150,
@@ -524,14 +524,15 @@
     },
     productName: {
       fontSize: 14,
-      fontWeight: 'bold',
       marginTop: 5,
       color: '#000000',
+      fontFamily: 'Roboto', // Aplicar la fuente Roboto
     },
     productPrice: {
       fontSize: 12,
       color: '#666666',
       marginBottom: 5,
+      fontFamily: 'Roboto', // Aplicar la fuente Roboto
     },
     veterinariasContainer: {
       marginVertical: 10,
@@ -546,10 +547,10 @@
     },
     veterinariasTitle: {
       fontSize: 20,
-      fontWeight: 'bold',
       paddingHorizontal: 10,
       marginBottom: 5,
       color: '#000000',
+      fontFamily: 'Roboto', // Aplicar la fuente Roboto
     },
     veterinariaCard: {
       width: 150,
@@ -570,11 +571,10 @@
     },
     veterinariaName: {
       fontSize: 14,
-      fontWeight: 'bold',
       marginTop: 5,
       color: '#000000',
+      fontFamily: 'Roboto', // Aplicar la fuente Roboto
     },
-  
     guarderiasAdiestramientoContainer: {
       marginVertical: 10,
     },
@@ -588,10 +588,10 @@
     },
     guarderiasAdiestramientoTitle: {
       fontSize: 20,
-      fontWeight: 'bold',
       paddingHorizontal: 10,
       marginBottom: 5,
       color: 'black',
+      fontFamily: 'Roboto', // Aplicar la fuente Roboto
     },
     guarderiaAdiestramientoCard: {
       width: 150,
@@ -612,9 +612,9 @@
     },
     guarderiaAdiestramientoName: {
       fontSize: 14,
-      fontWeight: 'bold',
       marginTop: 5,
       color: '#000000',
+      fontFamily: 'Roboto', // Aplicar la fuente Roboto
     },
   });
   

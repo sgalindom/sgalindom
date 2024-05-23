@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, ImageBackground, Linking } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 const Vet1DrScreen = () => {
   const drWhatsAppNumber = '3202212377';
@@ -54,9 +55,11 @@ const Vet1DrScreen = () => {
         </View>
         <View style={styles.buttonsContainer}>
           <TouchableOpacity onPress={handleAgendarCita} style={[styles.button, styles.agendarCitaButton]}>
+            <Icon name="calendar-outline" size={24} color="white" />
             <Text style={styles.buttonText}>Agendar Cita</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={handleLlamar} style={[styles.button, styles.llamarButton]}>
+            <Icon name="call-outline" size={24} color="white" />
             <Text style={styles.buttonText}>Llamar</Text>
           </TouchableOpacity>
         </View>
@@ -132,6 +135,7 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 8,
     alignItems: 'center',
+    flexDirection: 'row',
     width: '45%',
   },
   buttonText: {
@@ -139,6 +143,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 16,
     textAlign: 'center',
+    marginLeft: 5,
   },
   agendarCitaButton: {
     backgroundColor: '#2AC9FA',

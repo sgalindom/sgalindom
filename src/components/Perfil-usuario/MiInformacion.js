@@ -171,23 +171,22 @@ const MiInformacion = () => {
             {userData ? (
               <View>
                 <Text style={styles.title}>Mi Información</Text>
-                <View style={styles.userInfoRow}>
+                <View style={[styles.userInfoRow, styles.userInfoContainer]}>
                   <Icon name="user" size={20} color="black" style={styles.icon} />
                   <Text style={styles.userInfo}><Text style={styles.bold}>Nombre Completo:</Text> {userData.nombreCompleto}</Text>
                 </View>
-                <View style={styles.userInfoRow}>
+                <View style={[styles.userInfoRow, styles.userInfoContainer]}>
                   <Icon name="calendar-alt" size={20} color="black" style={styles.icon} />
                   <Text style={styles.userInfo}><Text style={styles.bold}>Edad:</Text> {userData.edad}</Text>
                 </View>
-                <View style={styles.userInfoRow}>
+                <View style={[styles.userInfoRow, styles.userInfoContainer]}>
                   <Icon name="map-marker-alt" size={20} color="black" style={styles.icon} />
                   <Text style={styles.userInfo}><Text style={styles.bold}>Dirección:</Text> {userData.direccion}</Text>
                 </View>
-                <View style={styles.userInfoRow}>
+                <View style={[styles.userInfoRow, styles.userInfoContainer]}>
                   <Icon name="phone" size={20} color="black" style={styles.icon} />
                   <Text style={styles.userInfo}><Text style={styles.bold}>Teléfono:</Text> {userData.telefono}</Text>
                 </View>
-                
               </View>
             ) : (
               <Text style={styles.infoText}>Cargando...</Text>
@@ -195,6 +194,7 @@ const MiInformacion = () => {
           </View>
         </ScrollView>
       </View>
+
       <Modal
         animationType="slide"
         transparent={true}
@@ -323,6 +323,10 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: 'black',
   },
+  userInfoContainer: {
+    marginBottom: 30,
+  },
+  
 });
 
 export default MiInformacion;

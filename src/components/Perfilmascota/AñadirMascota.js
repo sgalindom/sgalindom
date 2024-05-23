@@ -60,38 +60,41 @@ const AñadirMascota = ({ navigation }) => {
           <Picker
             selectedValue={tipoMascota}
             onValueChange={(itemValue, itemIndex) => setTipoMascota(itemValue)}
-            style={[styles.input, { color: 'black' }]}
+            style={styles.input}
           >
-            <Picker.Item label="Perro" value="perro" />
-            <Picker.Item label="Gato" value="gato" />
+            <Picker.Item label="Perro" value="perro" color="black" />
+            <Picker.Item label="Gato" value="gato" color="black" />
           </Picker>
         </View>
         <View style={styles.inputContainer}>
           <Icon name="user" size={20} color="black" style={styles.icon} />
           <TextInput
-            style={[styles.input, { color: 'black' }]}
+            style={styles.input}
             placeholder="Nombre de la mascota"
             value={nombre}
             onChangeText={setNombre}
+            placeholderTextColor="black"
           />
         </View>
         <View style={styles.inputContainer}>
           <Icon name="book" size={20} color="black" style={styles.icon} />
           <TextInput
-            style={[styles.input, { color: 'black' }]}
+            style={styles.input}
             placeholder="Raza de la mascota"
             value={raza}
             onChangeText={setRaza}
+            placeholderTextColor="black"
           />
         </View>
         <View style={styles.inputContainer}>
           <Icon name="calendar" size={20} color="black" style={styles.icon} />
           <TextInput
-            style={[styles.input, { color: 'black' }]}
+            style={styles.input}
             placeholder={`Edad de la mascota (${unidadEdad})`}
             value={edad}
             onChangeText={setEdad}
             keyboardType="numeric"
+            placeholderTextColor="black"
           />
         </View>
         <View style={styles.inputContainer}>
@@ -99,31 +102,33 @@ const AñadirMascota = ({ navigation }) => {
           <Picker
             selectedValue={unidadEdad}
             onValueChange={(itemValue, itemIndex) => setUnidadEdad(itemValue)}
-            style={[styles.input, { color: 'black' }]}
+            style={styles.input}
           >
-            <Picker.Item label="Años" value="años" />
-            <Picker.Item label="Meses" value="meses" />
+            <Picker.Item label="Años" value="años" color="black" />
+            <Picker.Item label="Meses" value="meses" color="black" />
           </Picker>
         </View>
         <View style={styles.inputContainer}>
           <Icon name="balance-scale" size={20} color="black" style={styles.icon} />
           <TextInput
-            style={[styles.input, { color: 'black' }]}
+            style={styles.input}
             placeholder="Peso de la mascota (Kg)"
             value={peso}
             onChangeText={setPeso}
             keyboardType="numeric"
+            placeholderTextColor="black"
           />
         </View>
         <View style={styles.inputContainer}>
           <Icon name="comment" size={20} color="black" style={styles.icon} />
           <TextInput
-            style={[styles.input, { color: 'black' }]}
+            style={styles.input}
             placeholder="Cuentanos más sobre tu mascota"
             multiline
             numberOfLines={4}
             value={descripcion}
             onChangeText={setDescripcion}
+            placeholderTextColor="black"
           />
         </View>
         <TouchableOpacity style={styles.registrarButton} onPress={registrarMascota}>
@@ -175,13 +180,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 15, // Aumenté el padding para que el botón sea más grande
     borderRadius: 8,
-    marginTop: 20,
-  },
-  registrarButtonText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: 'white',
-  },
-});
-
-export default AñadirMascota;
+    marginTop: 20,  },
+    registrarButtonText: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      color: 'white',
+    },
+  });
+  
+  export default AñadirMascota;
+  

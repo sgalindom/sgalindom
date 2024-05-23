@@ -1,23 +1,27 @@
 import React from 'react';
 import { View, Text, ScrollView, StyleSheet, ImageBackground, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 const PetShopScreen = () => {
   const productos = [
     {
       nombre: 'Juguete para perros',
       descripcion: 'Juguete resistente para perros, ideal para juegos interactivos.',
-      ruta: 'vet1juguetes', // Nueva propiedad para la ruta de navegación
+      icono: 'basketball-outline', // Cambiado a un hueso de perro
+      ruta: 'vet1juguetes',
     },
     {
       nombre: 'Comida balanceada',
       descripcion: 'Alimento completo y balanceado para perros de todas las edades y razas.',
-      ruta: 'vet1comida', // Nueva propiedad para la ruta de navegación
+      icono: 'paw-sharp', // Cambiado a un icono de comida
+      ruta: 'vet1comida',
     },
     {
-      nombre: 'Mas Accesorios',
+      nombre: 'Más Accesorios',
       descripcion: 'Collar y correa ajustables para pasear a tu mascota con estilo y seguridad.',
-      ruta: 'vet1accesorios', // Nueva propiedad para la ruta de navegación
+      icono: 'paw-sharp',
+      ruta: 'vet1accesorios',
     },
     // Agrega más productos según sea necesario
   ];
@@ -25,7 +29,7 @@ const PetShopScreen = () => {
   const navigation = useNavigation();
 
   const goTo = (ruta) => {
-    navigation.navigate(ruta); // Navega a la ruta específica al hacer clic
+    navigation.navigate(ruta);
   };
 
   return (
@@ -36,11 +40,12 @@ const PetShopScreen = () => {
       <ScrollView contentContainerStyle={styles.container}>
         <Text style={styles.title}>Pet Shop</Text>
         {productos.map((producto, index) => (
-          <TouchableOpacity key={index} style={styles.tarjetaProducto} onPress={() => goTo(producto.ruta)}>
-            {/* Agrega la imagen del producto aquí */}
-            {/* <Image source={producto.imagen} style={styles.productoImage} /> */}
-            <Text style={styles.productoNombre}>{producto.nombre}</Text>
-            <Text style={styles.productoDescripcion}>{producto.descripcion}</Text>
+          <TouchableOpacity key={index} style={styles.card} onPress={() => goTo(producto.ruta)}>
+            <View style={styles.iconContainer}>
+              <Icon name={producto.icono} size={40} color="white" />
+            </View>
+            <Text style={styles.productName}>{producto.nombre}</Text>
+            <Text style={styles.productDescription}>{producto.descripcion}</Text>
           </TouchableOpacity>
         ))}
       </ScrollView>
@@ -55,44 +60,51 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   container: {
-    flexGrow: 1,
     alignItems: 'center',
-    backgroundColor: 'transparent',
+    paddingTop: 40,
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginVertical: 20,
+    marginBottom: 20,
     color: 'white',
+    textAlign: 'center',
   },
-  tarjetaProducto: {
+  card: {
     backgroundColor: 'rgba(255, 255, 255, 0.8)',
     borderRadius: 8,
     padding: 16,
-    margin: 16,
-    width: 320,
+    marginVertical: 10,
+    width: '80%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 2,
     elevation: 2,
   },
-  productoImage: {
-    width: 290,
-    height: 200,
-    resizeMode: 'cover',
-    borderRadius: 8,
-    marginBottom: 10,
+  iconContainer: {
+    backgroundColor: '#2F9FFA',
+    borderRadius: 25,
+    width: 50,
+    height: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  productoNombre: {
+  productName: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: 'black', // Letra en negro
+    flex: 1,
+    marginLeft: 16,
+    color: 'black',
   },
-  productoDescripcion: {
+  productDescription: {
     fontSize: 16,
-    marginTop: 8,
-    color: 'black', // Letra en negro
+    flex: 1,
+    marginLeft: 16,
+    color: 'black',
   },
 });
 

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, FlatList, Image, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, FlatList, ImageBackground, Alert } from 'react-native';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 const Vet1Comida = ({ navigation }) => {
   const [productos, setProductos] = useState([]);
@@ -13,21 +14,18 @@ const Vet1Comida = ({ navigation }) => {
         const user = auth().currentUser;
 
         if (user) {
-          // Obtener datos de la veterinaria
           const veterinariaSnapshot = await firestore()
             .collection('Veterinarias')
-            .doc('1') // Puedes cambiar '1' por el ID de la veterinaria correspondiente
+            .doc('1')
             .get();
 
-          // Almacenar el nombre de la veterinaria en el estado
           const nombreVeterinaria = veterinariaSnapshot.exists ? veterinariaSnapshot.data().Nombre : '';
           setNombreVeterinaria(nombreVeterinaria);
 
-          // Obtener productos de comida
           const productosSnapshot = await firestore()
             .collection('Veterinarias')
-            .doc('1') // Puedes cambiar '1' por el ID de la veterinaria correspondiente
-            .collection('Comida') // Cambia a la colección correspondiente para productos de comida
+            .doc('1')
+            .collection('Comida')
             .get();
 
           const productosData = productosSnapshot.docs.map((doc) => ({
@@ -54,19 +52,14 @@ const Vet1Comida = ({ navigation }) => {
         if (user) {
           const usuarioRef = firestore().collection('usuarios').doc(user.email);
           const pedidoRef = usuarioRef.collection('pedidos').doc('default');
-          const productoRef = pedidoRef.collection('productosComida').doc(id); // Cambia a la colección correspondiente para productos de comida
+          const productoRef = pedidoRef.collection('Comida').doc(id);
 
-          // Obtener la cantidad actual del producto
           const productoActual = await productoRef.get();
           const cantidadActual = productoActual.exists ? productoActual.data().cantidad : 0;
 
-          // Sumar la cantidad seleccionada a la cantidad actual
           const nuevaCantidad = cantidadActual + cantidadSeleccionada;
-
-          // Calcular el precio total del producto
           const precioTotal = precioUnitario * nuevaCantidad;
 
-          // Actualizar la cantidad y precio en Firestore
           await productoRef.set({
             nombre: nombre || '',
             descripcion: descripcion || '',
@@ -75,12 +68,13 @@ const Vet1Comida = ({ navigation }) => {
             precioTotal,
           });
 
-          // Reiniciar el contador a cero
           setProductos((prevProductos) =>
             prevProductos.map((producto) =>
               producto.id === id ? { ...producto, cantidad: 0 } : producto
             )
           );
+
+          Alert.alert('Producto Agregado', 'El producto ha sido agregado a tu carrito');
         }
       } else {
         Alert.alert('Error', 'Seleccione una cantidad mayor que 0');
@@ -107,61 +101,61 @@ const Vet1Comida = ({ navigation }) => {
   };
 
   const handleNavegarPago = () => {
-    navigation.navigate('pago'); // Asegúrate de que 'pago' coincida con el nombre de tu pantalla de pago en la configuración de navegación
+    navigation.navigate('pago');
   };
 
   const renderItem = ({ item }) => (
-    <View style={styles.tarjeta}>
-      <Image source={{ uri: item.Foto }} style={styles.imagen} />
+    <View style={styles.card}>
+      <ImageBackground source={{ uri: item.Foto }} style={styles.image}>
+        <TouchableOpacity
+          onPress={() =>
+            handleAgregarCarrito(
+              item.id,
+              item.Nombre,
+              item.Descripcion,
+              item.cantidad,
+              item.Precio
+            )
+          }
+          style={styles.addButton}
+        >
+          <Icon name="cart" size={24} color="white" />
+          <Text style={styles.addButtonLabel}>Añadir</Text>
+        </TouchableOpacity>
+      </ImageBackground>
       <View style={styles.overlay}>
-        <Text style={styles.nombreProducto}>{item.Nombre}</Text>
-        <Text style={styles.descripcionProducto}>{item.Descripcion}</Text>
-        <Text style={styles.precioProducto}>Precio: {item.Precio}</Text>
-        <View style={styles.botonesContainer}>
-          <View style={styles.contadorContainer}>
-            <TouchableOpacity onPress={() => handleDecrementarCantidad(item.id)} style={styles.botonMasMenos}>
-              <Text style={styles.menosMasText}>-</Text>
-            </TouchableOpacity>
-            <Text style={styles.cantidadText}>{item.cantidad}</Text>
-            <TouchableOpacity onPress={() => handleIncrementarCantidad(item.id)} style={styles.botonMasMenos}>
-              <Text style={styles.menosMasText}>+</Text>
-            </TouchableOpacity>
-          </View>
-          <TouchableOpacity
-            onPress={() =>
-              handleAgregarCarrito(
-                item.id,
-                item.Nombre,
-                item.Descripcion,
-                item.cantidad,
-                item.Precio
-              )
-            }
-            style={styles.botonAgregar}
-          >
-            <Text style={styles.textoBotonAgregar}>Añadir al carrito</Text>
+        <Text style={styles.productName}>{item.Nombre}</Text>
+        <Text style={styles.productDescription}>{item.Descripcion}</Text>
+        <Text style={styles.productPrice}>Precio: {item.Precio}</Text>
+        <View style={styles.buttonsContainer}>
+          <TouchableOpacity onPress={() => handleDecrementarCantidad(item.id)} style={styles.plusMinusButton}>
+            <Icon name="remove" size={20} color="#599B85" />
+          </TouchableOpacity>
+          <Text style={styles.quantityText}>{item.cantidad}</Text>
+          <TouchableOpacity onPress={() => handleIncrementarCantidad(item.id)} style={styles.plusMinusButton}>
+            <Icon name="add" size={20} color="#599B85" />
           </TouchableOpacity>
         </View>
       </View>
     </View>
   );
 
-  
   useEffect(() => {
-    navigation.setOptions({ title: `Productos (${nombreVeterinaria})` });
+    navigation.setOptions({ title: `Productos Comida (${nombreVeterinaria})` });
   }, [nombreVeterinaria, navigation]);
 
   return (
-    <View style={styles.container}>
+    <ImageBackground source={require('../../imagenes/fondomain.jpg')} style={styles.container}>
       <FlatList
         data={productos}
         renderItem={renderItem}
         keyExtractor={(item) => item.id.toString()}
       />
-      <TouchableOpacity onPress={handleNavegarPago} style={styles.botonMisCompras}>
-        <Text>Mis Pedidos</Text>
+      <TouchableOpacity onPress={handleNavegarPago} style={styles.cartButton}>
+        <Icon name="cart" size={24} color="white" />
+        <Text style={styles.cartButtonText}>Mis Pedidos</Text>
       </TouchableOpacity>
-    </View>
+    </ImageBackground>
   );
 };
 
@@ -169,78 +163,81 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
+    resizeMode: 'cover',
+    justifyContent: 'center',
   },
-  tarjeta: {
+  card: {
     borderRadius: 8,
     marginBottom: 16,
-    overflow: 'hidden', // Para recortar la imagen dentro de la tarjeta
+    overflow: 'hidden',
   },
-  imagen: {
+  image: {
     width: '100%',
-    height: 300, // Altura ajustable según tus necesidades
+    height: 200,
     marginBottom: 8,
+    justifyContent: 'flex-end',
+    alignItems: 'flex-end',
   },
   overlay: {
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     padding: 16,
   },
-  nombreProducto: {
+  productName: {
     fontWeight: 'bold',
     fontSize: 16,
     color: 'white',
     marginBottom: 8,
   },
-  descripcionProducto: {
+  productDescription: {
     color: 'white',
     marginBottom: 8,
   },
-  precioProducto: {
+  productPrice: {
     color: 'white',
     marginBottom: 8,
   },
-  botonesContainer: {
+  buttonsContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-end',
   },
-  contadorContainer: {
-    flexDirection: 'row',
+  quantityText: {
+    fontSize: 20,
+    paddingHorizontal: 16,
+    color: 'white',
+  },
+  plusMinusButton: {
+    backgroundColor: 'transparent',
+    paddingHorizontal: 8,
+  },
+  addButton: {
+    backgroundColor: '#2F9FFA',
+    padding: 8,
+    borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'white',
-    borderRadius: 8,
+    flexDirection: 'row',
   },
-  cantidadText: {
-    fontSize: 20,
-    paddingHorizontal: 16,
-    color: 'black',
-  },
-  menosMasText: {
-    fontSize: 20,
-    paddingHorizontal: 16,
-    color: '#599B85',
-  },
-  botonMasMenos: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 8,
-  },
-  botonAgregar: {
-    backgroundColor: '#2F9FFA',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-  },
-  textoBotonAgregar: {
+  addButtonLabel: {
     color: 'white',
     fontWeight: 'bold',
+    marginLeft: 4,
   },
-  botonMisCompras: {
+  cartButton: {
     backgroundColor: '#2F9FFA',
     padding: 12,
     borderRadius: 8,
     alignItems: 'center',
     marginTop: 16,
+    flexDirection: 'row',
+    justifyContent: 'center',
+  },
+  cartButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    marginLeft: 8,
   },
 });
 
 export default Vet1Comida;
+   

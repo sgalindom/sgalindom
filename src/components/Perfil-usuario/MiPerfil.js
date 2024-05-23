@@ -12,6 +12,10 @@ const MiPerfil = ({ navigation }) => {
     navigation.navigate('MisMascotas');
   };
 
+  const goToMisPedidos = () => {
+    navigation.navigate('MisPedidos');
+  };
+
   const goToPolíticas = () => {
     navigation.navigate('politica');
   };
@@ -56,6 +60,7 @@ const MiPerfil = ({ navigation }) => {
             <Text style={styles.title}>Mi Perfil</Text>
             {renderOption('user', 'Mi Información', goToMiInformacion)}
             {renderOption('paw', 'Mis Mascotas', goToMisMascotas)}
+            {renderOption('shopping-cart', 'Mis Pedidos', goToMisPedidos)}
             {renderOption('ticket-alt', 'Cupones', goToCupones)}
             {renderOption('bell', 'Notificaciones', goToNotificaciones)}
             {renderOption('file-alt', 'Políticas', goToPolíticas)}
@@ -128,7 +133,7 @@ const styles = StyleSheet.create({
   },
   optionText: {
     color: 'black',
-    fontSize: 18, // Reducido el tamaño de la fuente
+    fontSize: 18,
   },
   logoutButton: {
     backgroundColor: '#FF6F61',

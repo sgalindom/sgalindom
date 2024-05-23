@@ -195,12 +195,12 @@ const styles = StyleSheet.create({
     elevation: 10,
   },
   logoContainer: {
-    marginBottom: 30,
+    marginBottom: 50,
     alignItems: 'center',
   },
   logo: {
-    width: 150,
-    height: 150,
+    width: 250,
+    height: 250,
     resizeMode: 'contain',
   },
   welcomeText: {
