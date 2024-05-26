@@ -95,6 +95,15 @@ import ProximamentePanel from './components/proximamente';
 import AdieguarScreen from './components/Adiestramiento/Adieguar1/Adieguar1';
 
 
+import VerProductoComida from './components/veterinarias/Veterinaria1/verproductocomida';
+import VerProductoJuguete from './components/veterinarias/Veterinaria1/verproductojuguetes';
+import VerProductoAccesorios from './components/veterinarias/Veterinaria1/verproductoaccesorios';
+
+
+import MisPedidos from './components/Pedidosusuarios/mispedidos';
+
+import Seguros from './components/seguros/seguros';
+
 
 const Stack = createNativeStackNavigator();
 
@@ -196,6 +205,18 @@ const Stack = createNativeStackNavigator();
 
         <Stack.Screen name="badieguar" component={Badiegard} />
         <Stack.Screen name="Adieguar1" component={AdieguarScreen} />
+
+
+
+        <Stack.Screen name="verproductocomida" component={VerProductoComida} />
+        <Stack.Screen name="verproductojuguetes" component={VerProductoJuguete} />
+        <Stack.Screen name="verproductoaccesorios" component={VerProductoAccesorios} />
+        <Stack.Screen name="mispedidos" component={MisPedidos} />
+
+        <Stack.Screen name="seguros" component={Seguros} />
+
+
+
 
       </Stack.Navigator>
     </NavigationContainer>

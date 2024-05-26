@@ -16,7 +16,7 @@ import firestore from '@react-native-firebase/firestore';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
 const backgroundImage = require('../imagenes/Login.jpg');
-const logoImage = require('../imagenes/logo_2.png');
+const logoImage = require('../imagenes/logo_.png');
 
 function Login({ navigation }) {
   const [email, setEmail] = useState('');
@@ -24,7 +24,7 @@ function Login({ navigation }) {
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [buttonScale] = useState(new Animated.Value(1));
-  const [hidePassword, setHidePassword] = useState(true); // Estado para ocultar/mostrar la contraseña
+  const [hidePassword, setHidePassword] = useState(true); 
 
   useEffect(() => {
     const unsubscribe = auth().onAuthStateChanged(async (user) => {
@@ -116,7 +116,7 @@ function Login({ navigation }) {
           <View style={styles.logoContainer}>
             <Image source={logoImage} style={styles.logo} />
           </View>
-          <Text style={styles.welcomeText}>Bienvenido</Text>
+          <Text style={styles.welcomeText}>Inicia Sesión</Text>
           <View style={styles.inputContainer}>
             <Icon name="envelope" size={20} color="gray" style={styles.icon} />
             <TextInput
@@ -130,13 +130,13 @@ function Login({ navigation }) {
             <Icon name="lock" size={20} color="gray" style={styles.icon} />
             <TextInput
               placeholder="Contraseña"
-              secureTextEntry={hidePassword} // Usar el estado para determinar si se oculta o muestra la contraseña
+              secureTextEntry={hidePassword} 
               onChangeText={(text) => setPassword(text)}
               value={password}
               style={styles.input}
             />
             <TouchableOpacity
-              onPress={() => setHidePassword(!hidePassword)} // Alternar el estado al presionar el botón
+              onPress={() => setHidePassword(!hidePassword)} 
               style={styles.eyeIconContainer}
             >
               <Icon name={hidePassword ? 'eye' : 'eye-slash'} size={20} color="gray" />
@@ -159,6 +159,10 @@ function Login({ navigation }) {
             <Text style={styles.registerButtonText}>¿No tienes una cuenta? Regístrate</Text>
           </TouchableOpacity>
         </View>
+      </View>
+      {/* Texto de la versión de la aplicación */}
+      <View style={styles.bottomRightTextContainer}>
+        <Text style={styles.bottomRightText}>Versión 0.0.1</Text>
       </View>
     </ImageBackground>
   );
@@ -204,11 +208,14 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
   },
   welcomeText: {
-    fontSize: 30,
+    fontSize: 40,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#FFFFFF', 
     marginBottom: 20,
     textAlign: 'center',
+    textShadowColor: '#000000', 
+    textShadowOffset: { width: 2, height: 2 },
+    textShadowRadius: 3,
   },
   inputContainer: {
     flexDirection: 'row',
@@ -219,7 +226,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     backgroundColor: 'white',
     borderWidth: 1,
-    borderColor: '#ccc', // Color del borde del cuadro de entrada
+    borderColor: '#ccc', 
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
@@ -235,7 +242,7 @@ const styles = StyleSheet.create({
     paddingLeft: 10,
   },
   button: {
-    backgroundColor: '#2F9FFA',
+    backgroundColor: '#007BFF',
     padding: 12,
     borderRadius: 10,
     width: '100%',
@@ -257,17 +264,25 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   registerButtonText: {
-    color: '#2F9FFA',
+    color: '#FFFFFF',
     fontWeight: 'bold',
     fontSize: 16,
+    textAlign: 'center',
+    textShadowColor: '#000000', 
+    textShadowOffset: { width: 2, height: 2 },
+    textShadowRadius: 3,
   },
   enlaceRecuperarContraseña: {
     marginTop: 10,
   },
   enlaceRecuperarContraseñaTexto: {
-    color: '#2F9FFA',
+    color: '#FFFFFF',
     fontWeight: 'bold',
     fontSize: 16,
+    textAlign: 'center',
+    textShadowColor: '#000000', 
+    textShadowOffset: { width: 2, height: 2 },
+    textShadowRadius: 3,
   },
   errorText: {
     color: 'red',
@@ -283,6 +298,16 @@ const styles = StyleSheet.create({
   eyeIconContainer: {
     position: 'absolute',
     right: 10,
+  },
+  bottomRightTextContainer: {
+    position: 'absolute',
+    bottom: 10,
+    right: 20,
+  },
+  bottomRightText: {
+    color: 'black',
+    fontSize: 12,
+    fontWeight: 'bold',
   },
 });
 

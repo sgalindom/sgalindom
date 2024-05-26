@@ -14,61 +14,18 @@ const Pago = ({ navigation }) => {
         const usuarioAutenticado = auth().currentUser;
 
         if (usuarioAutenticado) {
-          const productosJuguetesSnapshot = await firestore()
+          const pedidosSnapshot = await firestore()
             .collection('usuarios')
             .doc(usuarioAutenticado.email)
             .collection('pedidos')
-            .doc('default')
-            .collection('productos')
             .get();
 
-          const productosComidaSnapshot = await firestore()
-            .collection('usuarios')
-            .doc(usuarioAutenticado.email)
-            .collection('pedidos')
-            .doc('default')
-            .collection('productosComida')
-            .get();
-
-          const productosAccesoriosSnapshot = await firestore()
-            .collection('usuarios')
-            .doc(usuarioAutenticado.email)
-            .collection('pedidos')
-            .doc('default')
-            .collection('Accesorios')
-            .get();
-
-          const productosJuguetesData = productosJuguetesSnapshot.docs.map((doc) => ({
+          const pedidosData = pedidosSnapshot.docs.map((doc) => ({
             id: doc.id,
             ...doc.data(),
-            esComida: false,
-            esAccesorio: false,
           }));
 
-          const productosComidaData = productosComidaSnapshot.docs.map((doc) => ({
-            id: doc.id,
-            ...doc.data(),
-            esComida: true,
-            esAccesorio: false,
-          }));
-
-          const productosAccesoriosData = productosAccesoriosSnapshot.docs.map((doc) => ({
-            id: doc.id,
-            ...doc.data(),
-            esComida: false,
-            esAccesorio: true,
-          }));
-
-          const pedidosData = [...productosJuguetesData, ...productosComidaData, ...productosAccesoriosData];
           setPedidos(pedidosData);
-
-          const sumaTotal = pedidosData.reduce((total, producto) => {
-            const precioUnitario = parseFloat(producto.precioUnitario.replace(/[^0-9.]/g, ''));
-            const totalProducto = precioUnitario * producto.cantidad || 0;
-            return total + totalProducto;
-          }, 0);
-
-          setTotalPagar(sumaTotal.toFixed(3));
         }
       } catch (error) {
         console.error('Error al obtener pedidos:', error);
@@ -78,6 +35,15 @@ const Pago = ({ navigation }) => {
     obtenerPedidos();
   }, []);
 
+  useEffect(() => {
+    const sumaTotal = pedidos.reduce((total, pedido) => {
+      const precioTotalPedido = parseFloat(pedido.precio) * parseInt(pedido.cantidad);
+      return total + precioTotalPedido;
+    }, 0);
+
+    setTotalPagar(sumaTotal.toFixed(3));
+  }, [pedidos]);
+
   const handleHacerPedido = async () => {
     try {
       const usuarioAutenticado = auth().currentUser;
@@ -86,49 +52,67 @@ const Pago = ({ navigation }) => {
         const usuarioEmail = usuarioAutenticado.email;
         const usuarioRef = firestore().collection('usuarios').doc(usuarioEmail);
         const datosSnapshot = await usuarioRef.collection('datos').get();
-        
+  
         if (!datosSnapshot.empty) {
-          const primerDocumento = datosSnapshot.docs[0];
-          const { nombreCompleto, telefono } = primerDocumento.data();
-  
-          const pedidoRef = usuarioRef.collection('pedidos').doc(); // Generar un ID único para el pedido
-          const productosRef = pedidoRef.collection('productos');
-  
-          // Obtener productos desde el estado local
-          const productosData = pedidos.map((producto) => ({
-            nombre: producto.nombre,
-            cantidad: producto.cantidad,
-            precioUnitario: producto.precioUnitario,
-          }));
-  
-          await pedidoRef.set({
-            nombreCompleto: nombreCompleto,
-            telefono: telefono,
-            total: parseFloat(totalPagar),
-          });
-  
-          // Guardar productos en el pedido del usuario
-          productosData.forEach(async (producto) => {
-            await productosRef.add(producto);
-          });
-  
-          // Guardar pedido también en la ruta de la veterinaria
-          const domicilioRef = firestore().collection('Administradores').doc('animalzone@gmail.com').collection('pedidospetshop').doc(pedidoRef.id);
-          await domicilioRef.set({
-            usuario: usuarioEmail,
-            nombreCompleto: nombreCompleto,
-            telefono: telefono,
-            productos: productosData,
-            total: parseFloat(totalPagar),
-          });
-  
-          await limpiarProductos();
-  
-          navigation.navigate('vet1');
           Alert.alert(
-            'Pedido realizado',
-            'Gracias por tu pedido. Se ha procesado correctamente. Serás contactado vía WhatsApp para confirmar tu pedido.'
+            'Confirmar pedido',
+            '¿Estás seguro de hacer este pedido?',
+            [
+              {
+                text: 'Cancelar',
+                style: 'cancel',
+              },
+              {
+                text: 'Confirmar',
+                onPress: async () => {
+                  const primerDocumento = datosSnapshot.docs[0];
+                  const { nombreCompleto, telefono } = primerDocumento.data();
+  
+                  const misPedidosRef = usuarioRef.collection('mispedidos').doc(); // Generar un ID único para el pedido
+                  const productosRef = misPedidosRef.collection('productos');
+  
+                  // Obtener productos desde el estado local
+                  const productosData = pedidos.map((producto) => ({
+                    nombre: producto.nombre,
+                    cantidad: producto.cantidad,
+                    precio: producto.precio,
+                  }));
+  
+                  await misPedidosRef.set({
+                    nombreCompleto,
+                    telefono,
+                    total: parseFloat(totalPagar),
+                    fecha: new Date(),
+                  });
+  
+                  // Guardar productos en el pedido del usuario
+                  productosData.forEach(async (producto) => {
+                    await productosRef.add(producto);
+                  });
+  
+                  // Guardar pedido también en la ruta de la veterinaria
+                  const domicilioRef = firestore().collection('Administradores').doc('animalzone@gmail.com').collection('pedidospetshop').doc(misPedidosRef.id);
+                  await domicilioRef.set({
+                    usuario: usuarioEmail,
+                    nombreCompleto,
+                    telefono,
+                    productos: productosData,
+                    total: parseFloat(totalPagar),
+                  });
+  
+                  await limpiarProductos(usuarioEmail);
+  
+                  navigation.navigate('MainPanel');
+                  Alert.alert(
+                    'Pedido realizado',
+                    'Gracias por tu pedido. Se ha procesado correctamente. Serás contactado vía WhatsApp para confirmar tu pedido.'
+                  );
+                },
+              },
+            ],
+            { cancelable: false }
           );
+        } else {
           Alert.alert('Error', 'No se encontraron datos de usuario. Por favor, actualiza tu información de contacto antes de realizar el pedido.');
         }
       }
@@ -136,58 +120,57 @@ const Pago = ({ navigation }) => {
       console.error('Error al procesar el pedido:', error);
     }
   };
-
-  const limpiarProductos = async () => {
-    const usuarioAutenticado = auth().currentUser;
-
-    if (usuarioAutenticado) {
-      const usuarioRef = firestore().collection('usuarios').doc(usuarioAutenticado.email);
-      const pedidoRef = usuarioRef.collection('pedidos').doc('default');
-      const productosRef = pedidoRef.collection('productos');
-      const productosComidaRef = pedidoRef.collection('productosComida');
-      const productosAccesoriosRef = pedidoRef.collection('Accesorios');
-
-      await limpiarColeccion(productosRef);
-      await limpiarColeccion(productosComidaRef);
-      await limpiarColeccion(productosAccesoriosRef);
-    }
-  };
-
-  const limpiarColeccion = async (coleccionRef) => {
-    const querySnapshot = await coleccionRef.get();
-    querySnapshot.forEach((doc) => {
-      doc.ref.delete();
+  const limpiarProductos = async (usuarioEmail) => {
+    const pedidoRef = firestore().collection('usuarios').doc(usuarioEmail).collection('pedidos');
+    const productosSnapshot = await pedidoRef.get();
+    productosSnapshot.forEach(async (doc) => {
+      await doc.ref.delete();
     });
   };
 
-  const obtenerNumeroSecuencial = async () => {
+  const handleEliminarPedido = async (id) => {
     try {
-      const numeroSecuencialRef = firestore().collection('Administradores').doc('animalzone@gmail.com').collection('secuenciapepetshop').doc('Secuencial');
-      const numeroSecuencialDoc = await numeroSecuencialRef.get();
+      const usuarioAutenticado = auth().currentUser;
 
-      if (numeroSecuencialDoc.exists) {
-        const nuevoNumeroSecuencial = numeroSecuencialDoc.data().numero + 1;
-        await numeroSecuencialRef.update({ numero: nuevoNumeroSecuencial });
-        return nuevoNumeroSecuencial.toString();
-      } else {
-        await numeroSecuencialRef.set({ numero: 1 });
-        return '1';
+      if (usuarioAutenticado) {
+        Alert.alert(
+          'Eliminar pedido',
+          '¿Estás seguro de eliminar este pedido?',
+          [
+            {
+              text: 'Cancelar',
+              style: 'cancel',
+            },
+            {
+              text: 'Eliminar',
+              onPress: async () => {
+                await firestore()
+                  .collection('usuarios')
+                  .doc(usuarioAutenticado.email)
+                  .collection('pedidos')
+                  .doc(id)
+                  .delete();
+
+                const nuevosPedidos = pedidos.filter((pedido) => pedido.id !== id);
+                setPedidos(nuevosPedidos);
+              },
+            },
+          ],
+          { cancelable: false }
+        );
       }
     } catch (error) {
-      console.error('Error al obtener el número secuencial:', error);
-      return null;
+      console.error('Error al eliminar el pedido:', error);
     }
   };
 
   const renderItem = ({ item }) => (
     <View style={styles.itemContainer}>
       <Text style={styles.texto}>Nombre del Producto: {item.nombre}</Text>
-      {item.precioUnitario && typeof item.precioUnitario === 'number' && (
-        <Text style={styles.texto}>Precio por unidad: {item.precioUnitario}</Text>
-      )}
+      <Text style={styles.texto}>Precio: ${item.precio}</Text>
       <Text style={styles.texto}>Cantidad: {item.cantidad}</Text>
       <TouchableOpacity
-        onPress={() => confirmarEliminarProducto(item.id, item.precioUnitario, item.cantidad, item.esComida, item.esAccesorio)}
+        onPress={() => handleEliminarPedido(item.id)}
         style={styles.botonEliminar}
       >
         <Icon name="trash-outline" size={20} color="white" />
@@ -195,56 +178,6 @@ const Pago = ({ navigation }) => {
       </TouchableOpacity>
     </View>
   );
-
-  const confirmarEliminarProducto = (id, precioUnitario, cantidad, esComida, esAccesorio) => {
-    Alert.alert(
-      'Eliminar producto',
-      '¿Estás seguro que deseas eliminar este producto?',
-      [
-        {
-          text: 'Cancelar',
-          style: 'cancel',
-        },
-        {
-          text: 'Eliminar',
-          onPress: () => handleEliminarProducto(id, precioUnitario, cantidad, esComida, esAccesorio),
-          style: 'destructive',
-        },
-      ],
-      { cancelable: false }
-    );
-  };
-
-  const handleEliminarProducto = async (id, precioUnitario, cantidad, esComida, esAccesorio) => {
-    try {
-      const usuarioAutenticado = auth().currentUser;
-
-      if (usuarioAutenticado) {
-        const usuarioRef = firestore().collection('usuarios').doc(usuarioAutenticado.email);
-        const pedidoRef = usuarioRef.collection('pedidos').doc('default');
-        const productosRef = esComida
-          ? pedidoRef.collection('productosComida')
-          : esAccesorio
-          ? pedidoRef.collection('Accesorios')
-          : pedidoRef.collection('productos');
-
-        await productosRef.doc(id).delete();
-
-        const nuevosPedidos = pedidos.filter((producto) => producto.id !== id);
-        setPedidos(nuevosPedidos);
-
-        const sumaTotal = nuevosPedidos.reduce((total, producto) => {
-          const precio = parseFloat(producto.precioUnitario.replace(/[^0-9.]/g, ''));
-          const totalProducto = precio * producto.cantidad || 0;
-          return total + totalProducto;
-        }, 0);
-
-        setTotalPagar(sumaTotal.toFixed(3));
-      }
-    } catch (error) {
-      console.error('Error al eliminar el producto:', error);
-    }
-  };
 
   return (
     <ImageBackground source={require('../imagenes/fondomain.jpg')} style={styles.backgroundImage}>
@@ -290,7 +223,7 @@ const styles = StyleSheet.create({
   titulo: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#000', // Letra en negro
+    color: '#000',
   },
   itemContainer: {
     borderWidth: 1,
@@ -298,7 +231,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 16,
     marginBottom: 16,
-    backgroundColor: 'rgba(255, 255, 255, 0.8)', // Fondo blanco semitransparente
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
   },
   pie: {
     marginTop: 16,
@@ -310,7 +243,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 8,
-    color: '#000', // Letra en negro
+    color: '#000',
   },
   botonHacerPedido: {
     backgroundColor: '#599B85',
@@ -332,15 +265,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'center',
-marginTop: 8,
+    marginTop: 8,
   },
   textoBotonEliminar: {
     color: 'white',
     fontWeight: 'bold',
-    marginLeft: 5,
+    marginLeft: 5
   },
   texto: {
-    color: '#000', // Letra en negro
+    color: '#000',
   },
 });
 

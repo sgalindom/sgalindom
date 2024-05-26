@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet, Image, ScrollView, ImageBackg
 import { useNavigation } from '@react-navigation/native';
 import firestore from '@react-native-firebase/firestore';
 import moment from 'moment-timezone';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 const Badiegard = () => {
   const navigation = useNavigation();
@@ -45,7 +46,7 @@ const Badiegard = () => {
   }, [selectedBarrio]);
 
   const handleExplorarPress = (veterinariaId) => {
-    navigation.navigate(`${veterinariaId}`);
+    navigation.navigate(`Adieguar${veterinariaId}`);
   };
 
   const openModal = () => {
@@ -78,40 +79,43 @@ const Badiegard = () => {
   return (
     <ImageBackground source={fondoVeterinariasImage} style={styles.backgroundImage}>
       <ScrollView contentContainerStyle={styles.container}>
-        <Modal
-          animationType="slide"
-          transparent={true}
-          visible={modalVisible}
-          onRequestClose={closeModal}
-        >
-          <View style={styles.modalContainer}>
-            <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>Filtrar por Barrio</Text>
-              {barriosUnicos.map((barrio, index) => (
-                <Pressable
-                  key={index}
-                  style={styles.modalButton}
-                  onPress={() => handleBarrioSelect(barrio)}
-                >
-                  <Text style={styles.modalButtonText}>{barrio}</Text>
-                </Pressable>
-              ))}
-              <Pressable style={styles.modalCloseButton} onPress={closeModal}>
-                <Text style={styles.modalCloseButtonText}>Cerrar</Text>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={closeModal}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Filtrar por Barrio</Text>
+            {barriosUnicos.map((barrio, index) => (
+              <Pressable
+                key={index}
+                style={styles.modalButton}
+                onPress={() => handleBarrioSelect(barrio)}
+              >
+                <Icon name="location" size={20} color="#ffffff" style={styles.icon} />
+                <Text style={styles.modalButtonText}>{barrio}</Text>
               </Pressable>
-            </View>
+            ))}
+            <Pressable style={styles.modalCloseButton} onPress={closeModal}>
+              <Text style={styles.modalCloseButtonText}>Cerrar</Text>
+            </Pressable>
           </View>
-        </Modal>
+        </View>
+      </Modal>
 
-        <Text style={styles.title}>Explorar Veterinarias:</Text>
-        <TouchableOpacity style={styles.filterButton} onPress={openModal}>
-          <Text style={styles.filterButtonText}>Filtrar por Barrio</Text>
-        </TouchableOpacity>
-        {selectedBarrio && (
-          <TouchableOpacity style={styles.removeFilterButton} onPress={handleRemoveFilter}>
-            <Text style={styles.removeFilterButtonText}>Eliminar Filtro</Text>
+        <View style={styles.titleContainer}>
+          <Text style={styles.title}>Filtrar por barrio</Text>
+          <TouchableOpacity style={styles.filterButton} onPress={openModal}>
+            <Icon name="filter" size={20} color="white" />
           </TouchableOpacity>
-        )}
+          {selectedBarrio && (
+            <TouchableOpacity style={styles.removeFilterButton} onPress={handleRemoveFilter}>
+              <Text style={styles.removeFilterButtonText}>Eliminar Filtro</Text>
+            </TouchableOpacity>
+          )}
+        </View>
 
         {veterinarias.map((veterinaria, index) => (
           <TouchableOpacity
@@ -122,16 +126,18 @@ const Badiegard = () => {
             <View style={styles.imageContainer}>
               {veterinaria.Foto && <Image source={{ uri: veterinaria.Foto }} style={styles.servicioImage} />}
             </View>
-            <Text style={styles.servicioTitle}>{veterinaria.Nombre}</Text>
-            <Text style={styles.servicioDescription}>{veterinaria.Barrio}</Text>
-            <Text style={styles.servicioDescription}>{veterinaria.Direccion}</Text>
-            <Text style={styles.servicioDescription}>{veterinaria.Descripcion}</Text>
-            <Text style={[styles.servicioDescription, isAbierto(veterinaria.Horario) ? styles.abiertoText : styles.cerradoText]}>
-              {isAbierto(veterinaria.Horario) ? 'Abierto' : 'Cerrado'}
-            </Text>
-            <TouchableOpacity style={styles.explorarButtonStyle} onPress={() => handleExplorarPress(veterinaria.id)}>
-              <Text style={styles.explorarButtonText}>Explorar</Text>
-            </TouchableOpacity>
+            <View style={styles.infoContainer}>
+              <Text style={styles.servicioTitle}>{veterinaria.Nombre}</Text>
+              <Text style={styles.servicioDescription}>{veterinaria.Barrio}</Text>
+              <Text style={styles.servicioDescription}>{veterinaria.Direccion}</Text>
+              <Text style={[styles.servicioDescription, isAbierto(veterinaria.Horario) ? styles.abiertoText : styles.cerradoText]}>
+                {isAbierto(veterinaria.Horario) ? 'Abierto' : 'Cerrado'}
+              </Text>
+              <TouchableOpacity style={styles.explorarButtonStyle} onPress={() => handleExplorarPress(veterinaria.id)}>
+                <Icon name="search" size={20} color="white" />
+                <Text style={styles.explorarButtonText}>Explorar</Text>
+              </TouchableOpacity>
+            </View>
           </TouchableOpacity>
         ))}
       </ScrollView>
@@ -148,134 +154,162 @@ const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
     alignItems: 'center',
+    paddingVertical: 20,
+  },
+  titleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginVertical: 20,
     color: 'white',
+    marginRight: 'auto',
   },
   filterButton: {
     backgroundColor: '#2AC9FA',
-    padding: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 15,
     borderRadius: 4,
-    marginVertical: 8,
-  },
-  filterButtonText: {
-    color: 'white',
-    fontWeight: 'bold',
-    fontSize: 16,
-    textAlign: 'center',
-  },
-  servicioCard: {
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-    borderRadius: 8,
-    overflow: 'hidden',
-    margin: 8,
-    width: 300,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 2,
-    elevation: 2,
-  },
-  imageContainer: {
-    width: '100%',
-    aspectRatio: 16 / 9,
-    overflow: 'hidden',
-  },
-  servicioImage: {
-    width: '100%',
-    height: '100%',
-    resizeMode: 'cover',
-  },
-  servicioTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginVertical: 8,
-    marginLeft: 8,
-    marginRight: 8,
-    textAlign: 'center',
-    color: 'black', // Letra en negro
-  },
-  servicioDescription: {
-    fontSize: 16,
-    marginVertical: 8,
-    marginLeft: 8,
-    marginRight: 8,
-    color: 'black', // Letra en negro
-  },
-  abiertoText: {
-    color: 'green',
-  },
-  cerradoText: {
-    color: 'red',
-  },
-  explorarButtonStyle: {
-    backgroundColor: '#2AC9FA',
-    padding: 10,
-    borderRadius: 4,
-    width: '100%',
-    marginTop: 8,
-  },
-  explorarButtonText: {
-    color: 'white',
-    fontWeight: 'bold',
-    fontSize: 16,
-    textAlign: 'center',
-  },
-  modalContainer: {
-    flex: 1,
+    marginHorizontal: 10,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  modalContent: {
-    backgroundColor: 'white',
-    padding: 20,
-    borderRadius: 8,
-    width: 300,
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 16,
-  },
-  modalButton: {
-    backgroundColor: '#2AC9FA',
-    padding: 10,
-    borderRadius: 4,
-    marginVertical: 8,
-  },
-  modalButtonText: {
-    color: 'white',
-    fontWeight: 'bold',
-    fontSize: 16,
-    textAlign: 'center',
-  },
-  modalCloseButton: {
-    backgroundColor: '#FF5050',
-    padding: 10,
-    borderRadius: 4,
-    marginVertical: 8,
-  },
-  modalCloseButtonText: {
-    color: 'white',
-    fontWeight: 'bold',
-    fontSize: 16,
-    textAlign: 'center',
-  },
   removeFilterButton: {
     backgroundColor: '#FF5050',
-    padding: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 15,
     borderRadius: 4,
-    marginVertical: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   removeFilterButtonText: {
     color: 'white',
     fontWeight: 'bold',
     fontSize: 16,
-    textAlign: 'center',
   },
-});
+  servicioCard: {
+    flexDirection: 'row',
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    borderRadius: 8,
+    overflow: 'hidden',
+    marginVertical: 10,
+    width: '90%',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.
+    },
+    imageContainer: {
+      width: 130,
+      height: 100,
+      borderRadius: 8,
+      overflow: 'hidden',
+      marginRight: 10,
+    },
+    servicioImage: {
+      width: '100%',
+      height: '100%',
+      resizeMode: 'cover',
+    },
+    infoContainer: {
+      flex: 1,
+      justifyContent: 'center',
+    },
+    servicioTitle: {
+      fontSize: 20,
+      fontWeight: 'bold',
+      marginBottom: 5,
+      color: 'black',
+    },
+    servicioDescription: {
+      fontSize: 16,
+      color: 'black',
+    },
+    abiertoText: {
+      color: 'green',
+      marginTop: 5,
+    },
+    cerradoText: {
+      color: 'red',
+      marginTop: 5,
+    },
+    explorarButtonStyle: {
+      flexDirection: 'row',
+      backgroundColor: '#2AC9FA',
+      paddingVertical: 10,
+      paddingHorizontal: 15,
+      borderRadius: 4,
+      marginTop: 10,
+      width: '100%',
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    explorarButtonText: {
+      color: 'white',
+      fontWeight: 'bold',
+      fontSize: 16,
+      textAlign: 'center',
+      marginLeft: 5, // Añadido para separación entre el icono y el texto
+    },
+    modalContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    },
+    modalContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    },
+    modalContent: {
+      backgroundColor: 'white',
+      borderRadius: 10,
+      padding: 20,
+      width: '80%',
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.25,
+      shadowRadius: 3.84,
+      elevation: 5,
+    },
+    modalTitle: {
+      fontSize: 20,
+      fontWeight: 'bold',
+      marginBottom: 16,
+      textAlign: 'center',
+      color: '#333',
+    },
+    modalButton: {
+      backgroundColor: '#2AC9FA',
+      paddingVertical: 12,
+      paddingHorizontal: 20,
+      borderRadius: 6,
+      marginBottom: 10,
+      alignItems: 'center',
+    },
+    modalButtonText: {
+      color: 'white',
+      fontWeight: 'bold',
+      fontSize: 16,
+      textAlign: 'center',
+    },
+    modalCloseButton: {
+      backgroundColor: '#FF5050',
+      paddingVertical: 12,
+      paddingHorizontal: 20,
+      borderRadius: 6,
+      alignItems: 'center',
+    },
+    modalCloseButtonText: {
+      color: 'white',
+      fontWeight: 'bold',
+      fontSize: 16,
+      textAlign: 'center',
+    },
+  });
+  
 
 export default Badiegard;

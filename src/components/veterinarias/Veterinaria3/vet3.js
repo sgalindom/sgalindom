@@ -1,14 +1,14 @@
 import React from 'react';
 import { View, Text, Linking, ScrollView, ImageBackground, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import Icon from 'react-native-vector-icons/Ionicons';
 
-// Componente de botón genérico
-const CustomButton = ({ title, onPress }) => {
+// Componente de botón personalizado
+const CustomButton = ({ title, onPress, icon }) => {
   return (
-    <View style={styles.buttonContainer}>
-      <TouchableOpacity onPress={onPress} style={styles.button}>
-        <Text style={styles.buttonText}>{title}</Text>
-      </TouchableOpacity>
-    </View>
+    <TouchableOpacity onPress={onPress} style={styles.button}>
+      <Icon name={icon} size={24} color="white" style={styles.buttonIcon} />
+      <Text style={styles.buttonText}>{title}</Text>
+    </TouchableOpacity>
   );
 };
 
@@ -45,35 +45,35 @@ const Vet3Screen = () => {
           <View style={styles.card}>
             <Text style={styles.sectionTitle}>SERVICIOS</Text>
             <View style={styles.listItem}>
-              <Text style={styles.bullet}>•</Text>
+              <Icon name="paw-outline" size={24} color="black" style={styles.bullet} />
               <Text style={styles.listItemText}>PET SHOP</Text>
             </View>
             <View style={styles.listItem}>
-              <Text style={styles.bullet}>•</Text>
+              <Icon name="cut-outline" size={24} color="black" style={styles.bullet} />
               <Text style={styles.listItemText}>BAÑO Y PELUQUERÍA</Text>
             </View>
             <View style={styles.listItem}>
-              <Text style={styles.bullet}>•</Text>
+              <Icon name="medkit-outline" size={24} color="black" style={styles.bullet} />
               <Text style={styles.listItemText}>VETERINARÍA</Text>
             </View>
             <View style={styles.listItem}>
-              <Text style={styles.bullet}>•</Text>
+              <Icon name="basket-outline" size={24} color="black" style={styles.bullet} />
               <Text style={styles.listItemText}>Accesorios para todos los peludos</Text>
             </View>
             <View style={styles.listItem}>
-              <Text style={styles.bullet}>•</Text>
+              <Icon name="send-outline" size={24} color="black" style={styles.bullet} />
               <Text style={styles.listItemText}>Envíos a todo el país 🇨🇴</Text>
             </View>
             <View style={styles.listItem}>
-              <Text style={styles.bullet}>•</Text>
+              <Icon name="location-outline" size={24} color="black" style={styles.bullet} />
               <Text style={styles.listItemText}>Cra. 36 # 52-135, Bucaramanga, Santander 680003</Text>
             </View>
           </View>
-          {/* Botones separados */}
-          <CustomButton title="Ubicación" onPress={handleLocationPress} />
-          <CustomButton title="Contactar por WhatsApp" onPress={handleWhatsAppPress} />
-          <CustomButton title="Llamar" onPress={handleCallPress} />
-          <CustomButton title="Visita nuestra página WEB" onPress={handleLinkPress} />
+          {/* Botones */}
+          <CustomButton title="Ubicación" onPress={handleLocationPress} icon="location-outline" />
+          <CustomButton title="Contactar por WhatsApp" onPress={handleWhatsAppPress} icon="logo-whatsapp" />
+          <CustomButton title="Llamar" onPress={handleCallPress} icon="call-outline" />
+          <CustomButton title="Visita nuestra página WEB" onPress={handleLinkPress} icon="globe-outline" />
         </View>
       </ImageBackground>
     </ScrollView>
@@ -91,12 +91,13 @@ const styles = StyleSheet.create({
     justifyContent: "center"
   },
   content: {
-    paddingHorizontal: 20,
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    paddingVertical: 20,
   },
   image: {
-    width: '100%',
+    width: '80%',
     height: 200,
     resizeMode: 'contain',
     marginBottom: 20,
@@ -106,19 +107,20 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 20,
     marginBottom: 20,
-    width: '100%',
+    width: '80%',
+    alignItems: 'flex-start', // Alinear los elementos a la izquierda
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 10,
-    color: 'gray', // Cambiado a gris
+    color: '#333', // Cambiado a gris oscuro
   },
   subtitle: {
     fontSize: 20,
     marginBottom: 20,
     textAlign: 'center',
-    color: 'gray', // Cambiado a gris
+    color: '#333', // Cambiado a gris oscuro
   },
   sectionTitle: {
     fontSize: 20,
@@ -132,33 +134,22 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   bullet: {
-    fontSize: 16,
     marginRight: 5,
-    color: 'black',
   },
   listItemText: {
     fontSize: 16,
     color: 'black',
   },
-  address: {
-    fontSize: 16,
-    marginBottom: 20,
-    textAlign: 'center',
-    color: 'black',
-  },
-  buttonContainer: {
-    width: '80%',
-    marginBottom: 10,
-    borderRadius: 20, // Esquinas curvas para los botones
-    overflow: 'hidden', // Para que las esquinas curvas funcionen correctamente
-  },
   button: {
-    backgroundColor: '#007AFF', // Color de fondo del botón
-    height: 40, // Altura fija para todos los botones
-    justifyContent: 'center',
+    backgroundColor: '#007AFF', // Color del botón
+    flexDirection: 'row',
     alignItems: 'center',
-    borderRadius: 20, // Esquinas curvas para los botones
+    justifyContent: 'center',
+    borderRadius: 20, // Esquinas curvas para el botón
+    height: 40, // Altura fija para todos los botones
     marginBottom: 10,
+    width: '80%',
+    paddingHorizontal: 10,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -171,6 +162,9 @@ const styles = StyleSheet.create({
   buttonText: {
     color: 'white', // Color del texto del botón
     fontSize: 16,
+  },
+  buttonIcon: {
+    marginRight: 10,
   },
 });
 

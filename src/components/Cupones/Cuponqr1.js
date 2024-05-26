@@ -42,72 +42,89 @@ const Cuponqr1 = () => {
   }
 
   return (
-    // Agrega el estilo para la imagen de fondo
-    <View style={styles.container}>
-      <Image source={FondoImage} style={styles.backgroundImage} resizeMode="cover" />
-      <Text style={styles.title}>Detalles del Cupón</Text>
-      <Text style={styles.subtitle}>Presenta este QR para reclamar tu descuento</Text>
+    // Agrega el estilo para el ScrollView
+    <ScrollView contentContainerStyle={styles.scrollView}>
+      <View style={styles.container}>
+        <Image source={FondoImage} style={styles.backgroundImage} resizeMode="cover" />
+        <View style={styles.contentContainer}>
+          <Text style={styles.title}>Detalles del Cupón</Text>
+          
 
-      {/* Recuadro para los detalles del cupón */}
-      <View style={styles.couponDetailsContainer}>
-        <ScrollView>
-          <Text style={styles.sectionTitle}>Veterinaria:</Text>
-          <Text style={styles.description}>{cuponData.Veterinaria}</Text>
+          {/* Recuadro para los detalles del cupón */}
+          <ScrollView style={styles.couponDetailsContainer}>
+            <Text style={styles.sectionTitle}>Veterinaria:</Text>
+            <Text style={styles.description}>{cuponData.Veterinaria}</Text>
 
-          <Text style={styles.sectionTitle}>Nombre:</Text>
-          <Text style={styles.description}>{cuponData.Nombre}</Text>
+            <Text style={styles.sectionTitle}>Nombre:</Text>
+            <Text style={styles.description}>{cuponData.Nombre}</Text>
 
-          <Text style={styles.sectionTitle}>Descuento:</Text>
-          <Text style={styles.description}>{cuponData.Descuento}</Text>
+            <Text style={styles.sectionTitle}>Descuento:</Text>
+            <Text style={styles.description}>{cuponData.Descuento}</Text>
 
-          <Text style={styles.sectionTitle}>Precio:</Text>
-          <Text style={styles.description}>{cuponData.Precio}</Text>
+            <Text style={styles.sectionTitle}>Precio:</Text>
+            <Text style={styles.description}>{cuponData.Precio}</Text>
 
-          <Text style={styles.sectionTitle}>Precio Total:</Text>
-          <Text style={styles.description}>{cuponData.Preciototal}</Text>
-        </ScrollView>
+            <Text style={styles.sectionTitle}>Precio Total:</Text>
+            <Text style={[styles.description, { marginBottom: 20 }]}>{cuponData.Preciototal}</Text>
+
+          </ScrollView>
+        </View>
+
+        {/* Muestra el código QR con la información correspondiente */}
+        <View style={styles.qrContainer}>
+          <View style={styles.qrCard}>
+            <ScrollView>
+              <QRCode
+                value={`Veterinaria: ${cuponData.Veterinaria}\nNombre: ${cuponData.Nombre}\nDescuento: ${cuponData.Descuento}\nPrecio: ${cuponData.Precio}\nPrecio Total: ${cuponData.Preciototal}`}
+                size={200}
+              />
+            </ScrollView>
+            <Text style={styles.qrText}>Presenta este QR para reclamar tu descuento</Text>
+          </View>
+        </View>
       </View>
-
-      {/* Muestra el código QR con la información correspondiente */}
-      <QRCode
-        value={`Veterinaria: ${cuponData.Veterinaria}\nNombre: ${cuponData.Nombre}\nDescuento: ${cuponData.Descuento}\nPrecio: ${cuponData.Precio}\nPrecio Total: ${cuponData.Preciototal}`}
-        size={300}
-      />
-    </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
+  scrollView: {
+    flexGrow: 1,
+  },
   container: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
+  contentContainer: {
+    alignItems: 'center',
+  },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 5,
-    color: 'black', // Color negro
+    marginBottom: 10,
+    color: 'black',
   },
   subtitle: {
     fontSize: 18,
-    color: 'black', // Color negro
     marginBottom: 20,
+    color: 'black',
   },
   sectionTitle: {
     fontSize: 20,
     fontWeight: 'bold',
     marginTop: 10,
-    color: 'black', // Color negro
+    marginBottom: 5,
+    color: 'black',
   },
   description: {
     fontSize: 18,
     marginBottom: 5,
-    color: 'black', // Color negro
+    color: 'black',
   },
   loadingText: {
     fontSize: 18,
-    color: 'black', // Color negro
+    color: 'black',
   },
   // Agrega un estilo para la imagen de fondo
   backgroundImage: {
@@ -120,9 +137,29 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 255, 255, 0.8)',
     borderRadius: 10,
     padding: 20,
-    margin: 10,
-    width: '80%',
-    maxHeight: '60%',
+    marginHorizontal: 20,
+    marginBottom: 10,
+    width: '90%',
+    maxHeight: '50%',
+  },
+  // Estilo para el contenedor del código QR
+  qrContainer: {
+    alignItems: 'center',
+    marginTop: -50, // Ajusta este valor según sea necesario
+  },
+  // Estilo para la tarjeta del código QR
+  qrCard: {
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    borderRadius: 10,
+    padding: 20,
+    width: '90%',
+    alignItems: 'center',
+  },
+  // Estilo para el texto dentro de la tarjeta del QR
+  qrText: {
+    fontSize: 16,
+    marginTop: 10,
+    color: 'black',
   },
 });
 

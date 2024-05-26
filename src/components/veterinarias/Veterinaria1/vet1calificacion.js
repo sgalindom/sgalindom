@@ -2,11 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Alert, ImageBackground } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 const CalificacionScreen = ({ navigation }) => {
-  const [pregunta1, setPregunta1] = useState(null);
-  const [pregunta2, setPregunta2] = useState(null);
-  const [pregunta3, setPregunta3] = useState(null);
+  const [preguntas, setPreguntas] = useState([
+    { id: 1, pregunta: '¿Cómo calificarías la atención del personal?', respuesta: null },
+    { id: 2, pregunta: '¿Qué tan satisfecho estás con los servicios ofrecidos?', respuesta: null },
+    { id: 3, pregunta: '¿Recomendarías nuestros servicios a otros?', respuesta: null },
+  ]);
   const [usuario, setUsuario] = useState(null);
 
   useEffect(() => {
@@ -22,25 +25,32 @@ const CalificacionScreen = ({ navigation }) => {
     obtenerUsuario();
   }, []);
 
+  const handleSeleccionRespuesta = (id, respuesta) => {
+    const nuevasPreguntas = preguntas.map((pregunta) => {
+      if (pregunta.id === id) {
+        return { ...pregunta, respuesta };
+      }
+      return pregunta;
+    });
+    setPreguntas(nuevasPreguntas);
+  };
+
   const handleCalificarPress = async () => {
     try {
       if (usuario) {
+        const respuestas = preguntas.map((pregunta) => `${pregunta.pregunta}: ${pregunta.respuesta}`);
         await firestore().collection('Calificaciones').add({
-          pregunta1,
-          pregunta2,
-          pregunta3,
+          respuestas,
           userEmail: usuario.email,
           veterinariaNombre: 'Animal Zone',
         });
 
-        setPregunta1(null);
-        setPregunta2(null);
-        setPregunta3(null);
+        setPreguntas(preguntas.map((pregunta) => ({ ...pregunta, respuesta: null })));
 
         // Mostrar un mensaje de agradecimiento
         Alert.alert(
-          'Gracias por calificarnos',
-          'Agradecemos tu opinión y calificación. ¡Tu feedback es importante para nosotros!',
+          '¡Gracias por tu calificación!',
+          'Agradecemos tu opinión y calificación. Tu feedback es importante para nosotros.',
           [
             {
               text: 'OK',
@@ -63,48 +73,26 @@ const CalificacionScreen = ({ navigation }) => {
     <ImageBackground source={require('../../imagenes/fondocalificaranimalzone.jpg')} style={styles.backgroundImage}>
       <View style={styles.container}>
         <Text style={styles.title}>Califica nuestros servicios</Text>
-
-        <Text style={styles.pregunta}>1. ¿Cómo calificarías la atención del personal?</Text>
-        <View style={styles.respuestas}>
-          {[1, 2, 3, 4, 5].map((opcion) => (
-            <TouchableOpacity
-              key={opcion}
-              style={[styles.opcion, pregunta1 === opcion && styles.opcionSeleccionada]}
-              onPress={() => setPregunta1(opcion)}
-            >
-              <Text style={styles.opcionTexto}>{opcion}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-
-        <Text style={styles.pregunta}>2. ¿Qué tan satisfecho estás con los servicios ofrecidos?</Text>
-        <View style={styles.respuestas}>
-          {[1, 2, 3, 4, 5].map((opcion) => (
-            <TouchableOpacity
-              key={opcion}
-              style={[styles.opcion, pregunta2 === opcion && styles.opcionSeleccionada]}
-              onPress={() => setPregunta2(opcion)}
-            >
-              <Text style={styles.opcionTexto}>{opcion}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-
-        <Text style={styles.pregunta}>3. ¿Recomendarías nuestros servicios a otros?</Text>
-        <View style={styles.respuestas}>
-          {[1, 2, 3, 4, 5].map((opcion) => (
-            <TouchableOpacity
-              key={opcion}
-              style={[styles.opcion, pregunta3 === opcion && styles.opcionSeleccionada]}
-              onPress={() => setPregunta3(opcion)}
-            >
-              <Text style={styles.opcionTexto}>{opcion}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-
+        {preguntas.map((pregunta) => (
+          <View key={pregunta.id} style={styles.preguntaContainer}>
+            <Text style={styles.pregunta}>{pregunta.pregunta}</Text>
+            <View style={styles.respuestasContainer}>
+              {['Excelente', 'Bueno', 'Regular', 'Malo'].map((opcion) => (
+                <TouchableOpacity
+                  key={opcion}
+                  style={[styles.respuesta, pregunta.respuesta === opcion && styles.respuestaSeleccionada]}
+                  onPress={() => handleSeleccionRespuesta(pregunta.id, opcion)}
+                >
+                  <Text style={styles.respuestaTexto}>{opcion}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+        ))}
         <TouchableOpacity style={styles.calificarButton} onPress={handleCalificarPress}>
+          <Icon name="star" size={24} color="white" style={styles.iconoEstrella} />
           <Text style={styles.calificarButtonText}>Calificar</Text>
+          <Icon name="send" size={24} color="white" style={styles.iconoEnviar} />
         </TouchableOpacity>
       </View>
     </ImageBackground>
@@ -114,14 +102,15 @@ const CalificacionScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
     padding: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   backgroundImage: {
     flex: 1,
     resizeMode: 'cover',
     justifyContent: 'center',
+    alignItems: 'center',
   },
   title: {
     fontSize: 24,
@@ -130,43 +119,58 @@ const styles = StyleSheet.create({
     color: 'black',
     textAlign: 'center',
   },
+  preguntaContainer: {
+    marginBottom: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    padding: 15,
+    borderRadius: 10,
+    width: '100%',
+  },
   pregunta: {
     fontSize: 18,
+    fontWeight: 'bold',
     marginBottom: 10,
     color: 'black',
   },
-  respuestas: {
+  respuestasContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 20,
-  },
-  opcion: {
-    backgroundColor: '#2F9FFA',
-    padding: 10,
-    borderRadius: 4,
-    width: '18%',
     alignItems: 'center',
   },
-  opcionTexto: {
+  respuesta: {
+    backgroundColor: '#2F9FFA',
+    padding: 10,
+    borderRadius: 5,
+    width: '22%',
+    alignItems: 'center',
+  },
+  respuestaTexto: {
     color: 'white',
     fontWeight: 'bold',
-    fontSize: 16,
+    fontSize: 10, // Cambié el tamaño de la letra aquí
   },
-  opcionSeleccionada: {
+  respuestaSeleccionada: {
     backgroundColor: '#FFD700',
   },
   calificarButton: {
     backgroundColor: '#2F9FFA',
     padding: 15,
-    borderRadius: 4,
-    width: '50%',
-    alignSelf: 'center',
+    borderRadius: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   calificarButtonText: {
     color: 'white',
     fontWeight: 'bold',
     fontSize: 16,
-    textAlign: 'center',
+    marginLeft: 10,
+  },
+  iconoEstrella: {
+    marginRight: 10,
+  },
+  iconoEnviar: {
+    marginLeft: 10,
   },
 });
 

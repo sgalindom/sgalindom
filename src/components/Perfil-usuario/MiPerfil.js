@@ -13,7 +13,7 @@ const MiPerfil = ({ navigation }) => {
   };
 
   const goToMisPedidos = () => {
-    navigation.navigate('MisPedidos');
+    navigation.navigate('mispedidos');
   };
 
   const goToPolíticas = () => {
@@ -54,7 +54,7 @@ const MiPerfil = ({ navigation }) => {
         source={require('../imagenes/fondoadminpanel.jpg')}
         style={styles.backgroundImage}
       >
-        <Image source={require('../imagenes/fondoperfil.jpg')} style={styles.logo} />
+        <Image source={require('../imagenes/fondorectangular.jpg')} style={styles.logo} />
         <ScrollView contentContainerStyle={styles.contentContainer}>
           <View style={styles.innerContainer}>
             <Text style={styles.title}>Mi Perfil</Text>

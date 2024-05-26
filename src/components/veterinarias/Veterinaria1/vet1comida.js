@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, FlatList, ImageBackground, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, FlatList, ImageBackground, Alert, Dimensions } from 'react-native';
+import { useNavigation } from '@react-navigation/native'; 
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import Icon from 'react-native-vector-icons/Ionicons';
 
-const Vet1Comida = ({ navigation }) => {
+const Vet1Comida = () => {
+  const navigation = useNavigation(); 
   const [productos, setProductos] = useState([]);
   const [nombreVeterinaria, setNombreVeterinaria] = useState('');
 
@@ -31,7 +33,6 @@ const Vet1Comida = ({ navigation }) => {
           const productosData = productosSnapshot.docs.map((doc) => ({
             id: doc.id,
             ...doc.data(),
-            cantidad: 0,
           }));
 
           setProductos(productosData);
@@ -44,191 +45,99 @@ const Vet1Comida = ({ navigation }) => {
     obtenerProductos();
   }, []);
 
-  const handleAgregarCarrito = async (id, nombre, descripcion, cantidadSeleccionada, precioUnitario) => {
-    try {
-      if (cantidadSeleccionada > 0) {
-        const user = auth().currentUser;
-
-        if (user) {
-          const usuarioRef = firestore().collection('usuarios').doc(user.email);
-          const pedidoRef = usuarioRef.collection('pedidos').doc('default');
-          const productoRef = pedidoRef.collection('Comida').doc(id);
-
-          const productoActual = await productoRef.get();
-          const cantidadActual = productoActual.exists ? productoActual.data().cantidad : 0;
-
-          const nuevaCantidad = cantidadActual + cantidadSeleccionada;
-          const precioTotal = precioUnitario * nuevaCantidad;
-
-          await productoRef.set({
-            nombre: nombre || '',
-            descripcion: descripcion || '',
-            cantidad: nuevaCantidad,
-            precioUnitario,
-            precioTotal,
-          });
-
-          setProductos((prevProductos) =>
-            prevProductos.map((producto) =>
-              producto.id === id ? { ...producto, cantidad: 0 } : producto
-            )
-          );
-
-          Alert.alert('Producto Agregado', 'El producto ha sido agregado a tu carrito');
-        }
-      } else {
-        Alert.alert('Error', 'Seleccione una cantidad mayor que 0');
-      }
-    } catch (error) {
-      console.error('Error al agregar al carrito:', error);
-    }
+  const handleVerProducto = (producto) => {
+    navigation.navigate('verproductocomida', { producto });
   };
 
-  const handleIncrementarCantidad = (id) => {
-    setProductos((prevProductos) =>
-      prevProductos.map((producto) =>
-        producto.id === id ? { ...producto, cantidad: producto.cantidad + 1 } : producto
-      )
-    );
-  };
-
-  const handleDecrementarCantidad = (id) => {
-    setProductos((prevProductos) =>
-      prevProductos.map((producto) =>
-        producto.id === id ? { ...producto, cantidad: Math.max(0, producto.cantidad - 1) } : producto
-      )
-    );
-  };
-
-  const handleNavegarPago = () => {
+  const handleMisPedidos = () => {
     navigation.navigate('pago');
   };
 
-  const renderItem = ({ item }) => (
-    <View style={styles.card}>
-      <ImageBackground source={{ uri: item.Foto }} style={styles.image}>
-        <TouchableOpacity
-          onPress={() =>
-            handleAgregarCarrito(
-              item.id,
-              item.Nombre,
-              item.Descripcion,
-              item.cantidad,
-              item.Precio
-            )
-          }
-          style={styles.addButton}
-        >
-          <Icon name="cart" size={24} color="white" />
-          <Text style={styles.addButtonLabel}>Añadir</Text>
-        </TouchableOpacity>
-      </ImageBackground>
-      <View style={styles.overlay}>
-        <Text style={styles.productName}>{item.Nombre}</Text>
-        <Text style={styles.productDescription}>{item.Descripcion}</Text>
-        <Text style={styles.productPrice}>Precio: {item.Precio}</Text>
-        <View style={styles.buttonsContainer}>
-          <TouchableOpacity onPress={() => handleDecrementarCantidad(item.id)} style={styles.plusMinusButton}>
-            <Icon name="remove" size={20} color="#599B85" />
-          </TouchableOpacity>
-          <Text style={styles.quantityText}>{item.cantidad}</Text>
-          <TouchableOpacity onPress={() => handleIncrementarCantidad(item.id)} style={styles.plusMinusButton}>
-            <Icon name="add" size={20} color="#599B85" />
-          </TouchableOpacity>
-        </View>
+  const renderProducto = ({ item }) => (
+    <TouchableOpacity onPress={() => handleVerProducto(item)} style={styles.productoContainer}>
+      <View style={styles.card}>
+        <ImageBackground source={{ uri: item.Foto }} style={styles.image}>
+          <View style={styles.overlay}>
+            <Text style={styles.productName}>{item.Nombre}</Text>
+            <Text style={styles.productPrice}>Precio: {item.Precio}</Text>
+          </View>
+        </ImageBackground>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 
-  useEffect(() => {
-    navigation.setOptions({ title: `Productos Comida (${nombreVeterinaria})` });
-  }, [nombreVeterinaria, navigation]);
-
   return (
-    <ImageBackground source={require('../../imagenes/fondomain.jpg')} style={styles.container}>
-      <FlatList
-        data={productos}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id.toString()}
-      />
-      <TouchableOpacity onPress={handleNavegarPago} style={styles.cartButton}>
-        <Icon name="cart" size={24} color="white" />
-        <Text style={styles.cartButtonText}>Mis Pedidos</Text>
-      </TouchableOpacity>
+    <ImageBackground source={require('../../imagenes/fondomain.jpg')} style={styles.backgroundImage}>
+      <View style={styles.container}>
+        <FlatList
+          data={productos}
+          renderItem={renderProducto}
+          keyExtractor={(item) => item.id.toString()}
+          numColumns={2}
+          contentContainerStyle={styles.flatlistContainer}
+        />
+        <TouchableOpacity onPress={handleMisPedidos} style={styles.cartButton}>
+          <Icon name="cart" size={24} color="white" />
+          <Text style={styles.cartButtonText}>Mis Pedidos</Text>
+        </TouchableOpacity>
+      </View>
     </ImageBackground>
   );
 };
 
+const windowWidth = Dimensions.get('window').width;
+const cardWidth = (windowWidth - 32 - 16) / 2; // 32: padding horizontal del contenedor, 16: margen entre las tarjetas
+
 const styles = StyleSheet.create({
+  backgroundImage: {
+    flex: 1,
+    resizeMode: 'cover', // o 'stretch' si quieres que la imagen ocupe todo el espacio
+  },
   container: {
     flex: 1,
     padding: 16,
-    resizeMode: 'cover',
-    justifyContent: 'center',
+  },
+  flatlistContainer: {
+    flexGrow: 1,
+  },
+  productoContainer: {
+    width: '50%', // Dos productos por fila
+    padding: 8,
   },
   card: {
+    width: cardWidth,
+    height: cardWidth * 1.25, // Proporción 5:4
     borderRadius: 8,
-    marginBottom: 16,
     overflow: 'hidden',
   },
   image: {
     width: '100%',
-    height: 200,
-    marginBottom: 8,
+    height: '100%',
     justifyContent: 'flex-end',
-    alignItems: 'flex-end',
+    alignItems: 'center',
   },
   overlay: {
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    padding: 16,
+    padding: 8,
+    width: '100%',
   },
   productName: {
     fontWeight: 'bold',
     fontSize: 16,
     color: 'white',
-    marginBottom: 8,
-  },
-  productDescription: {
-    color: 'white',
-    marginBottom: 8,
+    marginBottom: 4,
   },
   productPrice: {
     color: 'white',
-    marginBottom: 8,
-  },
-  buttonsContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-  },
-  quantityText: {
-    fontSize: 20,
-    paddingHorizontal: 16,
-    color: 'white',
-  },
-  plusMinusButton: {
-    backgroundColor: 'transparent',
-    paddingHorizontal: 8,
-  },
-  addButton: {
-    backgroundColor: '#2F9FFA',
-    padding: 8,
-    borderRadius: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexDirection: 'row',
-  },
-  addButtonLabel: {
-    color: 'white',
-    fontWeight: 'bold',
-    marginLeft: 4,
   },
   cartButton: {
+    position: 'absolute',
+    bottom: 16,
+    right: 16,
     backgroundColor: '#2F9FFA',
     padding: 12,
     borderRadius: 8,
     alignItems: 'center',
-    marginTop: 16,
     flexDirection: 'row',
     justifyContent: 'center',
   },
@@ -240,4 +149,3 @@ const styles = StyleSheet.create({
 });
 
 export default Vet1Comida;
-   

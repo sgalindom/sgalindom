@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Button, FlatList, TouchableOpacity, StyleSheet, ImageBackground } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ImageBackground } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 import { useNavigation } from '@react-navigation/native';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 const VerCupones = () => {
   const [cupones, setCupones] = useState([]);
@@ -33,7 +34,10 @@ const VerCupones = () => {
         <Text style={styles.cuponSubtitle}>Descuento: {item.Descuento}</Text>
         <Text style={styles.cuponSubtitle}>Precio: {item.Precio}</Text>
         <Text style={styles.cuponSubtitle}>Precio Total: {item.Preciototal}</Text>
-        <Button title="Ver Detalles y Generar QR" onPress={() => navigateToCuponqr(item.id)} />
+        <TouchableOpacity style={styles.detailsButton} onPress={() => navigateToCuponqr(item.id)}>
+          <Icon name="information-circle" size={20} color="white" />
+          <Text style={styles.detailsButtonText}>Ver Detalles y Generar QR</Text>
+        </TouchableOpacity>
       </View>
     </TouchableOpacity>
   );
@@ -42,11 +46,11 @@ const VerCupones = () => {
     <ImageBackground source={require('../imagenes/fondocalificaranimalzone.jpg')} style={styles.backgroundImage}>
       <View style={styles.container}>
         <Text style={styles.listTitle}>Lista de Cupones:</Text>
-        <FlatList
-          data={cupones}
-          keyExtractor={(item) => item.id}
-          renderItem={renderCupon}
-        />
+        {cupones.map((cupon, index) => (
+          <View key={index}>
+            {renderCupon({ item: cupon })}
+          </View>
+        ))}
       </View>
     </ImageBackground>
   );
@@ -55,6 +59,7 @@ const VerCupones = () => {
 const styles = StyleSheet.create({
   container: {
     padding: 10,
+    flex: 1,
   },
   cuponCard: {
     marginVertical: 10,
@@ -79,6 +84,20 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     textAlign: 'center',
     color: 'black',
+  },
+  detailsButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#2F9FFA',
+    padding: 10,
+    borderRadius: 5,
+    marginTop: 10,
+    width: '70%',
+    alignSelf: 'center',
+  },
+  detailsButtonText: {
+    color: 'white',
+    marginLeft: 10,
   },
   backgroundImage: {
     flex: 1,

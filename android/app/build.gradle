@@ -70,6 +70,11 @@ def enableProguardInReleaseBuilds = false
 def jscFlavor = 'org.webkit:android-jsc:+'
 
 android {
+    tasks.whenTaskAdded { task ->
+        if (task.name == "lintAnalyzeDebug") {
+            task.dependsOn(":app:copyReactNativeVectorIconFonts")
+        }
+    }
     ndkVersion rootProject.ext.ndkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion

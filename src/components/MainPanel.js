@@ -1,65 +1,49 @@
-  import React, { useEffect, useState, useRef } from 'react';
-  import { View, Text, Image, StyleSheet, TouchableOpacity, BackHandler, ScrollView, ImageBackground, TextInput, Animated, Easing } from 'react-native';
-  import { useFocusEffect } from '@react-navigation/native';
-  import auth from '@react-native-firebase/auth';
-  import firestore from '@react-native-firebase/firestore';
-  import Icon from 'react-native-vector-icons/Ionicons';
-  
+import React, { useEffect, useState, useRef } from 'react';
+import { View, Text, Image, StyleSheet, TouchableOpacity, BackHandler, ScrollView, ImageBackground, TextInput, Easing, FlatList, } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
+import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
+import Icon from 'react-native-vector-icons/Ionicons';
+import { PanResponder, Animated } from 'react-native';
+
+const MainPanel = ({ navigation }) => {
+  const [userName, setUserName] = useState('');
+  const [currentServiceIndex, setCurrentServiceIndex] = useState(0);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filteredServices, setFilteredServices] = useState([]);
+  const [filteredProducts, setFilteredProducts] = useState([]);
+  const [filteredVeterinarias, setFilteredVeterinarias] = useState([]);
+  const [filteredGuarderias, setFilteredGuarderias] = useState([]);
+  const [fadeAnim] = useState(new Animated.Value(1));
+  const [slideAnim] = useState(new Animated.Value(0));
+  const [foodProducts, setFoodProducts] = useState([]);
+  const [accessoryProducts, setAccessoryProducts] = useState([]);
+  const [allProductProducts, setProductProducts] = useState([]);
+  const [veterinarias, setVeterinarias] = useState([]);
+  const [guarderiasAdiestramiento, setGuarderiasAndAdiestramiento] = useState([]);
+
+  // Función de búsqueda
+  useEffect(() => {
+    if (searchQuery.trim() !== '') {
+      const lowercasedQuery = searchQuery.toLowerCase();
+
+      setFilteredServices(services.filter(service => service.title.toLowerCase().includes(lowercasedQuery)));
+      setFilteredProducts([
+        ...foodProducts.filter(product => product.Nombre.toLowerCase().includes(lowercasedQuery)),
+        ...accessoryProducts.filter(product => product.Nombre.toLowerCase().includes(lowercasedQuery)),
+        ...allProductProducts.filter(product => product.Nombre.toLowerCase().includes(lowercasedQuery)),
+      ]);
+      setFilteredVeterinarias(veterinarias.filter(vet => vet.Nombre.toLowerCase().includes(lowercasedQuery)));
+      setFilteredGuarderias(guarderiasAdiestramiento.filter(guarderia => guarderia.Nombre.toLowerCase().includes(lowercasedQuery)));
+    } else {
+      setFilteredServices([]);
+      setFilteredProducts([]);
+      setFilteredVeterinarias([]);
+      setFilteredGuarderias([]);
+    }
+  }, [searchQuery, foodProducts, accessoryProducts, allProductProducts, veterinarias, guarderiasAdiestramiento]);
 
 
-  const MainPanel = ({ navigation }) => {
-    const [userName, setUserName] = useState('');
-    const [currentServiceIndex, setCurrentServiceIndex] = useState(0);
-    const [searchQuery, setSearchQuery] = useState('');
-    const slideAnim = useRef(new Animated.Value(0)).current;
-    const fadeAnim = useRef(new Animated.Value(1)).current;
-    const [foodProducts, setFoodProducts] = useState([]);
-    const [accessoryProducts, setAccessoryProducts] = useState([]);
-    const [allProductProducts, setProductProducts] = useState([]);
-    const [veterinarias, setVeterinarias] = useState([]);
-    const [guarderiasAdiestramiento, setGuarderiasAndAdiestramiento] = useState([]);
-
-    useEffect(() => {
-      const fetchUserData = async () => {
-        try {
-          const user = auth().currentUser;
-          if (user) {
-            const userEmail = user.email;
-
-            const userDocs = await firestore()
-              .collection('usuarios')
-              .doc(userEmail)
-              .collection('datos')
-              .get();
-
-            if (!userDocs.empty) {
-              const docId = userDocs.docs[0].id;
-
-              const userDoc = await firestore()
-                .collection('usuarios')
-                .doc(userEmail)
-                .collection('datos')
-                .doc(docId)
-                .get();
-
-              if (userDoc.exists) {
-                const userData = userDoc.data();
-                const nombreCompleto = userData?.nombreCompleto || 'usuario';
-                setUserName(nombreCompleto);
-              } else {
-                console.log('No se encontró el documento con el ID:', docId);
-              }
-            } else {
-              console.log('No se encontraron documentos en la colección "datos".');
-            }
-          }
-        } catch (error) {
-          console.error('Error al obtener datos del usuario', error);
-        }
-      };
-
-      fetchUserData();
-    }, []);
 
     useFocusEffect(
       React.useCallback(() => {
@@ -69,9 +53,9 @@
           }
           return false;
         };
-
+  
         const backHandler = BackHandler.addEventListener('hardwareBackPress', onBackPress);
-
+  
         return () => {
           backHandler.remove();
         };
@@ -82,8 +66,21 @@
       { id: 1, title: 'Veterinarias y Pets Shops', image: require('./imagenes/Veterinario.jpg'), route: 'bveterinaria' },
       { id: 2, title: 'Paseos', image: require('./imagenes/paseos.jpg'), route: 'PaquetesPaseos' },
       { id: 3, title: 'Adiestramiento', image: require('./imagenes/adiestramiento.jpg'), route: 'badieguar' },
-      { id: 4, title: 'Contáctanos', image: require('./imagenes/contacto.jpg'), route: 'Contactanos' },
+      
+      { id: 4, title: 'Seguro para tu mascota', image: require('./imagenes/seguro.jpg'), route: 'Contactanos' },
+      { id: 5, title: 'Servicios Funebres', image: require('./imagenes/Premium.jpg'), route: 'ServicioFuneraria' },
+      { id: 6, title: 'Contáctanos', image: require('./imagenes/contacto.jpg'), route: 'Contactanos' },
     ];
+
+    const renderItem = ({ item }) => (
+      <TouchableOpacity
+        style={styles.card}
+        onPress={() => navigation.navigate(item.route)}
+      >
+        <Image source={item.image} style={styles.image} />
+        <Text style={styles.title}>{item.title}</Text>
+      </TouchableOpacity>
+    );
 
     const tips = [
       { id: 1, text: 'Consejo 1: Mantén a tu mascota hidratada en todo momento.' },
@@ -102,46 +99,40 @@
     ];
     
     useEffect(() => {
-      if (services.length > 0) {
-        const intervalId = setInterval(() => {
-          Animated.sequence([
-            Animated.timing(fadeAnim, {
-              toValue: 0,
-              duration: 100, // Reduje la duración de la animación de desvanecimiento a 100ms
-              useNativeDriver: true,
-            }),
-            Animated.timing(slideAnim, {
-              toValue: -300,
-              duration: 500, // Reduje la duración del desplazamiento a 500ms
-              useNativeDriver: true,
-              easing: Easing.inOut(Easing.ease),
-            }),
-            Animated.timing(slideAnim, {
-              toValue: 300,
-              duration: 0,
-              useNativeDriver: true,
-            }),
-            Animated.timing(slideAnim, {
-              toValue: 0,
-              duration: 500, // Reduje la duración del desplazamiento a 500ms
-              useNativeDriver: true,
-              easing: Easing.inOut(Easing.ease),
-            }),
-            Animated.timing(fadeAnim, {
-              toValue: 1,
-              duration: 100, // Reduje la duración de la animación de desvanecimiento a 100ms
-              useNativeDriver: true,
-            }),
-          ]).start();
-    
-          setTimeout(() => {
-            setCurrentServiceIndex(prevIndex => (prevIndex + 1) % services.length);
-          }, 1000); // Reduje el tiempo entre cada cambio de servicio a 1000ms (1 segundo)
-        }, 8000); // Mantuve el tiempo total entre cada cambio de servicio a 8 segundos
-    
-        return () => clearInterval(intervalId);
-      }
-    }, [slideAnim, fadeAnim, services.length]);
+    const intervalId = setInterval(() => {
+      setCurrentServiceIndex(prevIndex => (prevIndex + 1) % services.length);
+    }, 8000);
+
+    return () => clearInterval(intervalId);
+  }, [services.length]);
+
+  
+    const panResponder = useRef(
+      PanResponder.create({
+        onStartShouldSetPanResponder: () => true,
+        onPanResponderMove: (evt, gestureState) => {
+          const { dx } = gestureState;
+          slideAnim.setValue(dx);
+        },
+        onPanResponderRelease: (evt, gestureState) => {
+          const { dx } = gestureState;
+          if (Math.abs(dx) > 50) {
+            if (dx > 0) {
+              setCurrentServiceIndex(prevIndex => (prevIndex === 0 ? services.length - 1 : prevIndex - 1));
+            } else {
+              setCurrentServiceIndex(prevIndex => (prevIndex + 1) % services.length);
+            }
+          }
+          Animated.spring(slideAnim, {
+            toValue: 0,
+            useNativeDriver: true,
+          }).start();
+        },
+      })
+    ).current;
+  
+
+
 
     useEffect(() => {
       const fetchProducts = async () => {
@@ -278,344 +269,443 @@
       const route = `Adieguar${id}`;
       navigation.navigate(route);
     };
-    
 
-    const slide = slideAnim.interpolate({
-      inputRange: [-300, 0, 300],
-      outputRange: [-300, 0, 300],
-    });
-
+   
     return (
       <ImageBackground source={require('./imagenes/fondomain.jpg')} style={styles.backgroundImage}>
-        <ScrollView contentContainerStyle={styles.container}>
-          <View style={styles.headerContainer}>
-            <Image source={require('./imagenes/fondoperfil.jpg')} style={styles.headerImage} />
-            {/* Ícono de perfil en la esquina superior izquierda de la imagen */}
-            <View style={styles.profileIconContainer}>
-              <TouchableOpacity onPress={() => navigation.navigate('MiPerfil')}>
-                <View style={styles.profileIconCircle}>
-                  <Icon name="person" size={30} color="#fff" />
-                </View>
-              </TouchableOpacity>
-            </View>
-          </View>
-    
-          <View style={styles.searchContainer}>
-            <TextInput
-              style={styles.searchInput}
-              placeholder="¿En qué podemos ayudarte hoy?"
-              value={searchQuery}
-              onChangeText={setSearchQuery}
-              placeholderTextColor="#000000"
-            />
-          </View>
-    
-          {services.length > 0 && (
-            <View style={styles.serviceCardContainer}>
-              <Animated.View style={[styles.serviceContainer, { transform: [{ translateY: slideAnim }], opacity: fadeAnim }]}>
-                <TouchableOpacity onPress={() => navigation.navigate(services[currentServiceIndex].route)}>
-                  <ImageBackground source={services[currentServiceIndex].image} style={styles.serviceImage}>
-                    <Text style={styles.serviceTitle}>{services[currentServiceIndex].title}</Text>
+      <ScrollView contentContainerStyle={styles.container}>
+        <View style={styles.headerContainer}>
+          <Image source={require('./imagenes/fondoperfil.jpg')} style={styles.headerImage} />
+          <View style={styles.profileIconContainer}></View>
+        </View>
+
+        <View style={styles.searchContainer}>
+          <TextInput
+            style={styles.searchInput}
+            placeholder="¿En qué podemos ayudarte hoy?"
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            placeholderTextColor="#000000"
+          />
+        </View>
+
+        {services.length > 0 && (
+          <View style={styles.serviceCardContainer}>
+            <ScrollView horizontal={true}>
+              {services.map(service => (
+                <TouchableOpacity
+                  key={service.id}
+                  style={styles.serviceCard}
+                  onPress={() => navigation.navigate(service.route)}
+                >
+                  <ImageBackground source={service.image} style={styles.serviceImage}>
+                    <Text style={styles.serviceTitle}>{service.title}</Text>
                   </ImageBackground>
                 </TouchableOpacity>
-              </Animated.View>
-            </View>
-          )}
-    
-          <View style={styles.tipCard}>
-            <Text style={styles.tipText}>{tips[currentServiceIndex % tips.length].text}</Text>
+              ))}
+            </ScrollView>
           </View>
-    
-          {/* Productos de comida */}
-          <View style={styles.productContainer}>
-            <View style={styles.productTitleContainer}>
-              <Icon name="cart" size={24} color="#000" style={{ marginRight: 5 }} />
-            <Text style={styles.productTitle}>Productos de Comida</Text>
+        )}
+
+        <View style={styles.tipCard}>
+          <Text style={styles.tipText}>{tips[currentServiceIndex % tips.length].text}</Text>
+        </View>
+
+        <View style={styles.productContainer}>
+          <View style={styles.productTitleContainer}>
+            <Icon name="cart" size={24} color="#E4784A" style={{ marginRight: 5 }} />
+            <Text style={styles.productTitle}>Comida</Text>
           </View>
-            <ScrollView horizontal={true}>
-             {foodProducts.map(product => (
+          <ScrollView horizontal={true}>
+            {foodProducts.map(product => (
               <TouchableOpacity key={product.id} style={styles.productCard} onPress={() => handleProductPress(product.id, product.vetId, 'comida')}>
-                  <Image source={{ uri: product.Foto }} style={styles.productImage} />
-                    <Text style={styles.productName}>{product.Nombre}</Text>
-                    <Text style={styles.productPrice}>${product.Precio}</Text>
+                <Image source={{ uri: product.Foto }} style={styles.productImage} />
+                <Text style={styles.productName}>{product.Nombre}</Text>
+                <Text style={styles.productPrice}>${product.Precio}</Text>
               </TouchableOpacity>
-               ))}
-            </ScrollView>
-          </View>
+            ))}
+          </ScrollView>
+        </View>
 
-          <View style={styles.productContainer}>
-            <View style={styles.productTitleContainer}>
-              <Icon name="cart" size={24} color="#000" style={{ marginRight: 5 }} />
-              <Text style={styles.productTitle}>Productos de Accesorios</Text>
-            </View>
-            <ScrollView horizontal={true}>
-              {accessoryProducts.map(product => (
-                <TouchableOpacity key={product.id} style={styles.productCard} onPress={() => handleProductPress(product.id, product.vetId, 'accesorios')}>
-                  <Image source={{ uri: product.Foto }} style={styles.productImage} />
-                  <Text style={styles.productName}>{product.Nombre}</Text>
-                  <Text style={styles.productPrice}>${product.Precio}</Text>
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
+        <View style={styles.productContainer}>
+          <View style={styles.productTitleContainer}>
+            <Icon name="cart" size={24} color="#E4784A" style={{ marginRight: 5 }} />
+            <Text style={styles.productTitle}>Accesorios</Text>
           </View>
+          <ScrollView horizontal={true}>
+            {accessoryProducts.map(product => (
+              <TouchableOpacity key={product.id} style={styles.productCard} onPress={() => handleProductPress(product.id, product.vetId, 'accesorios')}>
+                <Image source={{ uri: product.Foto }} style={styles.productImage} />
+                <Text style={styles.productName}>{product.Nombre}</Text>
+                <Text style={styles.productPrice}>${product.Precio}</Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </View>
 
-          <View style={styles.productContainer}>
-            <View style={styles.productTitleContainer}>
-              <Icon name="cart" size={24} color="#000" style={{ marginRight: 5 }} />
-              <Text style={styles.productTitle}>Productos</Text>
-            </View>
-            <ScrollView horizontal={true}>
-              {allProductProducts.map(product => (
-                <TouchableOpacity key={product.id} style={styles.productCard} onPress={() => handleProductPress(product.id, product.vetId, 'productos')}>
-                  <Image source={{ uri: product.Foto }} style={styles.productImage} />
-                  <Text style={styles.productName}>{product.Nombre}</Text>
-                  <Text style={styles.productPrice}>${product.Precio}</Text>
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
+        <View style={styles.productContainer}>
+          <View style={styles.productTitleContainer}>
+            <Icon name="cart" size={24} color="#E4784A" style={{ marginRight: 5 }} />
+            <Text style={styles.productTitle}>Juguetes</Text>
           </View>
+          <ScrollView horizontal={true}>
+            {allProductProducts.map(product => (
+              <TouchableOpacity key={product.id} style={styles.productCard} onPress={() => handleProductPress(product.id, product.vetId, 'productos')}>
+                <Image source={{ uri: product.Foto }} style={styles.productImage} />
+                <Text style={styles.productName}>{product.Nombre}</Text>
+                <Text style={styles.productPrice}>${product.Precio}</Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </View>
 
-          <View style={styles.veterinariasContainer}>
-            <View style={styles.veterinariasTitleContainer}>
-              <Icon name="paw" size={24} color="#000" style={{ marginRight: 5 }} />
-              <Text style={styles.veterinariasTitle}>Veterinarias</Text>
-            </View>
-            <ScrollView horizontal={true}>
-              {veterinarias.map(vet => (
-                <TouchableOpacity key={vet.id} style={styles.veterinariaCard} onPress={() => handleVetPress(vet.id)}>
-                  <Image source={{ uri: vet.Foto }} style={styles.veterinariaImage} />
-                  <Text style={styles.veterinariaName}>{vet.Nombre}</Text>
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
+        <View style={styles.veterinariasContainer}>
+          <View style={styles.veterinariasTitleContainer}>
+            <Icon name="paw" size={24} color="#E4784A" style={{ marginRight: 5 }} />
+            <Text style={styles.veterinariasTitle}>Veterinarias</Text>
           </View>
+          <ScrollView horizontal={true}>
+            {veterinarias.map(vet => (
+              <TouchableOpacity key={vet.id} style={styles.veterinariaCard} onPress={() => handleVetPress(vet.id)}>
+                <Image source={{ uri: vet.Foto }} style={styles.veterinariaImage} />
+                <Text style={styles.veterinariaName}>{vet.Nombre}</Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </View>
 
-          <View style={styles.guarderiasAdiestramientoContainer}>
-            <View style={styles.guarderiasAdiestramientoTitleContainer}>
-              <Icon name="home" size={24} color="#000" style={{ marginRight: 5 }} />
-              <Text style={styles.guarderiasAdiestramientoTitle}>Guarderías y Adiestramiento</Text>
-            </View>
-            <ScrollView horizontal={true}>
-              {guarderiasAdiestramiento.map(guarderia => (
-                <TouchableOpacity key={guarderia.id} style={styles.guarderiaAdiestramientoCard} onPress={() => handleGuarderiaAdiestramientoPress(guarderia.id)}>
-                  <Image source={{ uri: guarderia.Foto }} style={styles.guarderiaAdiestramientoImage} />
-                  <Text style={styles.guarderiaAdiestramientoName}>{guarderia.Nombre}</Text>
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
+        <View style={styles.guarderiasAdiestramientoContainer}>
+          <View style={styles.guarderiasAdiestramientoTitleContainer}>
+            <Icon name="home" size={24} color="#E4784A" style={{ marginRight: 5 }} />
+            <Text style={styles.guarderiasAdiestramientoTitle}>Guarderías y Adiestramiento</Text>
           </View>
-        </ScrollView>
-      </ImageBackground>
-    );
-  };
+          <ScrollView horizontal={true}>
+            {guarderiasAdiestramiento.map(guarderia => (
+              <TouchableOpacity key={guarderia.id} style={styles.guarderiaAdiestramientoCard} onPress={() => handleGuarderiaAdiestramientoPress(guarderia.id)}>
+                <Image source={{ uri: guarderia.Foto }} style={styles.guarderiaAdiestramientoImage} />
+                <Text style={styles.guarderiaAdiestramientoName}>{guarderia.Nombre}</Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </View>
 
-  const styles = StyleSheet.create({
-    container: {
-      flexGrow: 1,
-      fontFamily: 'Roboto', // Aplicar la fuente Roboto
-    },
-    headerContainer: {
-      position: 'relative',
-    },
-    headerImage: {
-      width: '100%',
-      height: 150,
-    },
-    profileIconContainer: {
-      position: 'absolute',
-      top: 20, // Ajusta la posición superior según sea necesario
-      left: 20, // Ajusta la posición izquierda según sea necesario
-      zIndex: 1, // Asegura que el botón esté sobre el contenido
-      backgroundColor: '#2F9FFA', // Color de fondo vibrante
-      borderRadius: 30,
-      padding: 10,
-      elevation: 3,
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.2,
-      shadowRadius: 5,
-    },
-    profileIconCircle: {
-      backgroundColor: 'transparent',
-      borderRadius: 30,
-    },
-    searchContainer: {
-      padding: 10,
-    },
-    searchInput: {
-      height: 40,
-      paddingHorizontal: 10,
-      color: '#000000',
-      backgroundColor: '#f5f5f5',
-      fontFamily: 'Roboto', // Aplicar la fuente Roboto
-    },
-    serviceCardContainer: {
-      alignItems: 'center',
-    },
-    serviceContainer: {
-      width: '100%',
-    },
-    serviceImage: {
-      width: '100%',
-      height: 200,
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
-    serviceTitle: {
-      fontSize: 24,
-      color: '#fff',
-      textAlign: 'center',
-      textShadowColor: 'rgba(0, 0, 0, 0.75)',
-      textShadowOffset: { width: 1, height: 1 },
-      textShadowRadius: 2,
-      fontFamily: 'Roboto', // Aplicar la fuente Roboto
-    },
-    tipCard: {
-      backgroundColor: '#f9f9f9',
-      padding: 15,
-      borderRadius: 5,
-      margin: 20,
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.2,
-      shadowRadius: 5,
-      elevation: 2,
-    },
-    tipText: {
-      fontSize: 16,
-      textAlign: 'center',
-      color: '#333',
-      fontFamily: 'Roboto', // Aplicar la fuente Roboto
-    },
-    productContainer: {
-      marginVertical: 10,
-    },
-    productTitleContainer: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      marginBottom: 5,
-    },
-    productTitleIcon: {
-      marginRight: 5,
-    },
-    productTitle: {
-      fontSize: 20,
-      paddingHorizontal: 10,
-      marginBottom: 5,
-      color: '#000000',
-      fontFamily: 'Roboto', // Aplicar la fuente Roboto
-    },
-    productCard: {
-      width: 150,
-      marginHorizontal: 5,
-      backgroundColor: '#ffffff',
-      borderRadius: 10,
-      overflow: 'hidden',
-      alignItems: 'center',
-      marginBottom: 10,
-      elevation: 2,
-    },
-    productImage: {
-      width: 150,
-      height: 100,
-      resizeMode: 'cover',
-      borderTopLeftRadius: 10,
-      borderTopRightRadius: 10,
-    },
-    productName: {
-      fontSize: 14,
-      marginTop: 5,
-      color: '#000000',
-      fontFamily: 'Roboto', // Aplicar la fuente Roboto
-    },
-    productPrice: {
-      fontSize: 12,
-      color: '#666666',
-      marginBottom: 5,
-      fontFamily: 'Roboto', // Aplicar la fuente Roboto
-    },
-    veterinariasContainer: {
-      marginVertical: 10,
-    },
-    veterinariasTitleContainer: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      marginBottom: 5,
-    },
-    veterinariasTitleIcon: {
-      marginRight: 5,
-    },
-    veterinariasTitle: {
-      fontSize: 20,
-      paddingHorizontal: 10,
-      marginBottom: 5,
-      color: '#000000',
-      fontFamily: 'Roboto', // Aplicar la fuente Roboto
-    },
-    veterinariaCard: {
-      width: 150,
-      marginHorizontal: 5,
-      backgroundColor: '#ffffff',
-      borderRadius: 10,
-      overflow: 'hidden',
-      alignItems: 'center',
-      marginBottom: 10,
-      elevation: 2,
-    },
-    veterinariaImage: {
-      width: 150,
-      height: 100,
-      resizeMode: 'cover',
-      borderTopLeftRadius: 10,
-      borderTopRightRadius: 10,
-    },
-    veterinariaName: {
-      fontSize: 14,
-      marginTop: 5,
-      color: '#000000',
-      fontFamily: 'Roboto', // Aplicar la fuente Roboto
-    },
-    guarderiasAdiestramientoContainer: {
-      marginVertical: 10,
-    },
-    guarderiasAdiestramientoTitleContainer: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      marginBottom: 5,
-    },
-    guarderiasAdiestramientoTitleIcon: {
-      marginRight: 5,
-    },
-    guarderiasAdiestramientoTitle: {
-      fontSize: 20,
-      paddingHorizontal: 10,
-      marginBottom: 5,
-      color: 'black',
-      fontFamily: 'Roboto', // Aplicar la fuente Roboto
-    },
-    guarderiaAdiestramientoCard: {
-      width: 150,
-      marginHorizontal: 5,
-      backgroundColor: '#ffffff',
-      borderRadius: 10,
-      overflow: 'hidden',
-      alignItems: 'center',
-      marginBottom: 10,
-      elevation: 2,
-    },
-    guarderiaAdiestramientoImage: {
-      width: 150,
-      height: 100,
-      resizeMode: 'cover',
-      borderTopLeftRadius: 10,
-      borderTopRightRadius: 10,
-    },
-    guarderiaAdiestramientoName: {
-      fontSize: 14,
-      marginTop: 5,
-      color: '#000000',
-      fontFamily: 'Roboto', // Aplicar la fuente Roboto
-    },
-  });
-  
-  export default MainPanel;
+        {/* Sección "Servicios Funebres" */}
+        <View style={styles.productContainer}>
+          <View style={styles.productTitleContainer}>
+            <Icon name="home" size={24} color="#E4784A" style={{ marginRight: 5 }} />
+            <Text style={styles.productTitle}>Servicios Funebres y Otros</Text>
+          </View>
+          <ScrollView horizontal={true}>
+            <TouchableOpacity style={styles.productCard} onPress={() => navigation.navigate('ServicioFuneraria')}>
+              <Image source={require('./imagenes/Premium.jpg')} style={styles.productImage} />
+              <Text style={styles.productName}>Servicio Funerario y otros </Text>
+            </TouchableOpacity>
+          </ScrollView>
+        </View>
+
+        {/* Sección "Seguro para tu Mascota" */}
+        <View style={styles.productContainer}>
+          <View style={styles.productTitleContainer}>
+            <Icon name="home" size={24} color="#E4784A" style={{ marginRight: 5 }} />
+            <Text style={styles.productTitle}>Seguro para tu Mascota</Text>
+          </View>
+          <ScrollView horizontal={true}>
+            <TouchableOpacity style={styles.productCard} onPress={() => navigation.navigate('proximamente')}>
+              <Image source={require('./imagenes/seguro.jpg')} style={styles.productImage} />
+              <Text style={styles.productName}>Seguro para Mascotas</Text>
+            </TouchableOpacity>
+          </ScrollView>
+        </View>
+
+        {/* Añadir un View vacío para espacio extra al final */}
+        <View style={styles.footerSpacing} />
+      </ScrollView>
+
+      {/* Barra de perfil */}
+      <View style={styles.profileBar}>
+        <TouchableOpacity onPress={() => navigation.navigate('MiPerfil')} style={styles.profileButton}>
+          <Icon name="person" size={30} color="#000" />
+          <Text style={styles.profileButtonText}>Perfil</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate('Contactanos')} style={styles.profileButton}>
+          <Icon name="paw" size={30} color="#000" />
+          <Text style={styles.profileButtonText}>Contactanos</Text>
+        </TouchableOpacity>
+      </View>
+    </ImageBackground>
+  );
+};
+    
+    const styles = StyleSheet.create({
+
+      footerSpacing: {
+        height: 100, // Ajusta esta altura según sea necesario para asegurar que el contenido no sea cubierto
+      },
+
+      otrosCard: {
+        width: 150,
+        marginHorizontal: 5,
+        backgroundColor: '#ffffff',
+        borderRadius: 10,
+        overflow: 'hidden',
+        alignItems: 'center',
+        marginBottom: 10,
+      },
+      otrosImage: {
+        width: 150,
+        height: 100,
+        resizeMode: 'cover',
+        borderTopLeftRadius: 10,
+        borderTopRightRadius: 10,
+      },
+      otrosName: {
+        fontSize: 14,
+        marginTop: 5,
+        marginBottom: 5,
+        paddingHorizontal: 10,
+        color: '#000000',
+        fontFamily: 'Roboto',
+      },
+      otrosContainer: {
+        marginVertical: 10,
+      },
+      otrosTitleContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 5,
+      },
+      otrosTitle: {
+        fontSize: 20,
+        paddingHorizontal: 10,
+        marginBottom: 5,
+        color: '#ffffff',
+        fontFamily: 'Roboto',
+        textShadowColor: '#000000',
+        textShadowOffset: { width: 2, height: 2 },
+        textShadowRadius: 3,
+      },
+      container: {
+        flexGrow: 1,
+        fontFamily: 'Roboto', 
+      },
+      headerContainer: {
+        position: 'relative',
+      },
+      headerImage: {
+        width: '100%',
+        height: 150,
+      },
+      searchContainer: {
+        padding: 10,
+      },
+      searchInput: {
+        height: 40,
+        paddingHorizontal: 10,
+        color: '#000000',
+        backgroundColor: '#f5f5f5',
+        fontFamily: 'Roboto',
+      },
+
+      
+      serviceCardContainer: {
+        alignItems: 'center',
+        paddingHorizontal: 20, // Ajusta el margen horizontal para separar las tarjetas de los lados
+      },
+      
+      serviceCard: {
+        width: 250, // Ajusta el ancho de la tarjeta
+        height: 250, // Ajusta la altura de la tarjeta
+        marginHorizontal: 10, // Margen horizontal entre tarjetas
+        marginBottom: 10, // Margen inferior para separar las tarjetas del contenido debajo
+      },
+      
+      serviceImage: {
+        width: '100%',
+        height: '100%', // Ajusta la altura de la imagen para llenar el contenedor de la tarjeta
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 10, // Añade bordes redondeados a la imagen de la tarjeta
+        overflow: 'hidden', // Asegura que el contenido de la imagen no se desborde
+      },
+      
+      serviceTitle: {
+        fontSize: 24,
+        color: '#fff',
+        textAlign: 'center',
+        textShadowColor: 'rgba(0, 0, 0, 0.75)',
+        textShadowOffset: { width: 1, height: 1 },
+        textShadowRadius: 2,
+        fontFamily: 'Roboto',
+        paddingVertical: 10, // Añade un espacio vertical al texto dentro de la tarjeta
+        backgroundColor: 'rgba(0, 0, 0, 0.5)', // Añade un fondo semitransparente al texto para mayor legibilidad
+      },
+
+      tipCard: {
+        backgroundColor: '#f9f9f9',
+        padding: 15,
+        borderRadius: 5,
+        margin: 20,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 5,
+        elevation: 2,
+      },
+      tipText: {
+        fontSize: 16,
+        textAlign: 'center',
+        color: '#333',
+        fontFamily: 'Roboto',
+      },
+      productContainer: {
+        marginVertical: 10,
+      },
+      productTitleContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 5,
+      },
+      productTitle: {
+        fontSize: 20,
+        paddingHorizontal: 10,
+        marginBottom: 5,
+        color: '#ffffff',
+        fontFamily: 'Roboto',
+        textShadowColor: '#000000',
+        textShadowOffset: { width: 2, height: 2 },
+        textShadowRadius: 3,
+      },
+      productCard: {
+        width: 150,
+        marginHorizontal: 5,
+        backgroundColor: '#ffffff',
+        borderRadius: 10,
+        overflow: 'hidden',
+        alignItems: 'center',
+        marginBottom: 10,
+        elevation: 2,
+      },
+      productImage: {
+        width: 150,
+        height: 100,
+        resizeMode: 'cover',
+        borderTopLeftRadius: 10,
+        borderTopRightRadius: 10,
+      },
+      productName: {
+        fontSize: 14,
+        marginTop: 5,
+        color: '#000000',
+        fontFamily: 'Roboto',
+      },
+      productPrice: {
+        fontSize: 12,
+        color: '#666666',
+        marginBottom: 5,
+        fontFamily: 'Roboto',
+      },
+      veterinariasContainer: {
+        marginVertical: 10,
+      },
+      veterinariasTitleContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 5,
+      },
+      veterinariasTitle: {
+        fontSize: 20,
+        paddingHorizontal: 10,
+        marginBottom: 5,
+        color: '#ffffff',
+        fontFamily: 'Roboto',
+        textShadowColor: '#000000',
+        textShadowOffset: { width: 2, height: 2 },
+        textShadowRadius: 3,
+      },
+      veterinariaCard: {
+        width: 150,
+        marginHorizontal: 5,
+        backgroundColor: '#ffffff',
+        borderRadius: 10,
+        overflow: 'hidden',
+        alignItems: 'center',
+        marginBottom: 10,
+        elevation: 2,
+      },
+      veterinariaImage: {
+        width: 150,
+        height: 100,
+        resizeMode: 'cover',
+        borderTopLeftRadius: 10,
+        borderTopRightRadius: 10,
+      },
+      veterinariaName: {
+        fontSize: 14,
+        marginTop: 5,
+        color: '#000000',
+        fontFamily: 'Roboto',
+      },
+      guarderiasAdiestramientoContainer: {
+        marginVertical: 10,
+      },
+      guarderiasAdiestramientoTitleContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 5,
+      },
+      guarderiasAdiestramientoTitle: {
+        fontSize: 20,
+        paddingHorizontal: 10,
+        marginBottom: 5,
+        color: '#ffffff',
+        fontFamily: 'Roboto',
+        textShadowColor: '#000000',
+        textShadowOffset: { width: 2, height: 2 },
+        textShadowRadius: 3,
+      },
+      guarderiaAdiestramientoCard: {
+        width: 150,
+        marginHorizontal: 5,
+        backgroundColor: '#ffffff',
+        borderRadius: 10,
+        overflow: 'hidden',
+        alignItems: 'center',
+        marginBottom: 10,
+        elevation: 2,
+      },
+      guarderiaAdiestramientoImage: {
+        width: 150,
+        height: 100,
+        resizeMode: 'cover',
+        borderTopLeftRadius: 10,
+        borderTopRightRadius: 10,
+      },
+      guarderiaAdiestramientoName: {
+        fontSize: 14,
+        marginTop: 5,
+        color: '#000000',
+        fontFamily: 'Roboto',
+      },
+      profileBar: {
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        backgroundColor: '#ffffff',  // Cambiado a blanco
+        flexDirection: 'row',
+        justifyContent: 'space-around',  // Alinea los íconos equitativamente en la barra
+        paddingVertical: 1,  // Reducir el padding vertical
+      },
+      profileButton: {
+        justifyContent: 'center',
+        alignItems: 'center',
+      },
+      profileButtonText: {
+        fontSize: 10,  // Reducir el tamaño del texto
+        color: '#000',  // Cambiado a negro para mejor visibilidad sobre fondo blanco
+        marginTop: 1,  // Reducir el margen superior para separar el texto del icono
+        fontFamily: 'Roboto',
+      },
+    });
+    
+    export default MainPanel;
