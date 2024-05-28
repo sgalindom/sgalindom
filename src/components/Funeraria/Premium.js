@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Linking, ImageBackground } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
-const backgroundImg = require('../imagenes/Fondopremium.jpg');
+const backgroundImg = require('../imagenes/fondomain.jpg');
 
 // Nuevo componente para la tarjeta de información
 const InfoCard = ({ title, description, icon }) => (

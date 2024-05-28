@@ -15,7 +15,7 @@ import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
-const backgroundImage = require('../imagenes/Login.jpg');
+const backgroundImage = require('../imagenes/fondomain.jpg');
 const logoImage = require('../imagenes/logo_.png');
 
 function Login({ navigation }) {

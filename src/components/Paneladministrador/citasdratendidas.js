@@ -59,7 +59,7 @@ const CitasDrAtendidas = () => {
   );
 
   return (
-    <ImageBackground source={require('../imagenes/fondoadminpanel.jpg')} style={styles.background}>
+    <ImageBackground source={require('../imagenes/fondomain.jpg')} style={styles.background}>
       <View style={styles.container}>
         {citasAtendidas.length === 0 ? (
           <Text style={styles.noCitasText}>No hay citas atendidas por el Dr.</Text>

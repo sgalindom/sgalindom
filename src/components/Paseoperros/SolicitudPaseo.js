@@ -6,7 +6,7 @@ import auth from '@react-native-firebase/auth';
 import CheckBox from '@react-native-community/checkbox';
 import Icon from 'react-native-vector-icons/Ionicons';
 
-const backgroundImage = require('../imagenes/fondopanelbaño.jpg');
+const backgroundImage = require('../imagenes/fondomain.jpg');
 
 const SolicitudPaseo = ({ route, navigation }) => {
   const [selectedDate, setSelectedDate] = useState({});

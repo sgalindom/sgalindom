@@ -13,7 +13,7 @@ import {
 import auth from '@react-native-firebase/auth';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 
-const backgroundImage = require('../imagenes/recontraseña.jpg');
+const backgroundImage = require('../imagenes/fondomain.jpg');
 const logoImage = require('../imagenes/logo_2.png');
 
 const RecuperarContraseña = ({ navigation }) => {

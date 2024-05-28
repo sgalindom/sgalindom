@@ -51,7 +51,7 @@ const MisMascotas = ({ navigation }) => {
 
   return (
     <ImageBackground
-      source={require('../imagenes/MisMascotas.jpg')}
+      source={require('../imagenes/fondomain.jpg')}
       style={styles.container}
     >
       <Text style={styles.title}>Mis Mascotas</Text>

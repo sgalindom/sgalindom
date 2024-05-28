@@ -70,7 +70,7 @@ const CalificacionScreen = ({ navigation }) => {
   };
 
   return (
-    <ImageBackground source={require('../../imagenes/fondocalificaranimalzone.jpg')} style={styles.backgroundImage}>
+    <ImageBackground source={require('../../imagenes/fondomain.jpg')} style={styles.backgroundImage}>
       <View style={styles.container}>
         <Text style={styles.title}>Califica nuestros servicios</Text>
         {preguntas.map((pregunta) => (

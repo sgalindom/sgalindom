@@ -6,7 +6,7 @@ const PaquetesPaseos = ({ navigation }) => {
   const diarioImage = require('../imagenes/Diario.jpg');
   const semanalImage = require('../imagenes/semanal.jpg');
   const mensualImage = require('../imagenes/mensual.jpg');
-  const fondoPaquetesImage = require('../imagenes/fondopanelbaño.jpg');
+  const fondoPaquetesImage = require('../imagenes/fondomain.jpg');
 
   const navigateToSolicitudPaseo = (paquete) => {
     navigation.navigate('SolicitudPaseo', { paquete });

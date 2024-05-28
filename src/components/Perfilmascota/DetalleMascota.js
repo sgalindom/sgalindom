@@ -30,7 +30,7 @@ const DetalleMascota = ({ route, navigation }) => {
 
   return (
     <ImageBackground
-      source={require('../imagenes/DetalleMascota.jpg')}
+      source={require('../imagenes/fondomain.jpg')}
       style={styles.background}
     >
       <View style={styles.container}>

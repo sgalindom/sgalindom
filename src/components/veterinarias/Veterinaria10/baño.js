@@ -4,8 +4,8 @@ import { useNavigation } from '@react-navigation/native';
 
 const BañoScreen = () => {
   const navigation = useNavigation();
-  const bañoImage = require('../../imagenes/baño2.jpg');
-  const fondoImage = require('../../imagenes/fondopanelbaño.jpg');
+  const bañoImage = require('../../imagenes/bañado.jpg');
+  const fondoImage = require('../../imagenes/fondomain.jpg');
 
   const llamarVeterinaria = () => {
     Linking.openURL('tel:+573202212377');

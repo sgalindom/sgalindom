@@ -36,7 +36,7 @@ const Vet1DrScreen = () => {
   };
 
   return (
-    <ImageBackground source={require('../../imagenes/fondodr.jpg')} style={styles.backgroundImage}>
+    <ImageBackground source={require('../../imagenes/fondomain.jpg')} style={styles.backgroundImage}>
       <View style={styles.container}>
         <Image source={require('../../imagenes/drmanuel.jpg')} style={styles.veterinarioImage} />
         <View style={styles.textContainer}>

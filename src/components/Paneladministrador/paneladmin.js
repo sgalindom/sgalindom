@@ -40,7 +40,7 @@ const Paneladmin = () => {
   };
 
   const handleCuponesQRClick = () => {
-    navigation.navigate('CuponesQR');
+    navigation.navigate('proximamente');
   };
 
   const handleProductosTiendaClick = () => {
@@ -52,7 +52,7 @@ const Paneladmin = () => {
   };
 
   return (
-    <ImageBackground source={require('../imagenes/fondoadminpanel.jpg')} style={styles.container} imageStyle={{ opacity: 1 }}>
+    <ImageBackground source={require('../imagenes/fondomain.jpg')} style={styles.container} imageStyle={{ opacity: 1 }}>
       <Text style={styles.title}>Panel de Administrador</Text>
 
       <TouchableOpacity style={styles.card} onPress={handleOrdersClick}>

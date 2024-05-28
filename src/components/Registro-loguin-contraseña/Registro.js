@@ -17,7 +17,7 @@ import firestore from '@react-native-firebase/firestore';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
 const logoImage = require('../imagenes/fondoperfil.jpg');
-const backgroundImage = require('../imagenes/Registro.jpg');
+const backgroundImage = require('../imagenes/fondomain.jpg');
 
 const Registro = ({ navigation }) => {
   const [email, setEmail] = useState('');

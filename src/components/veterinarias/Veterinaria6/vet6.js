@@ -32,7 +32,7 @@ const Vet6Screen = () => {
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
       <ImageBackground
-        source={require('../../imagenes/fondovet4.jpg')}
+        source={require('../../imagenes/fondomain.jpg')}
         style={styles.container}
       >
         <View style={styles.content}>

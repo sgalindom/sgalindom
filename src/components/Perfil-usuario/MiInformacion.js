@@ -151,7 +151,7 @@ const MiInformacion = () => {
 
   return (
     <ImageBackground
-      source={require('../imagenes/MiInformacion.jpg')}
+      source={require('../imagenes/fondomain.jpg')}
       style={styles.container}
     >
       <View style={styles.topContainer}>

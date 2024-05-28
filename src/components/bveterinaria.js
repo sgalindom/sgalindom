@@ -7,7 +7,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 
 const VeterinariaScreen = () => {
   const navigation = useNavigation();
-  const fondoVeterinariasImage = require('./imagenes/fondoveterinarias.jpg');
+  const fondoVeterinariasImage = require('./imagenes/fondomain.jpg');
 
   const [veterinarias, setVeterinarias] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);

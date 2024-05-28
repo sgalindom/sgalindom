@@ -5,10 +5,10 @@ import Icon from 'react-native-vector-icons/Ionicons';
 
 const Vet10Screen = () => {
   const navigation = useNavigation();
-  const doctorImage = require('../../imagenes/doctor.jpg');
+  const doctorImage = require('../../imagenes/drmanuel.jpg');
   const bañadoImage = require('../../imagenes/bañado.jpg');
   const ubicacionImage = require('../../imagenes/ubicacion.jpg');
-  const backgroundImage = require('../../imagenes/color.jpg');
+  const backgroundImage = require('../../imagenes/fondomain.jpg');
 
   const goToDomicilio = () => {
     navigation.navigate('vet1dr');

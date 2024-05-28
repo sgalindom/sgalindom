@@ -83,13 +83,13 @@ import Basico from './components/Funeraria/Basico';
 import Premium from './components/Funeraria/Premium';
 
 // Importaciones relacionadas con el Panel Administrativo
-import CuponesQRadmin from './components/Paneladministrador/cuponesqr';
+
 import PanelAdmin from './components/Paneladministrador/paneladmin';
 import PedidosPetShopPanel from './components/Paneladministrador/pepetshop';
 import DespachadosPetShopPanel from './components/Paneladministrador/despapetshop';
 import ProductosPanel from './components/Paneladministrador/productostiendaañadir';
 import Accesorios from './components/Paneladministrador/accesorios';
-import Comida from './components/Paneladministrador/coida';
+import Comida from './components/Paneladministrador/comida';
 import Productos from './components/Paneladministrador/productos';
 import MisProductos from './components/Paneladministrador/misproductos';
 
@@ -184,7 +184,7 @@ const Stack = createNativeStackNavigator();
         <Stack.Screen name="ServicioFuneraria" component={ServicioFuneraria} />
         <Stack.Screen name="Basico" component={Basico} />
         <Stack.Screen name="Premium" component={Premium} />
-        <Stack.Screen name="CuponesQR" component={CuponesQRadmin} />
+        
         <Stack.Screen name="paneladmin" component={PanelAdmin} />
         <Stack.Screen name="pepetshop" component={PedidosPetShopPanel} />
         <Stack.Screen name="misproductos" component={MisProductos} />

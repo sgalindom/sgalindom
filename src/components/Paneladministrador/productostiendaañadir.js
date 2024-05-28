@@ -78,7 +78,7 @@ const ProductosPanel = () => {
   };
 
   return (
-    <ImageBackground source={require('../imagenes/fondoadminpanel.jpg')} style={styles.container}>
+    <ImageBackground source={require('../imagenes/fondomain.jpg')} style={styles.container}>
       <View style={styles.container}>
         <View style={styles.header}>
           <Text style={styles.headerText}>AÑADIR PRODUCTOS</Text>

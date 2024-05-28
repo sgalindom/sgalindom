@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, ImageBackground, TouchableOpacity, Linking, Image } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 
-const backgroundImage = require('./imagenes/fondopanelbaño.jpg');
+const backgroundImage = require('./imagenes/fondomain.jpg');
 const tuFoto = require('./imagenes/tu_foto.jpg');
 
 const ContactanosScreen = () => {

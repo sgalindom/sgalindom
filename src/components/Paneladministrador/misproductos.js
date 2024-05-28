@@ -18,7 +18,7 @@ const MisProductos = () => {
   };
 
   return (
-    <ImageBackground source={require('../imagenes/fondoadminpanel.jpg')} style={styles.container}>
+    <ImageBackground source={require('../imagenes/fondomain.jpg')} style={styles.container}>
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.button} onPress={handleAccesoriosClick}>
           <Text style={styles.buttonText}>Accesorios</Text>

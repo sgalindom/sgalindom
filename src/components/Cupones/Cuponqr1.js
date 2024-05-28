@@ -5,7 +5,7 @@ import { useRoute } from '@react-navigation/native';
 import QRCode from 'react-native-qrcode-svg';
 
 // Importa la imagen
-import FondoImage from '../imagenes/fondoadminpanel.jpg';
+import FondoImage from '../imagenes/fondomain.jpg';
 
 const Cuponqr1 = () => {
   const route = useRoute();

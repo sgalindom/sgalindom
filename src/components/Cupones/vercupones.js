@@ -43,7 +43,7 @@ const VerCupones = () => {
   );
 
   return (
-    <ImageBackground source={require('../imagenes/fondocalificaranimalzone.jpg')} style={styles.backgroundImage}>
+    <ImageBackground source={require('../imagenes/fondomain.jpg')} style={styles.backgroundImage}>
       <View style={styles.container}>
         <Text style={styles.listTitle}>Lista de Cupones:</Text>
         {cupones.map((cupon, index) => (

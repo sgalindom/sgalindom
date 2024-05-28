@@ -137,7 +137,7 @@ const CitasBañoPanel = () => {
   );
 
   return (
-    <ImageBackground source={require('../imagenes/fondoadminpanel.jpg')} style={styles.background}>
+    <ImageBackground source={require('../imagenes/fondomain.jpg')} style={styles.background}>
       <View style={styles.container}>
         {citas.length === 0 ? (
           <Text style={styles.noCitasText}>No hay citas disponibles</Text>

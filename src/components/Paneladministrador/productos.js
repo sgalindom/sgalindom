@@ -95,7 +95,7 @@ const Productos = () => {
   }
 
   return (
-    <ImageBackground source={require('../imagenes/fondoadminpanel.jpg')} style={styles.backgroundImage}>
+    <ImageBackground source={require('../imagenes/fondomain.jpg')} style={styles.backgroundImage}>
       <View style={styles.container}>
         {productosData && productosData.length > 0 ? (
           productosData.map(producto => (

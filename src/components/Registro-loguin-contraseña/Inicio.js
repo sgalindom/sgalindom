@@ -1,12 +1,33 @@
-import React from 'react';
-import { View, Text, StyleSheet, Alert, ImageBackground, TouchableOpacity, Image } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, Alert, ImageBackground, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import auth from '@react-native-firebase/auth';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { useNavigation } from '@react-navigation/native';
+import storage from '@react-native-firebase/storage';
 
 const Inicio = () => {
   const navigation = useNavigation();
+  const [backgroundUrl, setBackgroundUrl] = useState(null);
+  const [logoUrl, setLogoUrl] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchImages = async () => {
+      try {
+        const backgroundUrl = await storage().ref('imagenes/fondomain.jpg').getDownloadURL();
+        const logoUrl = await storage().ref('imagenes/fondoperfil.jpg').getDownloadURL();
+        setBackgroundUrl(backgroundUrl);
+        setLogoUrl(logoUrl);
+      } catch (error) {
+        console.error('Error fetching images from Firebase Storage', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchImages();
+  }, []);
 
   const handleGoogleSignIn = async () => {
     try {
@@ -22,10 +43,18 @@ const Inicio = () => {
     }
   };
 
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    );
+  }
+
   return (
-    <ImageBackground source={require('../imagenes/fondomain.jpg')} style={styles.background}>
+    <ImageBackground source={{ uri: backgroundUrl }} style={styles.background}>
       <View style={styles.container}>
-        <Image source={require('../imagenes/fondoperfil.jpg')} style={styles.logo} />
+        <Image source={{ uri: logoUrl }} style={styles.logo} />
         <View style={styles.buttonContainer}>
           <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Login')}>
             <Icon name="log-in-outline" size={24} color="#fff" style={styles.icon} />
@@ -35,7 +64,7 @@ const Inicio = () => {
             <Icon name="person-add-outline" size={24} color="#fff" style={styles.icon} />
             <Text style={styles.buttonText}>Registrarse</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={[styles.button, styles.googleButton]} onPress={() => navigation.navigate('proximamente')}>
+          <TouchableOpacity style={[styles.button, styles.googleButton]} onPress={handleGoogleSignIn}>
             <Icon name="logo-google" size={24} color="#fff" style={styles.icon} />
             <Text style={styles.buttonText}>Iniciar Sesión con Google</Text>
           </TouchableOpacity>
@@ -57,7 +86,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   logo: {
-    width: 1000,
+    width: 200,
     height: 100,
     resizeMode: 'contain',
     marginTop: 10,
@@ -88,6 +117,11 @@ const styles = StyleSheet.create({
   },
   icon: {
     marginRight: 10,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 

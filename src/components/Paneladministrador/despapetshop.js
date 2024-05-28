@@ -69,7 +69,7 @@ const DespachadosPetShopPanel = () => {
   );
 
   return (
-    <ImageBackground source={require('../imagenes/fondoadminpanel.jpg')} style={styles.background}>
+    <ImageBackground source={require('../imagenes/fondomain.jpg')} style={styles.background}>
       <View style={styles.container}>
         {pedidosDespachados.length === 0 ? (
           <Text style={styles.noPedidosText}>No hay pedidos despachados</Text>

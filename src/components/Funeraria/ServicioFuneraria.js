@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, ImageBackground } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 
-const backgroundImg = require('../imagenes/Fondofuneraria.jpg');
+const backgroundImg = require('../imagenes/fondomain.jpg');
 
 const ServicioFuneraria = ({ navigation }) => {
   const goToScreen = (screenName) => {

@@ -34,7 +34,7 @@ const PetShopScreen = () => {
 
   return (
     <ImageBackground
-      source={require('../../imagenes/petshopfondo.jpg')}
+      source={require('../../imagenes/fondomain.jpg')}
       style={styles.background}
     >
       <ScrollView contentContainerStyle={styles.container}>
