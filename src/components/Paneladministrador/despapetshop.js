@@ -60,10 +60,11 @@ const DespachadosPetShopPanel = () => {
 
       <Text style={styles.subTitle}>Productos:</Text>
       <FlatList
-        data={item.productos}
-        renderItem={({ item: producto }) => renderProducto(producto)}
-        keyExtractor={(producto) => producto.id}
-      />
+          data={item.productos}
+          renderItem={({ item: producto }) => renderProducto(producto)}
+          keyExtractor={(producto, index) => index.toString()} // Usando el índice como key
+        />
+
     </View>
   );
 

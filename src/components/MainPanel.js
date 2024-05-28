@@ -361,7 +361,7 @@ const MainPanel = ({ navigation }) => {
 
         <View style={styles.veterinariasContainer}>
           <View style={styles.veterinariasTitleContainer}>
-            <Icon name="paw" size={24} color="#E4784A" style={{ marginRight: 5 }} />
+            <Icon name="storefront-sharp" size={24} color="#E4784A" style={{ marginRight: 5 }} />
             <Text style={styles.veterinariasTitle}>Veterinarias</Text>
           </View>
           <ScrollView horizontal={true}>
@@ -376,7 +376,7 @@ const MainPanel = ({ navigation }) => {
 
         <View style={styles.guarderiasAdiestramientoContainer}>
           <View style={styles.guarderiasAdiestramientoTitleContainer}>
-            <Icon name="home" size={24} color="#E4784A" style={{ marginRight: 5 }} />
+            <Icon name="storefront" size={24} color="#E4784A" style={{ marginRight: 5 }} />
             <Text style={styles.guarderiasAdiestramientoTitle}>Guarderías y Adiestramiento</Text>
           </View>
           <ScrollView horizontal={true}>
@@ -427,10 +427,16 @@ const MainPanel = ({ navigation }) => {
           <Icon name="person" size={30} color="#000" />
           <Text style={styles.profileButtonText}>Perfil</Text>
         </TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate('mispedidos')} style={styles.profileButton}>
+          <Icon name="cart" size={30} color="#000" />
+          <Text style={styles.profileButtonText}>Pedidos</Text>
+        </TouchableOpacity>
+
         <TouchableOpacity onPress={() => navigation.navigate('Contactanos')} style={styles.profileButton}>
           <Icon name="paw" size={30} color="#000" />
           <Text style={styles.profileButtonText}>Contactanos</Text>
         </TouchableOpacity>
+
       </View>
     </ImageBackground>
   );

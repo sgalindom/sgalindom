@@ -91,7 +91,7 @@ const Pago = ({ navigation }) => {
                   });
   
                   // Guardar pedido también en la ruta de la veterinaria
-                  const domicilioRef = firestore().collection('Administradores').doc('animalzone@gmail.com').collection('pedidospetshop').doc(misPedidosRef.id);
+                  const domicilioRef = firestore().collection('Administradores').doc('petservicesbga@gmail.com').collection('pedidospetshop').doc(misPedidosRef.id);
                   await domicilioRef.set({
                     usuario: usuarioEmail,
                     nombreCompleto,
@@ -120,6 +120,7 @@ const Pago = ({ navigation }) => {
       console.error('Error al procesar el pedido:', error);
     }
   };
+
   const limpiarProductos = async (usuarioEmail) => {
     const pedidoRef = firestore().collection('usuarios').doc(usuarioEmail).collection('pedidos');
     const productosSnapshot = await pedidoRef.get();
@@ -163,9 +164,9 @@ const Pago = ({ navigation }) => {
       console.error('Error al eliminar el pedido:', error);
     }
   };
-
+  
   const renderItem = ({ item }) => (
-    <View style={styles.itemContainer}>
+    <View style={styles.itemContainer} key={item.id}>
       <Text style={styles.texto}>Nombre del Producto: {item.nombre}</Text>
       <Text style={styles.texto}>Precio: ${item.precio}</Text>
       <Text style={styles.texto}>Cantidad: {item.cantidad}</Text>
@@ -178,6 +179,7 @@ const Pago = ({ navigation }) => {
       </TouchableOpacity>
     </View>
   );
+  
 
   return (
     <ImageBackground source={require('../imagenes/fondomain.jpg')} style={styles.backgroundImage}>
@@ -194,7 +196,11 @@ const Pago = ({ navigation }) => {
           ListFooterComponent={() => (
             <View style={styles.pie}>
               <Text style={styles.totalText}>Total a Pagar: ${totalPagar}</Text>
-              <TouchableOpacity onPress={handleHacerPedido} style={styles.botonHacerPedido}>
+              <TouchableOpacity 
+                onPress={pedidos.length > 0 ? handleHacerPedido : null}
+                style={[styles.botonHacerPedido, pedidos.length === 0 && styles.botonDeshabilitado]}
+                disabled={pedidos.length === 0}
+              >
                 <Icon name="checkmark-circle-outline" size={20} color="white" />
                 <Text style={styles.textoBoton}>HACER PEDIDO</Text>
               </TouchableOpacity>
@@ -252,6 +258,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'center',
+  },
+  botonDeshabilitado: {
+    backgroundColor: '#A9A9A9',
   },
   textoBoton: {
     color: 'white',

@@ -2,6 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import auth from '@react-native-firebase/auth';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
+
+GoogleSignin.configure({
+  webClientId: '273923140034-t2scom2bamihapkdpt5t2dpf902j3qnj.apps.googleusercontent.com',
+});
+
 
 // Importaciones relacionadas con Registro, Loguin y Contraseña
 import PreLogin from './components/Registro-loguin-contraseña/PreLogin';
@@ -37,17 +43,17 @@ import pago from './components/Pedidosusuarios/pago';
 import bveterinaria from './components/bveterinaria';
 import Vet1Screen from './components/veterinarias/Veterinaria1/vet1';
 import petshop from './components/veterinarias/Veterinaria1/petshop';
-import baño from './components/veterinarias/Veterinaria1/baño';
-import domicilio from './components/veterinarias/Veterinaria1/vet1dr';
+import baño from './components/veterinarias/Veterinaria10/baño';
+import domicilio from './components/veterinarias/Veterinaria10/vet1dr';
 import vet1juguetes from './components/veterinarias/Veterinaria1/vet1juguetes';
 import Vet1Comida from './components/veterinarias/Veterinaria1/vet1comida';
 import vet1accesorios from './components/veterinarias/Veterinaria1/vet1accesorios';
-import vet1calificacion from './components/veterinarias/Veterinaria1/vet1calificacion';
-import Vet1DrScreen from './components/veterinarias/Veterinaria1/vet1dr';
-import Vet1BañoCitasScreen from './components/veterinarias/Veterinaria1/vet1bañocita';
+import vet1calificacion from './components/veterinarias/Veterinaria10/vet1calificacion';
+import Vet1DrScreen from './components/veterinarias/Veterinaria10/vet1dr';
+import Vet1BañoCitasScreen from './components/veterinarias/Veterinaria10/vet1bañocita';
 import CitasBañoPanel from './components/Paneladministrador/citasbaños';
 import CitasDrPanel from './components/Paneladministrador/citasdr';
-import Vet1CitasDrScreen from './components/veterinarias/Veterinaria1/vet1citasdr';
+import Vet1CitasDrScreen from './components/veterinarias/Veterinaria10/vet1citasdr';
 import CitasDrAtendidas from './components/Paneladministrador/citasdratendidas';
 import CitasBañosAtendidas from './components/Paneladministrador/citasbañoatendidas';
 
@@ -103,6 +109,9 @@ import VerProductoAccesorios from './components/veterinarias/Veterinaria1/verpro
 import MisPedidos from './components/Pedidosusuarios/mispedidos';
 
 import Seguros from './components/seguros/seguros';
+
+import Inicio from './components/Registro-loguin-contraseña/Inicio';
+import Vet10Screen from './components/veterinarias/Veterinaria10/Vet10';
 
 
 const Stack = createNativeStackNavigator();
@@ -215,8 +224,10 @@ const Stack = createNativeStackNavigator();
 
         <Stack.Screen name="seguros" component={Seguros} />
 
+        <Stack.Screen name="Inicio" component={Inicio} />
 
 
+        <Stack.Screen name="vet10" component={Vet10Screen} />
 
       </Stack.Navigator>
     </NavigationContainer>

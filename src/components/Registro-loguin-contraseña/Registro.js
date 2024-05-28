@@ -28,6 +28,7 @@ const Registro = ({ navigation }) => {
   const [direccion, setDireccion] = useState('');
   const [edad, setEdad] = useState('');
   const [hidePassword, setHidePassword] = useState(true);
+  const [errorField, setErrorField] = useState(null);
 
   const handleRegistro = async () => {
     try {
@@ -36,23 +37,29 @@ const Registro = ({ navigation }) => {
         Alert.alert('Error', 'Por favor completa todos los campos');
         return;
       }
-
+  
+      // Validar que la contraseña tenga al menos 6 caracteres
+      if (password.length < 6) {
+        Alert.alert('Error', 'La contraseña debe tener al menos 6 caracteres');
+        return;
+      }
+  
       if (password !== confirmPassword) {
         Alert.alert('Error', 'Las contraseñas no coinciden');
         return;
       }
-
+  
       // Validar formato de email
       if (!validateEmail(email)) {
         Alert.alert('Error', 'Por favor ingresa un correo electrónico válido');
         return;
       }
-
+  
       await auth().createUserWithEmailAndPassword(email, password);
       console.log('Registro exitoso');
-
+  
       const user = auth().currentUser;
-
+  
       if (user) {
         const userData = {
           nombreCompleto,
@@ -60,9 +67,9 @@ const Registro = ({ navigation }) => {
           direccion,
           edad,
         };
-
+  
         await firestore().collection('usuarios').doc(user.email).collection('datos').add(userData);
-
+        Alert.alert('Éxito', 'Usuario registrado exitosamente');
         navigation.navigate('MainPanel');
       }
     } catch (error) {
@@ -100,7 +107,7 @@ const Registro = ({ navigation }) => {
         </View>
         <Text style={styles.title}>¡Únete a nosotros!</Text>
         <Animated.View style={styles.formContainer}>
-          <View style={styles.inputContainer}>
+          <View style={[styles.inputContainer, errorField === 'nombreCompleto' && styles.error]}>
             <Icon name="user" size={20} color="#000000" style={styles.icon} />
             <TextInput
               placeholder="Nombre completo"
@@ -295,6 +302,9 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontWeight: 'bold',
     fontSize: 16,
+  },
+  error: {
+    borderBottomColor: 'red', // Cambia el color del borde del campo en caso de error
   },
 });
 

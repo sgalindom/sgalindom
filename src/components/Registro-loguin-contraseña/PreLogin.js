@@ -29,7 +29,7 @@ function PreLogin({ navigation }) {
         }
       } else {
         // El usuario no está autenticado, redirige a Login
-        navigation.replace('Login');
+        navigation.replace('Inicio');
         setIsLoading(false);
       }
     });

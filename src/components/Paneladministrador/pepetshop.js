@@ -110,16 +110,19 @@ const PedidosPetShopPanel = () => {
     <View style={styles.card}>
       <Text style={styles.cardTitle}>Pedido ID: {item.id}</Text>
       <Text style={styles.cardText}>Usuario: {item.usuario}</Text>
-      {renderUsuarioInfo(item.nombreCompleto, item.telefono)}
+      <Text style={styles.cardText}>Nombre Completo: {item.nombreCompleto}</Text>
+      <Text style={styles.cardText}>Teléfono: {item.telefono}</Text>
       <Text style={styles.cardText}>Total: ${item.total}</Text>
-
+  
       <Text style={styles.subTitle}>Productos:</Text>
-      <FlatList
-        data={item.productos}
-        renderItem={({ item: producto }) => renderProducto(producto)}
-        keyExtractor={(producto) => producto.id}
-      />
-
+      {item.productos.map((producto, index) => (
+        <View key={index} style={styles.productoCard}>
+          <Text style={styles.productoText}>Nombre: {producto.nombre}</Text>
+          <Text style={styles.productoText}>Cantidad: {producto.cantidad}</Text>
+          <Text style={styles.productoText}>Precio Unitario: ${parseFloat(producto.precio).toFixed(2)}</Text>
+        </View>
+      ))}
+  
       <TouchableOpacity
         style={styles.despachadoButton}
         onPress={() => confirmarDespacho(item.id, item)}
@@ -128,6 +131,8 @@ const PedidosPetShopPanel = () => {
       </TouchableOpacity>
     </View>
   );
+  
+  
 
   return (
     <View style={styles.container}>
