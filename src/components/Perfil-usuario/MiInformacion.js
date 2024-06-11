@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ImageBackground, ScrollView, TouchableOpacity, Image, Modal } from 'react-native';
+import Icon from 'react-native-vector-icons/FontAwesome5';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import storage from '@react-native-firebase/storage';
 import ImageCropPicker from 'react-native-image-crop-picker';
-import Icon from 'react-native-vector-icons/FontAwesome5';
 
 const MiInformacion = () => {
   const [userData, setUserData] = useState(null);
   const [profileImage, setProfileImage] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
+  const [userEmail, setUserEmail] = useState('');
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -17,6 +18,7 @@ const MiInformacion = () => {
         const user = auth().currentUser;
         if (user) {
           const userEmail = user.email;
+          setUserEmail(userEmail);
 
           const userDocs = await firestore()
             .collection('usuarios')
@@ -164,6 +166,7 @@ const MiInformacion = () => {
             </View>
           )}
         </TouchableOpacity>
+        <Text style={styles.emailText}>{userEmail}</Text>
       </View>
       <View style={styles.bottomContainer}>
         <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -200,133 +203,138 @@ const MiInformacion = () => {
         transparent={true}
         visible={modalVisible}
         onRequestClose={() => setModalVisible(false)}
-      >
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <TouchableOpacity style={styles.modalItem} onPress={takePhoto}>
-              <Text style={styles.modalItemText}>Tomar Foto</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.modalItem} onPress={pickImage}>
-              <Text style={styles.modalItemText}>Seleccionar de la Galería</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.modalItem} onPress={removePhoto}>
-              <Text style={styles.modalItemText}>Quitar Foto</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.modalItem} onPress={() => setModalVisible(false)}>
-              <Text style={styles.modalItemText}>Cancelar</Text>
-            </TouchableOpacity>
+        >
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <TouchableOpacity style={styles.modalItem} onPress={takePhoto}>
+                <Text style={styles.modalItemText}>Tomar Foto</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.modalItem} onPress={pickImage}>
+                <Text style={styles.modalItemText}>Seleccionar de la Galería</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.modalItem} onPress={removePhoto}>
+                <Text style={styles.modalItemText}>Quitar Foto</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.modalItem} onPress={() => setModalVisible(false)}>
+                <Text style={styles.modalItemText}>Cancelar</Text>
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
-      </Modal>
-    </ImageBackground>
-  );
-};
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-  },
-  topContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: '100%',
-  },
-  bottomContainer: {
-    flex: 1,
-    width: '100%',
-    borderTopLeftRadius: 30,
-    borderTopRightRadius: 30,
-    overflow: 'hidden',
-    backgroundColor: '#fff', // Color de fondo blanco
-  },
-  scrollContainer: {
-    flexGrow: 1,
-    alignItems: 'center',
-    backgroundColor: 'transparent',
-    paddingBottom: 20,
-  },
-  userDataContainer: {
-    padding: 16,
-    width: '100%',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 10,
-    color: 'black',
-    textAlign: 'center',
-  },
-  userInfoRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  icon: {
-    marginRight: 10,
-  },
-  userInfo: {
-    fontSize: 18,
-    marginVertical: 5,
-    color: 'black',
-  },
-  bold: {
-    fontWeight: 'bold',
-  },
-  infoText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    margin: 10,
-  },
-  profileImageContainer: {
-    alignItems: 'center',
-  },
-  profileImage: {
-    width: 150,
-    height: 150,
-    borderRadius: 75,
-    marginVertical: 10,
-  },
-  profileImagePlaceholder: {
-    width: 150,
-    height: 150,
-    borderRadius: 75,
-    backgroundColor: 'lightgray',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginVertical: 10,
-  },
-  profileImageText: {
-    fontSize: 30,
-    fontWeight: 'bold',
-    color: 'white',
-  },
-  modalContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  modalContent: {
-    backgroundColor: 'white',
-    borderRadius: 8,
-    padding: 16,
-    width: '80%',
-  },
-  modalItem: {
-    paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: 'lightgray',
-  },
-  modalItemText: {
-    fontSize: 18,
-    textAlign: 'center',
-    color: 'black',
-  },
-  userInfoContainer: {
-    marginBottom: 30,
-  },
+        </Modal>
+      </ImageBackground>
+    );
+  };
   
-});
-
-export default MiInformacion;
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      alignItems: 'center',
+    },
+    topContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      width: '100%',
+    },
+    bottomContainer: {
+      flex: 1,
+      width: '100%',
+      borderTopLeftRadius: 30,
+      borderTopRightRadius: 30,
+      overflow: 'hidden',
+      backgroundColor: '#fff', // Color de fondo blanco
+    },
+    scrollContainer: {
+      flexGrow: 1,
+      alignItems: 'center',
+      backgroundColor: 'transparent',
+      paddingBottom: 20,
+    },
+    userDataContainer: {
+      padding: 16,
+      width: '100%',
+    },
+    title: {
+      fontSize: 24,
+      fontWeight: 'bold',
+      marginBottom: 10,
+      color: 'black',
+      textAlign: 'center',
+    },
+    userInfoRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    icon: {
+      marginRight: 10,
+    },
+    userInfo: {
+      fontSize: 18,
+      marginVertical: 5,
+      color: 'black',
+    },
+    bold: {
+      fontWeight: 'bold',
+    },
+    infoText: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      margin: 10,
+    },
+    profileImageContainer: {
+      alignItems: 'center',
+    },
+    profileImage: {
+      width: 150,
+      height: 150,
+      borderRadius: 75,
+      marginVertical: 10,
+    },
+    profileImagePlaceholder: {
+      width: 150,
+      height: 150,
+      borderRadius: 75,
+      backgroundColor: 'lightgray',
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginVertical: 10,
+    },
+    profileImageText: {
+      fontSize: 30,
+      fontWeight: 'bold',
+      color: 'white',
+    },
+    modalContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    },
+    modalContent: {
+      backgroundColor: 'white',
+      borderRadius: 8,
+      padding: 16,
+      width: '80%',
+    },
+    modalItem: {
+      paddingVertical: 10,
+      borderBottomWidth: 1,
+      borderBottomColor: 'lightgray',
+    },
+    modalItemText: {
+      fontSize: 18,
+      textAlign: 'center',
+      color: 'black',
+    },
+    userInfoContainer: {
+      marginBottom: 30,
+    },
+    emailText: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      color: 'black',
+    },
+  });
+  
+  export default MiInformacion;
+  

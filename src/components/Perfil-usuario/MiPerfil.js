@@ -54,7 +54,7 @@ const MiPerfil = ({ navigation }) => {
         source={require('../imagenes/fondomain.jpg')}
         style={styles.backgroundImage}
       >
-        <Image source={require('../imagenes/fondomain.jpg')} style={styles.logo} />
+        <Image source={require('../imagenes/fondoperfil.jpg')} style={styles.logo} />
         <ScrollView contentContainerStyle={styles.contentContainer}>
           <View style={styles.innerContainer}>
             <Text style={styles.title}>Mi Perfil</Text>

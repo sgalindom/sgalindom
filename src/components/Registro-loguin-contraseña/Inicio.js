@@ -52,59 +52,57 @@ const Inicio = () => {
   }
 
   return (
-    <ImageBackground source={{ uri: backgroundUrl }} style={styles.background}>
-      <View style={styles.container}>
+    <View style={styles.container}>
+      <ImageBackground source={{ uri: backgroundUrl }} style={styles.background}>
         <Image source={{ uri: logoUrl }} style={styles.logo} />
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Login')}>
-            <Icon name="log-in-outline" size={24} color="#fff" style={styles.icon} />
-            <Text style={styles.buttonText}>Iniciar Sesión</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Registro')}>
-            <Icon name="person-add-outline" size={24} color="#fff" style={styles.icon} />
-            <Text style={styles.buttonText}>Registrarse</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={[styles.button, styles.googleButton]} onPress={handleGoogleSignIn}>
-            <Icon name="logo-google" size={24} color="#fff" style={styles.icon} />
-            <Text style={styles.buttonText}>Iniciar Sesión con Google</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    </ImageBackground>
+        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Login')}>
+          <Icon name="log-in-outline" size={24} color="#fff" style={styles.icon} />
+          <Text style={styles.buttonText}>Iniciar Sesión</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Registro')}>
+          <Icon name="person-add-outline" size={24} color="#fff" style={styles.icon} />
+          <Text style={styles.buttonText}>Registrarse</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={[styles.button, styles.googleButton]} onPress={handleGoogleSignIn}>
+          <Icon name="logo-google" size={24} color="#fff" style={styles.icon} />
+          <Text style={styles.buttonText}>Iniciar Sesión con Google</Text>
+        </TouchableOpacity>
+      </ImageBackground>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  background: {
-    flex: 1,
-    resizeMode: 'cover',
-    justifyContent: 'center',
-  },
   container: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: '#f0f0f0', // Color de fondo del contenedor principal
+  },
+  background: {
+    flex: 1,
+    resizeMode: 'cover',
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '100%',
   },
   logo: {
-    width: 200,
-    height: 100,
+    width: 300, // Ancho de la imagen del logo
+    height: 150, // Alto de la imagen del logo
     resizeMode: 'contain',
-    marginTop: 10,
-  },
-  buttonContainer: {
-    alignItems: 'center',
-    marginTop: 50,
+    marginBottom: 50, // Espacio entre el logo y los botones
   },
   button: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#2196F3',
-    padding: 15,
+    paddingVertical: 15,
+    paddingHorizontal: 30,
     marginVertical: 10,
     borderRadius: 30,
-    width: '80%',
-    elevation: 5, // Elevación para dar un efecto de tarjeta
+    elevation: 3, // Leve sombra para dar profundidad
+    width: '80%', // Ancho de los botones
   },
   googleButton: {
     backgroundColor: '#DB4437',

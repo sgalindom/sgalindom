@@ -19,7 +19,6 @@ const Badiegard = () => {
       try {
         let query = firestore().collection('Guarderiasyadiestramiento');
 
-        
         if (selectedBarrio) {
           query = query.where('Barrio', '==', selectedBarrio);
         }
@@ -31,7 +30,6 @@ const Badiegard = () => {
           console.log('Datos de las veterinarias:', datosVeterinarias);
           setVeterinarias(datosVeterinarias);
 
-        
           const uniqueBarrios = new Set(datosVeterinarias.map(veterinaria => veterinaria.Barrio));
           setBarriosUnicos(Array.from(uniqueBarrios));
         } else {
@@ -45,8 +43,8 @@ const Badiegard = () => {
     obtenerVeterinarias();
   }, [selectedBarrio]);
 
-  const handleExplorarPress = (veterinariaId) => {
-    navigation.navigate(`Adieguar${veterinariaId}`);
+  const handleExplorarPress = (GuarderiasyadiestramientoId) => {
+    navigation.navigate('Adieguar1', { adieguarId: GuarderiasyadiestramientoId });
   };
 
   const openModal = () => {
@@ -65,7 +63,7 @@ const Badiegard = () => {
   const handleRemoveFilter = () => {
     setSelectedBarrio(null);
   };
-  
+
   const isAbierto = (horario) => {
     if (horario && horario.apertura && horario.cierre) {
       const now = moment();
@@ -75,35 +73,35 @@ const Badiegard = () => {
       return false;
     }
   };
-  
+
   return (
     <ImageBackground source={fondoVeterinariasImage} style={styles.backgroundImage}>
       <ScrollView contentContainerStyle={styles.container}>
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={closeModal}
-      >
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Filtrar por Barrio</Text>
-            {barriosUnicos.map((barrio, index) => (
-              <Pressable
-                key={index}
-                style={styles.modalButton}
-                onPress={() => handleBarrioSelect(barrio)}
-              >
-                <Icon name="location" size={20} color="#ffffff" style={styles.icon} />
-                <Text style={styles.modalButtonText}>{barrio}</Text>
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={modalVisible}
+          onRequestClose={closeModal}
+        >
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>Filtrar por Barrio</Text>
+              {barriosUnicos.map((barrio, index) => (
+                <Pressable
+                  key={index}
+                  style={styles.modalButton}
+                  onPress={() => handleBarrioSelect(barrio)}
+                >
+                  <Icon name="location" size={20} color="#ffffff" style={styles.icon} />
+                  <Text style={styles.modalButtonText}>{barrio}</Text>
+                </Pressable>
+              ))}
+              <Pressable style={styles.modalCloseButton} onPress={closeModal}>
+                <Text style={styles.modalCloseButtonText}>Cerrar</Text>
               </Pressable>
-            ))}
-            <Pressable style={styles.modalCloseButton} onPress={closeModal}>
-              <Text style={styles.modalCloseButtonText}>Cerrar</Text>
-            </Pressable>
+            </View>
           </View>
-        </View>
-      </Modal>
+        </Modal>
 
         <View style={styles.titleContainer}>
           <Text style={styles.title}>Filtrar por barrio</Text>
@@ -198,118 +196,113 @@ const styles = StyleSheet.create({
     width: '90%',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.
-    },
-    imageContainer: {
-      width: 130,
-      height: 100,
-      borderRadius: 8,
-      overflow: 'hidden',
-      marginRight: 10,
-    },
-    servicioImage: {
-      width: '100%',
-      height: '100%',
-      resizeMode: 'cover',
-    },
-    infoContainer: {
-      flex: 1,
-      justifyContent: 'center',
-    },
-    servicioTitle: {
-      fontSize: 20,
-      fontWeight: 'bold',
-      marginBottom: 5,
-      color: 'black',
-    },
-    servicioDescription: {
-      fontSize: 16,
-      color: 'black',
-    },
-    abiertoText: {
-      color: 'green',
-      marginTop: 5,
-    },
-    cerradoText: {
-      color: 'red',
-      marginTop: 5,
-    },
-    explorarButtonStyle: {
-      flexDirection: 'row',
-      backgroundColor: '#2AC9FA',
-      paddingVertical: 10,
-      paddingHorizontal: 15,
-      borderRadius: 4,
-      marginTop: 10,
-      width: '100%',
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
-    explorarButtonText: {
-      color: 'white',
-      fontWeight: 'bold',
-      fontSize: 16,
-      textAlign: 'center',
-      marginLeft: 5, // Añadido para separación entre el icono y el texto
-    },
-    modalContainer: {
-      flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
-      backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    },
-    modalContainer: {
-      flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
-      backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    },
-    modalContent: {
-      backgroundColor: 'white',
-      borderRadius: 10,
-      padding: 20,
-      width: '80%',
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.25,
-      shadowRadius: 3.84,
-      elevation: 5,
-    },
-    modalTitle: {
-      fontSize: 20,
-      fontWeight: 'bold',
-      marginBottom: 16,
-      textAlign: 'center',
-      color: '#333',
-    },
-    modalButton: {
-      backgroundColor: '#2AC9FA',
-      paddingVertical: 12,
-      paddingHorizontal: 20,
-      borderRadius: 6,
-      marginBottom: 10,
-      alignItems: 'center',
-    },
-    modalButtonText: {
-      color: 'white',
-      fontWeight: 'bold',
-      fontSize: 16,
-      textAlign: 'center',
-    },
-    modalCloseButton: {
-      backgroundColor: '#FF5050',
-      paddingVertical: 12,
-      paddingHorizontal: 20,
-      borderRadius: 6,
-      alignItems: 'center',
-    },
-    modalCloseButtonText: {
-      color: 'white',
-      fontWeight: 'bold',
-      fontSize: 16,
-      textAlign: 'center',
-    },
-  });
-  
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  imageContainer: {
+    width: 130,
+    height: 100,
+    borderRadius: 8,
+    overflow: 'hidden',
+    marginRight: 10,
+  },
+  servicioImage: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
+  },
+  infoContainer: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  servicioTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 5,
+    color: 'black',
+  },
+  servicioDescription: {
+    fontSize: 16,
+    color: 'black',
+  },
+  abiertoText: {
+    color: 'green',
+    marginTop: 5,
+  },
+  cerradoText: {
+    color: 'red',
+    marginTop: 5,
+  },
+  explorarButtonStyle: {
+    flexDirection: 'row',
+    backgroundColor: '#2AC9FA',
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: 4,
+    marginTop: 10,
+    width: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  explorarButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 16,
+    textAlign: 'center',
+    marginLeft: 5,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    borderRadius: 10,
+    padding: 20,
+    width: '80%',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 16,
+    textAlign: 'center',
+    color: '#333',
+  },
+  modalButton: {
+    backgroundColor: '#2AC9FA',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 6,
+    marginBottom: 10,
+    alignItems: 'center',
+  },
+  modalButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 16,
+    textAlign: 'center',
+  },
+  modalCloseButton: {
+    backgroundColor: '#FF5050',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 6,
+    alignItems: 'center',
+  },
+  modalCloseButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 16,
+    textAlign: 'center',
+  },
+});
 
 export default Badiegard;

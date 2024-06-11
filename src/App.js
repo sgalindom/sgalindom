@@ -41,35 +41,20 @@ import pago from './components/Pedidosusuarios/pago';
 
 // Importaciones relacionadas con Veterinaria 1
 import bveterinaria from './components/bveterinaria';
-import Vet1Screen from './components/veterinarias/Veterinaria1/vet1';
-import petshop from './components/veterinarias/Veterinaria1/petshop';
-import baño from './components/veterinarias/Veterinaria10/baño';
-import domicilio from './components/veterinarias/Veterinaria10/vet1dr';
-import vet1juguetes from './components/veterinarias/Veterinaria1/vet1juguetes';
-import Vet1Comida from './components/veterinarias/Veterinaria1/vet1comida';
-import vet1accesorios from './components/veterinarias/Veterinaria1/vet1accesorios';
-import vet1calificacion from './components/veterinarias/Veterinaria10/vet1calificacion';
-import Vet1DrScreen from './components/veterinarias/Veterinaria10/vet1dr';
-import Vet1BañoCitasScreen from './components/veterinarias/Veterinaria10/vet1bañocita';
+
+
+
+
 import CitasBañoPanel from './components/Paneladministrador/citasbaños';
 import CitasDrPanel from './components/Paneladministrador/citasdr';
-import Vet1CitasDrScreen from './components/veterinarias/Veterinaria10/vet1citasdr';
+
 import CitasDrAtendidas from './components/Paneladministrador/citasdratendidas';
 import CitasBañosAtendidas from './components/Paneladministrador/citasbañoatendidas';
 
-// Importaciones relacionadas con Veterinaria 2
-import Vet2Screen from './components/veterinarias/Veterinaria2/vet2';
-import Vet2ServiciosMedicos from './components/veterinarias/Veterinaria2/vet2serviciosmedicos';
-import Vet2Consultas from './components/veterinarias/Veterinaria2/vet2consultas';
 
 
-import Vet3Screen from './components/veterinarias/Veterinaria3/vet3';
-import Vet4Screen from './components/veterinarias/Veterinaria4/vet4';
-import Vet5Screen from './components/veterinarias/Veterinaria5/vet5';
-import Vet6Screen from './components/veterinarias/Veterinaria6/vet6';
-import Vet7Screen from './components/veterinarias/Veterinaria7/vet7';
-import Vet8Screen from './components/veterinarias/Veterinaria8/vet8';
-import Vet9Screen from './components/veterinarias/Veterinaria9/vet9';
+
+
 
 
 
@@ -98,12 +83,9 @@ import ProximamentePanel from './components/proximamente';
 
 
 // Importaciones relacionadas con el Panel Adiestramiento y Guarderia Adieguar
-import AdieguarScreen from './components/Adiestramiento/Adieguar1/Adieguar1';
+import AdieguarScreen from './components/Adiestramiento/Adieguar1';
 
 
-import VerProductoComida from './components/veterinarias/Veterinaria1/verproductocomida';
-import VerProductoJuguete from './components/veterinarias/Veterinaria1/verproductojuguetes';
-import VerProductoAccesorios from './components/veterinarias/Veterinaria1/verproductoaccesorios';
 
 
 import MisPedidos from './components/Pedidosusuarios/mispedidos';
@@ -111,7 +93,12 @@ import MisPedidos from './components/Pedidosusuarios/mispedidos';
 import Seguros from './components/seguros/seguros';
 
 import Inicio from './components/Registro-loguin-contraseña/Inicio';
-import Vet10Screen from './components/veterinarias/Veterinaria10/Vet10';
+
+import VerVeterinarias from './components/veterinarias/verveterinarias';
+import GatoScreen from './components/Petshop/Gato/gato';
+import Opciones from './components/Petshop/Gato/opciones';
+import VerProductos from './components/Petshop/Gato/verproductos';
+import Detalle from './components/Petshop/detalles';
 
 
 const Stack = createNativeStackNavigator();
@@ -155,20 +142,11 @@ const Stack = createNativeStackNavigator();
         
         <Stack.Screen name="pago" component={pago} />
         <Stack.Screen name='bveterinaria' component={bveterinaria}/>
-        <Stack.Screen name="domicilio" component={domicilio} />
-
-
-        <Stack.Screen name="vet1" component={Vet1Screen} /> 
-        <Stack.Screen name="vet1calificacion" component={vet1calificacion} />
-        <Stack.Screen name="baño" component={baño} />
-        <Stack.Screen name="vet1bañocita" component={Vet1BañoCitasScreen} />
-        <Stack.Screen name="petshop" component={petshop} /> 
-        <Stack.Screen name= 'vet1comida' component={Vet1Comida}/>
-        <Stack.Screen name="vet1juguetes" component={vet1juguetes} />
-        <Stack.Screen name="vet1accesorios" component={vet1accesorios} />
-        <Stack.Screen name="vet1dr" component={Vet1DrScreen} />
       
-        <Stack.Screen name="vet1citasdr" component={Vet1CitasDrScreen} />
+
+
+      
+      
 
         <Stack.Screen name="citasdr" component={CitasDrPanel} />
 
@@ -194,20 +172,7 @@ const Stack = createNativeStackNavigator();
         
 
 
-        <Stack.Screen name="vet2" component={Vet2Screen} />
-        <Stack.Screen name="vet2serviciosmedicos" component={Vet2ServiciosMedicos} />
-        <Stack.Screen name="vet2consultas" component={Vet2Consultas} />
-
-
-        
-        <Stack.Screen name="vet3" component={Vet3Screen} />
-        <Stack.Screen name="vet4" component={Vet4Screen} />
-        <Stack.Screen name="vet5" component={Vet5Screen} />
-        <Stack.Screen name="vet6" component={Vet6Screen} />
-        <Stack.Screen name="vet7" component={Vet7Screen} />
-        <Stack.Screen name="vet8" component={Vet8Screen} />
-        <Stack.Screen name="vet9" component={Vet9Screen} />
-
+      
 
         <Stack.Screen name="proximamente" component={ProximamentePanel} />
 
@@ -217,9 +182,7 @@ const Stack = createNativeStackNavigator();
 
 
 
-        <Stack.Screen name="verproductocomida" component={VerProductoComida} />
-        <Stack.Screen name="verproductojuguetes" component={VerProductoJuguete} />
-        <Stack.Screen name="verproductoaccesorios" component={VerProductoAccesorios} />
+       
         <Stack.Screen name="mispedidos" component={MisPedidos} />
 
         <Stack.Screen name="seguros" component={Seguros} />
@@ -227,7 +190,18 @@ const Stack = createNativeStackNavigator();
         <Stack.Screen name="Inicio" component={Inicio} />
 
 
-        <Stack.Screen name="vet10" component={Vet10Screen} />
+   
+
+
+        <Stack.Screen name="verveterinarias" component={VerVeterinarias} />
+
+
+        <Stack.Screen name="gato" component={GatoScreen} />
+        <Stack.Screen name="perro" component={VerVeterinarias} />
+        <Stack.Screen name="opciones" component={Opciones} />
+        <Stack.Screen name="verproductos" component={VerProductos} />
+        <Stack.Screen name="detalles" component={Detalle} />
+
 
       </Stack.Navigator>
     </NavigationContainer>

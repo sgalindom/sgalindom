@@ -16,7 +16,7 @@
     "@react-native-firebase/firestore": "^18.9.0",
     "@react-native-firebase/storage": "^18.9.0",
     "@react-native-google-signin/google-signin": "^12.1.0",
-    "@react-native-picker/picker": "^2.7.2",
+    "@react-native-picker/picker": "^2.7.6",
     "@react-navigation/native": "^6.1.9",
     "@react-navigation/native-stack": "^6.9.17",
     "moment": "^2.29.4",

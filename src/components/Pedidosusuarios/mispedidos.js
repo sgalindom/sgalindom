@@ -6,6 +6,7 @@ import auth from '@react-native-firebase/auth';
 
 const MisPedidos = () => {
   const [pedidos, setPedidos] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const obtenerMisPedidos = async () => {
@@ -40,6 +41,7 @@ const MisPedidos = () => {
               });
 
               setPedidos(pedidosData);
+              setLoading(false); // Actualizamos el estado de carga cuando se obtienen los pedidos
             });
           });
         }
@@ -62,6 +64,26 @@ const MisPedidos = () => {
       </View>
     </View>
   );
+
+  if (loading) {
+    return (
+      <ImageBackground source={require('../imagenes/fondomain.jpg')} style={styles.backgroundImage}>
+        <View style={styles.container}>
+          <Text style={styles.emptyMessage}>Cargando...</Text>
+        </View>
+      </ImageBackground>
+    );
+  }
+
+  if (pedidos.length === 0) {
+    return (
+      <ImageBackground source={require('../imagenes/fondomain.jpg')} style={styles.backgroundImage}>
+        <View style={styles.container}>
+          <Text style={styles.emptyMessage}>No hay pedidos</Text>
+        </View>
+      </ImageBackground>
+    );
+  }
 
   return (
     <ImageBackground source={require('../imagenes/fondomain.jpg')} style={styles.backgroundImage}>
@@ -113,6 +135,12 @@ const styles = StyleSheet.create({
   },
   cantidad: {
     fontSize: 16,
+    color: '#555',
+  },
+  emptyMessage: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    textAlign: 'center',
     color: '#555',
   },
 });
