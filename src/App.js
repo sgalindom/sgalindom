@@ -43,21 +43,11 @@ import pago from './components/Pedidosusuarios/pago';
 import bveterinaria from './components/bveterinaria';
 
 
-
-
 import CitasBañoPanel from './components/Paneladministrador/citasbaños';
 import CitasDrPanel from './components/Paneladministrador/citasdr';
 
 import CitasDrAtendidas from './components/Paneladministrador/citasdratendidas';
 import CitasBañosAtendidas from './components/Paneladministrador/citasbañoatendidas';
-
-
-
-
-
-
-
-
 
 
 // Importaciones relacionadas con Cupones y Servicios
@@ -85,9 +75,6 @@ import ProximamentePanel from './components/proximamente';
 // Importaciones relacionadas con el Panel Adiestramiento y Guarderia Adieguar
 import AdieguarScreen from './components/Adiestramiento/Adieguar1';
 
-
-
-
 import MisPedidos from './components/Pedidosusuarios/mispedidos';
 
 import Seguros from './components/seguros/seguros';
@@ -99,6 +86,11 @@ import GatoScreen from './components/Petshop/Gato/gato';
 import Opciones from './components/Petshop/Gato/opciones';
 import VerProductos from './components/Petshop/Gato/verproductos';
 import Detalle from './components/Petshop/detalles';
+
+import Paseosadmin from './components/Paneladministrador/paseosadmin';
+
+
+
 
 
 const Stack = createNativeStackNavigator();
@@ -201,6 +193,8 @@ const Stack = createNativeStackNavigator();
         <Stack.Screen name="opciones" component={Opciones} />
         <Stack.Screen name="verproductos" component={VerProductos} />
         <Stack.Screen name="detalles" component={Detalle} />
+        <Stack.Screen name="solicitudpaseos" component={Paseosadmin} />
+
 
 
       </Stack.Navigator>

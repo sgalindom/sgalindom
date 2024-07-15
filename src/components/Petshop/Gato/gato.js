@@ -4,12 +4,12 @@ import Icon from 'react-native-vector-icons/Ionicons';
 
 const GatoScreen = ({ navigation }) => {
   const tarjetas = [
-    { nombre: 'Alimento', rutaImagen: require('../../imagenes/alimento.jpg') },
-    { nombre: 'Snacks', rutaImagen: require('../../imagenes/alimento.jpg') },
-    { nombre: 'Arena', rutaImagen: require('../../imagenes/alimento.jpg') },
-    { nombre: 'Juguetes', rutaImagen: require('../../imagenes/alimento.jpg') },
-    { nombre: 'Accesorios', rutaImagen: require('../../imagenes/alimento.jpg') },
-    { nombre: 'Higiene', rutaImagen: require('../../imagenes/alimento.jpg') },
+    { nombre: 'Alimento', rutaImagen: require('../../imagenes/alimentogatos.jpg') },
+    { nombre: 'Snacks', rutaImagen: require('../../imagenes/snacksgatos.jpg') },
+    { nombre: 'Arena', rutaImagen: require('../../imagenes/arenagatos.jpg') },
+    { nombre: 'Juguetes', rutaImagen: require('../../imagenes/juguetesgatos.jpg') },
+    { nombre: 'Accesorios', rutaImagen: require('../../imagenes/accesoriosgatos.jpg') },
+    { nombre: 'Higiene', rutaImagen: require('../../imagenes/higiene.jpg') },
   ];
 
   const handleSeleccionarOpcion = (nombre) => {

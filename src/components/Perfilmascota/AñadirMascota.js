@@ -32,7 +32,7 @@ const AñadirMascota = ({ navigation }) => {
           nombre: nombre,
           raza: raza,
           edad: unidadEdad === 'años' ? Number(edad) : `(${Number(edad)} meses)`,
-          peso: peso, // Mantengo el peso tal como lo ingresó el usuario
+          peso: peso,
           descripcion: descripcion,
           tipo: tipoMascota,
         };
@@ -50,85 +50,85 @@ const AñadirMascota = ({ navigation }) => {
 
   return (
     <ImageBackground
-      source={require('../imagenes/AñadirMascota.jpg')}
+      source={require('../imagenes/fondomain.jpg')}
       style={styles.container}
     >
       <View style={styles.formContainer}>
         <Text style={styles.title}>Conozcamos a tu mascota</Text>
         <View style={styles.inputContainer}>
-          <Icon name="paw" size={20} color="black" style={styles.icon} />
+          <Icon name="paw" size={20} color="#FF6F61" style={styles.icon} />
           <Picker
             selectedValue={tipoMascota}
-            onValueChange={(itemValue, itemIndex) => setTipoMascota(itemValue)}
+            onValueChange={(itemValue) => setTipoMascota(itemValue)}
             style={styles.input}
           >
-            <Picker.Item label="Perro" value="perro" color="black" />
-            <Picker.Item label="Gato" value="gato" color="black" />
+            <Picker.Item label="Perro" value="perro" />
+            <Picker.Item label="Gato" value="gato" />
           </Picker>
         </View>
         <View style={styles.inputContainer}>
-          <Icon name="user" size={20} color="black" style={styles.icon} />
+          <Icon name="user" size={20} color="#FF6F61" style={styles.icon} />
           <TextInput
             style={styles.input}
             placeholder="Nombre de la mascota"
             value={nombre}
             onChangeText={setNombre}
-            placeholderTextColor="black"
+            placeholderTextColor="#666"
           />
         </View>
         <View style={styles.inputContainer}>
-          <Icon name="book" size={20} color="black" style={styles.icon} />
+          <Icon name="book" size={20} color="#FF6F61" style={styles.icon} />
           <TextInput
             style={styles.input}
             placeholder="Raza de la mascota"
             value={raza}
             onChangeText={setRaza}
-            placeholderTextColor="black"
+            placeholderTextColor="#666"
           />
         </View>
         <View style={styles.inputContainer}>
-          <Icon name="calendar" size={20} color="black" style={styles.icon} />
+          <Icon name="calendar" size={20} color="#FF6F61" style={styles.icon} />
           <TextInput
             style={styles.input}
             placeholder={`Edad de la mascota (${unidadEdad})`}
             value={edad}
             onChangeText={setEdad}
             keyboardType="numeric"
-            placeholderTextColor="black"
+            placeholderTextColor="#666"
           />
         </View>
         <View style={styles.inputContainer}>
-          <Icon name="clock-o" size={20} color="black" style={styles.icon} />
+          <Icon name="clock-o" size={20} color="#FF6F61" style={styles.icon} />
           <Picker
             selectedValue={unidadEdad}
-            onValueChange={(itemValue, itemIndex) => setUnidadEdad(itemValue)}
+            onValueChange={(itemValue) => setUnidadEdad(itemValue)}
             style={styles.input}
           >
-            <Picker.Item label="Años" value="años" color="black" />
-            <Picker.Item label="Meses" value="meses" color="black" />
+            <Picker.Item label="Años" value="años" />
+            <Picker.Item label="Meses" value="meses" />
           </Picker>
         </View>
         <View style={styles.inputContainer}>
-          <Icon name="balance-scale" size={20} color="black" style={styles.icon} />
+          <Icon name="balance-scale" size={20} color="#FF6F61" style={styles.icon} />
           <TextInput
             style={styles.input}
             placeholder="Peso de la mascota (Kg)"
             value={peso}
             onChangeText={setPeso}
             keyboardType="numeric"
-            placeholderTextColor="black"
+            placeholderTextColor="#666"
           />
         </View>
         <View style={styles.inputContainer}>
-          <Icon name="comment" size={20} color="black" style={styles.icon} />
+          <Icon name="comment" size={20} color="#FF6F61" style={styles.icon} />
           <TextInput
-            style={styles.input}
+            style={[styles.input, { height: 80 }]}
             placeholder="Cuentanos más sobre tu mascota"
             multiline
             numberOfLines={4}
             value={descripcion}
             onChangeText={setDescripcion}
-            placeholderTextColor="black"
+            placeholderTextColor="#666"
           />
         </View>
         <TouchableOpacity style={styles.registrarButton} onPress={registrarMascota}>
@@ -146,47 +146,58 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   formContainer: {
-    backgroundColor: 'rgba(255, 255, 255, 0.7)',
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
     padding: 20,
     borderRadius: 10,
-    width: '80%',
+    width: '90%',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 5,
   },
   title: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: 'bold',
     marginBottom: 20,
-    color: 'black',
+    color: '#333',
     textAlign: 'center',
   },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: 15,
   },
   input: {
     flex: 1,
     fontSize: 18,
     borderWidth: 1,
-    borderColor: 'gray',
+    borderColor: '#ccc',
     borderRadius: 8,
     padding: 10,
-    color: 'black',
+    color: '#333',
+    backgroundColor: '#f9f9f9',
   },
   icon: {
     marginRight: 10,
   },
   registrarButton: {
-    backgroundColor: '#2AC9FA',
+    backgroundColor: '#FF6F61',
     alignItems: 'center',
-    padding: 15, // Aumenté el padding para que el botón sea más grande
+    padding: 15,
     borderRadius: 8,
-    marginTop: 20,  },
-    registrarButtonText: {
-      fontSize: 18,
-      fontWeight: 'bold',
-      color: 'white',
-    },
-  });
-  
-  export default AñadirMascota;
-  
+    marginTop: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  registrarButtonText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: 'white',
+  },
+});
+
+export default AñadirMascota;

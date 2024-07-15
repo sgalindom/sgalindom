@@ -8,17 +8,17 @@ const Opciones = ({ route, navigation }) => {
     switch (tarjeta) {
       case 'Alimento':
         return [
-          { nombre: 'Humedo', imagen: require('../../imagenes/alimento.jpg'), tipoColeccion: tarjeta },
-          { nombre: 'Concentrado', imagen: require('../../imagenes/alimento.jpg'), tipoColeccion: tarjeta }
+          { nombre: 'Humedo', imagen: require('../../imagenes/comidahumeda.png'), tipoColeccion: tarjeta },
+          { nombre: 'Concentrado', imagen: require('../../imagenes/alimentoconcentradogatos.jpg'), tipoColeccion: tarjeta }
         ];
       case 'Snacks':
         return [
-          { nombre: 'Cremosos', imagen: require('../../imagenes/alimento.jpg'), tipoColeccion: tarjeta },
-          { nombre: 'Galletas', imagen: require('../../imagenes/alimento.jpg'), tipoColeccion: tarjeta }
+          { nombre: 'Cremosos', imagen: require('../../imagenes/cremososgatos.jpg'), tipoColeccion: tarjeta },
+          { nombre: 'Galletas', imagen: require('../../imagenes/galletasgatos.jpg'), tipoColeccion: tarjeta }
         ];
       case 'Juguetes':
         return [
-          { nombre: 'Interactivos', imagen: require('../../imagenes/alimento.jpg'), tipoColeccion: tarjeta },
+          { nombre: 'Interactivos', imagen: require('../../imagenes/interactivos.png'), tipoColeccion: tarjeta },
           { nombre: 'Peluches y pelotas', imagen: require('../../imagenes/alimento.jpg'), tipoColeccion: tarjeta },
           { nombre: 'Rascadores', imagen: require('../../imagenes/alimento.jpg'), tipoColeccion: tarjeta }
         ];
@@ -30,7 +30,7 @@ const Opciones = ({ route, navigation }) => {
         ];
       case 'Arena':
         return [
-          { nombre: 'Arenas', imagen: require('../../imagenes/alimento.jpg'), tipoColeccion: tarjeta }
+          { nombre: 'Arenas', imagen: require('../../imagenes/arenagatos2.jpg'), tipoColeccion: tarjeta }
         ];
       case 'Accesorios':
         return [

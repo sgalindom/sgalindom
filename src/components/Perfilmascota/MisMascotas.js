@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ImageBackground, TouchableOpacity, Alert, FlatList } from 'react-native';
+import { View, Text, StyleSheet, ImageBackground, TouchableOpacity, FlatList } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
@@ -45,7 +45,13 @@ const MisMascotas = ({ navigation }) => {
         navigation.navigate('DetalleMascota', { mascota: item });
       }}
     >
-      <Text style={styles.mascotaNombre}>{item.nombre}</Text>
+      <View style={styles.cardContent}>
+        <Icon name="paw" size={40} color="#FF6F61" style={styles.icon} />
+        <View style={styles.textContainer}>
+          <Text style={styles.mascotaNombre}>{item.nombre}</Text>
+          <Text style={styles.mascotaDetalles}>Detalles de la mascota...</Text>
+        </View>
+      </View>
     </TouchableOpacity>
   );
 
@@ -54,22 +60,25 @@ const MisMascotas = ({ navigation }) => {
       source={require('../imagenes/fondomain.jpg')}
       style={styles.container}
     >
-      <Text style={styles.title}>Mis Mascotas</Text>
-      {mascotas.length > 0 ? (
-        <FlatList
-          data={mascotas}
-          keyExtractor={(item) => item.id}
-          renderItem={renderItem}
-        />
-      ) : (
-        <Text style={styles.noMascotasText}>No tienes mascotas registradas.</Text>
-      )}
-      <TouchableOpacity
-        style={styles.registrarButton}
-        onPress={() => navigation.navigate('AñadirMascota')}
-      >
-        <Text style={styles.registrarButtonText}>Registrar Mascota</Text>
-      </TouchableOpacity>
+      <View style={styles.overlay}>
+        <Text style={styles.title}>Mis Mascotas</Text>
+        {mascotas.length > 0 ? (
+          <FlatList
+            data={mascotas}
+            keyExtractor={(item) => item.id}
+            renderItem={renderItem}
+            contentContainerStyle={styles.flatListContainer}
+          />
+        ) : (
+          <Text style={styles.noMascotasText}>No tienes mascotas registradas.</Text>
+        )}
+        <TouchableOpacity
+          style={styles.registrarButton}
+          onPress={() => navigation.navigate('AñadirMascota')}
+        >
+          <Text style={styles.registrarButtonText}>Registrar Mascota</Text>
+        </TouchableOpacity>
+      </View>
     </ImageBackground>
   );
 };
@@ -77,42 +86,76 @@ const MisMascotas = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  overlay: {
+    flex: 1,
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
     alignItems: 'center',
     justifyContent: 'center',
+    padding: 20,
   },
   title: {
-    fontSize: 32,
+    fontSize: 36,
     fontWeight: 'bold',
+    color: '#333',
     marginBottom: 20,
-    color: 'white',
+  },
+  flatListContainer: {
+    paddingBottom: 20,
   },
   mascotaCard: {
     flexDirection: 'row',
     alignItems: 'center',
     marginVertical: 10,
-    padding: 15,
-    backgroundColor: 'rgba(42, 201, 250, 0.7)',
-    borderRadius: 8,
+    padding: 20,
+    backgroundColor: '#FFF',
+    borderRadius: 12,
+    width: '100%',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  cardContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  icon: {
+    marginRight: 15,
+  },
+  textContainer: {
+    flex: 1,
   },
   mascotaNombre: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: 'bold',
-    color: 'white',
+    color: '#333',
+  },
+  mascotaDetalles: {
+    fontSize: 16,
+    color: '#888',
   },
   noMascotasText: {
-    fontSize: 18,
+    fontSize: 20,
     textAlign: 'center',
-    color: 'white',
-  },
-  registrarButton: {
-    backgroundColor: '#2AC9FA',
-    alignItems: 'center',
-    padding: 15,
-    borderRadius: 8,
+    color: '#333',
     marginTop: 20,
   },
+  registrarButton: {
+    backgroundColor: '#FF6F61',
+    paddingVertical: 15,
+    paddingHorizontal: 30,
+    borderRadius: 12,
+    marginTop: 30,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+  },
   registrarButtonText: {
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: 'bold',
     color: 'white',
   },

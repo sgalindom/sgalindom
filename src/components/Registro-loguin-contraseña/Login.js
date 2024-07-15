@@ -25,6 +25,7 @@ function Login({ navigation }) {
   const [isLoading, setIsLoading] = useState(true);
   const [buttonScale] = useState(new Animated.Value(1));
   const [hidePassword, setHidePassword] = useState(true); 
+  const [fadeAnim] = useState(new Animated.Value(0)); // Animación de desvanecimiento
 
   useEffect(() => {
     const unsubscribe = auth().onAuthStateChanged(async (user) => {
@@ -45,10 +46,16 @@ function Login({ navigation }) {
         }
       }
       setIsLoading(false);
+      // Iniciar animación de desvanecimiento cuando los datos estén cargados
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 500,
+        useNativeDriver: true,
+      }).start();
     });
 
     return unsubscribe;
-  }, [navigation]);
+  }, [navigation, fadeAnim]);
 
   const checkAdminStatus = async (userEmail) => {
     const adminSnapshot = await firestore()
@@ -112,7 +119,7 @@ function Login({ navigation }) {
   return (
     <ImageBackground source={backgroundImage} style={styles.backgroundImage}>
       <View style={styles.overlay}>
-        <View style={styles.container}>
+        <Animated.View style={{ ...styles.container, opacity: fadeAnim }}>
           <View style={styles.logoContainer}>
             <Image source={logoImage} style={styles.logo} />
           </View>
@@ -124,6 +131,7 @@ function Login({ navigation }) {
               onChangeText={(text) => setEmail(text)}
               value={email}
               style={styles.input}
+              placeholderTextColor="#333"
             />
           </View>
           <View style={styles.inputContainer}>
@@ -134,6 +142,7 @@ function Login({ navigation }) {
               onChangeText={(text) => setPassword(text)}
               value={password}
               style={styles.input}
+              placeholderTextColor="#333"
             />
             <TouchableOpacity
               onPress={() => setHidePassword(!hidePassword)} 
@@ -158,9 +167,8 @@ function Login({ navigation }) {
           <TouchableOpacity onPress={() => navigation.navigate('Registro')} style={styles.registerButton}>
             <Text style={styles.registerButtonText}>¿No tienes una cuenta? Regístrate</Text>
           </TouchableOpacity>
-        </View>
+        </Animated.View>
       </View>
-      {/* Texto de la versión de la aplicación */}
       <View style={styles.bottomRightTextContainer}>
         <Text style={styles.bottomRightText}>Versión 0.0.1</Text>
       </View>
@@ -180,35 +188,34 @@ const styles = StyleSheet.create({
   },
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
     justifyContent: 'center',
     alignItems: 'center',
   },
   container: {
-    width: '90%',
+    width: '85%',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 24,
-    paddingTop: 50,
-    borderRadius: 10,
-    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    padding: 20,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 5,
+    shadowOpacity: 0.4,
+    shadowRadius: 8,
     elevation: 10,
   },
   logoContainer: {
-    marginBottom: 50,
+    marginBottom: 30,
     alignItems: 'center',
   },
   logo: {
-    width: 250,
-    height: 250,
+    width: 200,
+    height: 200,
     resizeMode: 'contain',
   },
   welcomeText: {
-    fontSize: 40,
+    fontSize: 32,
     fontWeight: 'bold',
     color: '#FFFFFF', 
     marginBottom: 20,
@@ -221,25 +228,27 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     width: '100%',
-    marginBottom: 20,
+    marginBottom: 15,
     borderRadius: 10,
-    paddingHorizontal: 10,
-    backgroundColor: 'white',
+    paddingHorizontal: 15,
+    backgroundColor: '#FFFFFF', // Fondo blanco
     borderWidth: 1,
-    borderColor: '#ccc', 
+    borderColor: '#333', 
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 3,
-    elevation: 5,
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 6,
   },
   icon: {
     marginRight: 10,
+    color: '#333', // Color del icono gris
   },
   input: {
     flex: 1,
     height: 40,
     paddingLeft: 10,
+    color: '#333', // Texto gris
   },
   button: {
     backgroundColor: '#007BFF',
@@ -251,7 +260,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
+    shadowOpacity: 0.4,
     shadowRadius: 5,
     elevation: 10,
   },
@@ -305,7 +314,7 @@ const styles = StyleSheet.create({
     right: 20,
   },
   bottomRightText: {
-    color: 'black',
+    color: 'white',
     fontSize: 12,
     fontWeight: 'bold',
   },

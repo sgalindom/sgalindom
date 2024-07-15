@@ -1,7 +1,8 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ImageBackground } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ImageBackground, ScrollView } from 'react-native';
 import auth from '@react-native-firebase/auth';
 import { useNavigation } from '@react-navigation/native';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 const Paneladmin = () => {
   const navigation = useNavigation();
@@ -15,81 +16,65 @@ const Paneladmin = () => {
     }
   };
 
-  const handleOrdersClick = () => {
-    navigation.navigate('pepetshop');
-  };
-
-  const handleDeliveredClick = () => {
-    navigation.navigate('despapetshop');
-  };
-
-  const handleAppointmentsBathClick = () => {
-    navigation.navigate('citasbaños');
-  };
-
-  const handleAppointmentsBathAttendedClick = () => {
-    navigation.navigate('citasbañoatendidas');
-  };
-
-  const handleAppointmentsDoctorClick = () => {
-    navigation.navigate('citasdr');
-  };
-
-  const handleAppointmentsDrAttendedClick = () => {
-    navigation.navigate('citasdratendidas');
-  };
-
-  const handleCuponesQRClick = () => {
-    navigation.navigate('proximamente');
-  };
-
-  const handleProductosTiendaClick = () => {
-    navigation.navigate('productostiendaañadir');
-  };
-
-  const handleMisProductosClick = () => {
-    navigation.navigate('misproductos');
+  const navigateTo = (screenName) => {
+    navigation.navigate(screenName);
   };
 
   return (
-    <ImageBackground source={require('../imagenes/fondomain.jpg')} style={styles.container} imageStyle={{ opacity: 1 }}>
+    <ImageBackground source={require('../imagenes/fondomain.jpg')} style={styles.container}>
       <Text style={styles.title}>Panel de Administrador</Text>
 
-      <TouchableOpacity style={styles.card} onPress={handleOrdersClick}>
-        <Text style={styles.cardText}>Pedidos Pet Shop</Text>
-      </TouchableOpacity>
+      <ScrollView contentContainerStyle={styles.scrollViewContainer}>
+        <TouchableOpacity style={styles.card} onPress={() => navigateTo('pepetshop')}>
+          <Icon name="shopping-cart" size={30} color="#2F9FFA" />
+          <Text style={styles.cardText}>Pedidos Pet Shop</Text>
+        </TouchableOpacity>
 
-      <TouchableOpacity style={styles.card} onPress={handleDeliveredClick}>
-        <Text style={styles.cardText}>Pedidos Despachados</Text>
-      </TouchableOpacity>
+        <TouchableOpacity style={styles.card} onPress={() => navigateTo('despapetshop')}>
+          <Icon name="truck" size={30} color="#2F9FFA" />
+          <Text style={styles.cardText}>Pedidos Despachados</Text>
+        </TouchableOpacity>
 
-      <TouchableOpacity style={styles.card} onPress={handleAppointmentsBathClick}>
-        <Text style={styles.cardText}>Citas Baño</Text>
-      </TouchableOpacity>
+        <TouchableOpacity style={styles.card} onPress={() => navigateTo('citasbaños')}>
+          <Icon name="bathtub" size={30} color="#2F9FFA" />
+          <Text style={styles.cardText}>Citas Baño</Text>
+        </TouchableOpacity>
 
-      <TouchableOpacity style={styles.card} onPress={handleAppointmentsBathAttendedClick}>
-        <Text style={styles.cardText}>Citas Baño Atendidas</Text>
-      </TouchableOpacity>
+        <TouchableOpacity style={styles.card} onPress={() => navigateTo('citasbañoatendidas')}>
+          <Icon name="check-circle" size={30} color="#2F9FFA" />
+          <Text style={styles.cardText}>Citas Baño Atendidas</Text>
+        </TouchableOpacity>
 
-      <TouchableOpacity style={styles.card} onPress={handleAppointmentsDoctorClick}>
-        <Text style={styles.cardText}>Citas Dr</Text>
-      </TouchableOpacity>
+        <TouchableOpacity style={styles.card} onPress={() => navigateTo('citasdr')}>
+          <Icon name="user-md" size={30} color="#2F9FFA" />
+          <Text style={styles.cardText}>Citas Dr</Text>
+        </TouchableOpacity>
 
-      <TouchableOpacity style={styles.card} onPress={handleAppointmentsDrAttendedClick}>
-        <Text style={styles.cardText}>Citas Dr Atendidas</Text>
-      </TouchableOpacity>
+        <TouchableOpacity style={styles.card} onPress={() => navigateTo('citasdratendidas')}>
+          <Icon name="check-circle" size={30} color="#2F9FFA" />
+          <Text style={styles.cardText}>Citas Dr Atendidas</Text>
+        </TouchableOpacity>
 
-      <TouchableOpacity style={styles.card} onPress={handleCuponesQRClick}>
-        <Text style={styles.cardText}>Cupones QR</Text>
-      </TouchableOpacity>
+        <TouchableOpacity style={styles.card} onPress={() => navigateTo('proximamente')}>
+          <Icon name="qrcode" size={30} color="#2F9FFA" />
+          <Text style={styles.cardText}>Cupones QR</Text>
+        </TouchableOpacity>
 
-      <TouchableOpacity style={styles.card} onPress={handleProductosTiendaClick}>
-        <Text style={styles.cardText}>Añadir Productos</Text>
-      </TouchableOpacity>
+        <TouchableOpacity style={styles.card} onPress={() => navigateTo('productostiendaañadir')}>
+          <Icon name="plus-square" size={30} color="#2F9FFA" />
+          <Text style={styles.cardText}>Añadir Productos</Text>
+        </TouchableOpacity>
 
-      <TouchableOpacity style={styles.card} onPress={handleMisProductosClick}>
-        <Text style={styles.cardText}>Mis Productos</Text>
-      </TouchableOpacity>
+        <TouchableOpacity style={styles.card} onPress={() => navigateTo('misproductos')}>
+          <Icon name="list-alt" size={30} color="#2F9FFA" />
+          <Text style={styles.cardText}>Mis Productos</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.card} onPress={() => navigateTo('solicitudpaseos')}>
+          <Icon name="paw" size={30} color="#2F9FFA" />
+          <Text style={styles.cardText}>Paseos</Text>
+        </TouchableOpacity>
+      </ScrollView>
 
       <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
         <Text style={styles.logoutButtonText}>Cerrar Sesión</Text>
@@ -110,16 +95,23 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     marginVertical: 20,
-    color: '#000', // Color negro
+    color: '#000',
+  },
+  scrollViewContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 20,
   },
   card: {
     backgroundColor: 'white',
     borderRadius: 8,
-    padding: 16,
-    marginVertical: 8,
-    width: '80%',
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    marginBottom: 16,
+    width: '90%',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
@@ -129,16 +121,17 @@ const styles = StyleSheet.create({
   cardText: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#000', // Color negro
+    color: '#2F9FFA',
+    marginLeft: 20,
   },
   logoutButton: {
     backgroundColor: '#2F9FFA',
     padding: 12,
     borderRadius: 8,
-    width: '80%',
+    width: '90%',
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 8,
+    marginTop: 20,
   },
   logoutButtonText: {
     color: '#FFFFFF',

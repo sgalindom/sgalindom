@@ -262,8 +262,7 @@ const MainPanel = ({ navigation }) => {
     
 
     const handleVetPress = (vetId) => {
-      const route = `vet${vetId}`;
-      navigation.navigate(route);
+      navigation.navigate('verveterinarias', { veterinariaId: vetId });
     };
 
     const handleGuarderiaAdiestramientoPress = (id) => {
@@ -334,7 +333,10 @@ const MainPanel = ({ navigation }) => {
               ))}
             </ScrollView>
           </View>
-  
+
+
+
+
           <View style={styles.guarderiasAdiestramientoContainer}>
             <View style={styles.guarderiasAdiestramientoTitleContainer}>
               <Icon name="storefront" size={24} color="#E4784A" style={{ marginRight: 5 }} />

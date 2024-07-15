@@ -1,26 +1,32 @@
+
+
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Alert, ImageBackground, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, Alert, TouchableOpacity, ActivityIndicator } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import auth from '@react-native-firebase/auth';
-import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { useNavigation } from '@react-navigation/native';
 import storage from '@react-native-firebase/storage';
+import FastImage from 'react-native-fast-image';
 
 const Inicio = () => {
   const navigation = useNavigation();
   const [backgroundUrl, setBackgroundUrl] = useState(null);
-  const [logoUrl, setLogoUrl] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchImages = async () => {
       try {
-        const backgroundUrl = await storage().ref('imagenes/fondomain.jpg').getDownloadURL();
-        const logoUrl = await storage().ref('imagenes/fondoperfil.jpg').getDownloadURL();
+        const backgroundRef = storage().ref('imagenes/MiPerfil.jpg');
+        await backgroundRef.getMetadata();
+        const backgroundUrl = await backgroundRef.getDownloadURL();
         setBackgroundUrl(backgroundUrl);
-        setLogoUrl(logoUrl);
       } catch (error) {
-        console.error('Error fetching images from Firebase Storage', error);
+        if (error.code === 'storage/object-not-found') {
+          console.error('El archivo no existe en Firebase Storage', error);
+          Alert.alert('Error', 'El archivo no existe en Firebase Storage. Verifica que la ruta y el nombre sean correctos.');
+        } else {
+          console.error('Error fetching images from Firebase Storage', error);
+          Alert.alert('Error', 'Error al obtener imágenes de Firebase Storage. Verifica los permisos y la configuración.');
+        }
       } finally {
         setLoading(false);
       }
@@ -29,23 +35,22 @@ const Inicio = () => {
     fetchImages();
   }, []);
 
-  const handleGoogleSignIn = async () => {
-    try {
-      await GoogleSignin.hasPlayServices();
-      const userInfo = await GoogleSignin.signIn();
-      const googleCredential = auth.GoogleAuthProvider.credential(userInfo.idToken);
-      await auth().signInWithCredential(googleCredential);
-      Alert.alert('Inicio de sesión con Google exitoso');
-      navigation.navigate('MainPanel');
-    } catch (error) {
-      console.error(error);
-      Alert.alert('Error en el inicio de sesión con Google', error.message);
-    }
+  const navigateToLogin = () => {
+    navigation.navigate('Login');
+  };
+
+  const navigateToRegistro = () => {
+    navigation.navigate('Registro');
+  };
+
+  const navigateToHola = () => {
+    // Navegar a la pantalla 'Hola'
+    navigation.navigate('proximamente');
   };
 
   if (loading) {
     return (
-      <View style={styles.loadingContainer}>
+      <View style={styles.container}>
         <ActivityIndicator size="large" color="#0000ff" />
       </View>
     );
@@ -53,21 +58,38 @@ const Inicio = () => {
 
   return (
     <View style={styles.container}>
-      <ImageBackground source={{ uri: backgroundUrl }} style={styles.background}>
-        <Image source={{ uri: logoUrl }} style={styles.logo} />
-        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Login')}>
-          <Icon name="log-in-outline" size={24} color="#fff" style={styles.icon} />
-          <Text style={styles.buttonText}>Iniciar Sesión</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Registro')}>
-          <Icon name="person-add-outline" size={24} color="#fff" style={styles.icon} />
-          <Text style={styles.buttonText}>Registrarse</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={[styles.button, styles.googleButton]} onPress={handleGoogleSignIn}>
-          <Icon name="logo-google" size={24} color="#fff" style={styles.icon} />
-          <Text style={styles.buttonText}>Iniciar Sesión con Google</Text>
-        </TouchableOpacity>
-      </ImageBackground>
+      <FastImage
+        style={styles.background}
+        source={{
+          uri: backgroundUrl,
+          priority: FastImage.priority.high,
+        }}
+        resizeMode={FastImage.resizeMode.cover}
+      >
+        <View style={styles.buttonsContainer}>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={navigateToLogin}
+          >
+            <Icon name="log-in-outline" size={24} color="#fff" style={styles.icon} />
+            <Text style={styles.buttonText}>Iniciar Sesión</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={navigateToRegistro}
+          >
+            <Icon name="person-add-outline" size={24} color="#fff" style={styles.icon} />
+            <Text style={styles.buttonText}>Registrarse</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={navigateToHola}
+          >
+            <Icon name="logo-google" size={24} color="#fff" style={styles.icon} />
+            <Text style={styles.buttonText}>Iniciar Sesión con Google</Text>
+          </TouchableOpacity>
+        </View>
+      </FastImage>
     </View>
   );
 };
@@ -77,20 +99,19 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f0f0f0', // Color de fondo del contenedor principal
+    backgroundColor: '#f0f0f0',
   },
   background: {
     flex: 1,
-    resizeMode: 'cover',
     justifyContent: 'center',
     alignItems: 'center',
     width: '100%',
   },
-  logo: {
-    width: 300, // Ancho de la imagen del logo
-    height: 150, // Alto de la imagen del logo
-    resizeMode: 'contain',
-    marginBottom: 50, // Espacio entre el logo y los botones
+  buttonsContainer: {
+    position: 'absolute',
+    top: '20%',
+    alignItems: 'center',
+    width: '100%',
   },
   button: {
     flexDirection: 'row',
@@ -101,11 +122,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 30,
     marginVertical: 10,
     borderRadius: 30,
-    elevation: 3, // Leve sombra para dar profundidad
-    width: '80%', // Ancho de los botones
-  },
-  googleButton: {
-    backgroundColor: '#DB4437',
+    elevation: 3,
+    width: '80%',
   },
   buttonText: {
     color: '#fff',
@@ -115,11 +133,6 @@ const styles = StyleSheet.create({
   },
   icon: {
     marginRight: 10,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
 });
 

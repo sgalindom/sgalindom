@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { ScrollView, View, Text, TextInput, TouchableOpacity, ImageBackground } from 'react-native';
+import { ScrollView, View, Text, TextInput, TouchableOpacity, ImageBackground, FlatList } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import CheckBox from '@react-native-community/checkbox';
 import Icon from 'react-native-vector-icons/Ionicons';
+import DateTimePickerModal from "react-native-modal-datetime-picker";
 
 const backgroundImage = require('../imagenes/fondomain.jpg');
 
@@ -15,13 +16,35 @@ const SolicitudPaseo = ({ route, navigation }) => {
   const [selectedMascotas, setSelectedMascotas] = useState([]);
   const [observaciones, setObservaciones] = useState('');
   const [selectedPackage, setSelectedPackage] = useState(null);
+  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+  const [userData, setUserData] = useState({});
 
   const user = auth().currentUser;
   const userEmail = user ? user.email : '';
 
   useEffect(() => {
     if (userEmail) {
-      const unsubscribe = firestore()
+      // Obtener ID del documento de datos del usuario
+      const fetchUserData = async () => {
+        try {
+          const userDatosSnapshot = await firestore()
+            .collection('usuarios')
+            .doc(userEmail)
+            .collection('datos')
+            .get();
+          
+          if (!userDatosSnapshot.empty) {
+            const dataDoc = userDatosSnapshot.docs[0]; // Suponemos que solo hay un documento de datos por usuario
+            const data = dataDoc.data();
+            setUserData(data);
+          }
+        } catch (error) {
+          console.error('Error al obtener los datos del usuario: ', error);
+        }
+      };
+
+      // Obtener mascotas del usuario
+      const unsubscribeMascotas = firestore()
         .collection('usuarios')
         .doc(userEmail)
         .collection('mascotas')
@@ -37,8 +60,10 @@ const SolicitudPaseo = ({ route, navigation }) => {
           setMascotas(mascotasCargadas);
         });
 
+      fetchUserData();
+
       return () => {
-        unsubscribe();
+        unsubscribeMascotas();
       };
     }
   }, [userEmail]);
@@ -58,7 +83,7 @@ const SolicitudPaseo = ({ route, navigation }) => {
       setSelectedDate(updatedDates);
     } else {
       const updatedDates = { ...selectedDate };
-      updatedDates[day.dateString] = { selected: true, selectedColor: 'blue' };
+      updatedDates[day.dateString] = { selected: true, selectedColor: '#007bff' }; // Cambiar color de selección
       setSelectedDate(updatedDates);
     }
   };
@@ -95,6 +120,9 @@ const SolicitudPaseo = ({ route, navigation }) => {
       hora: selectedHour,
       observaciones: observaciones,
       paquete: selectedPackage,
+      nombre: userData.nombreCompleto,
+      telefono: userData.telefono,
+      direccion: userData.direccion,
     };
 
     if (userEmail) {
@@ -105,20 +133,77 @@ const SolicitudPaseo = ({ route, navigation }) => {
         .collection('servicios')
         .add(solicitudData)
         .then(() => {
-          alert('Solicitud de paseo enviada con éxito!');
-          navigation.navigate('MainPanel');
+          // Guardar la misma solicitud en la colección "paseos" para los paseadores
+          firestore()
+            .collection('paseos')
+            .doc() // Genera un ID automático para la solicitud de paseo en "paseos"
+            .set(solicitudData)
+            .then(() => {
+              alert('Solicitud de paseo enviada con éxito!');
+              navigation.navigate('MainPanel');
+            })
+            .catch((error) => {
+              console.error('Error al enviar la solicitud de paseo a paseos: ', error);
+            });
         })
         .catch((error) => {
-          console.error('Error al enviar la solicitud de paseo: ', error);
+          console.error('Error al enviar la solicitud de paseo a servicios: ', error);
         });
     }
+  };
+
+  const showDatePicker = () => {
+    setDatePickerVisibility(true);
+  };
+
+  const hideDatePicker = () => {
+    setDatePickerVisibility(false);
+  };
+
+  const handleConfirm = (date) => {
+    const hours = date.getHours();
+    const minutes = date.getMinutes();
+    setSelectedHour(`${hours}:${minutes < 10 ? '0' : ''}${minutes}`);
+    hideDatePicker();
+  };
+
+  const renderTimePickerButton = () => {
+    return (
+      <TouchableOpacity style={styles.timePickerButton} onPress={showDatePicker}>
+        <Text style={styles.timePickerText}>{selectedHour ? selectedHour : 'Seleccionar hora'}</Text>
+        <Icon name="time-outline" size={20} color="black" />
+      </TouchableOpacity>
+    );
+  };
+
+  const renderHourPicker = () => {
+    // Crear un array de horas desde las 8 AM hasta las 4 PM
+    const hours = Array.from({ length: 9 }, (_, index) => index + 8);
+
+    return (
+      <FlatList
+        data={hours}
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        keyExtractor={(item) => item.toString()}
+        renderItem={({ item }) => (
+          <TouchableOpacity
+            style={[styles.hourOption, selectedHour === `${item}:00` ? styles.selectedHourOption : null]}
+            onPress={() => setSelectedHour(`${item}:00`)}
+          >
+            <Text style={styles.hourOptionText}>{`${item}:00`}</Text>
+          </TouchableOpacity>
+        )}
+      />
+    );
   };
 
   return (
     <ImageBackground source={backgroundImage} style={styles.backgroundImage}>
       <ScrollView contentContainerStyle={styles.container}>
         <View style={styles.panelContainer}>
-          <View style={styles.calendarContainer}>
+          {/* Calendar Section */}
+          <View style={styles.sectionContainer}>
             <Calendar
               style={styles.calendar}
               onDayPress={handleDayPress}
@@ -127,10 +212,12 @@ const SolicitudPaseo = ({ route, navigation }) => {
             />
           </View>
 
+          {/* Separator */}
           <View style={styles.separator} />
 
-          <View style={styles.mascotaContainer}>
-            <Text style={styles.label}>Selecciona tus mascotas (hasta 6):</Text>
+          {/* Mascotas Section */}
+          <View style={styles.sectionContainer}>
+            <Text style={styles.sectionTitle}>Selecciona tus mascotas (hasta 6)</Text>
             {mascotas.length > 0 ? (
               // Si el usuario tiene mascotas registradas, muestra la lista de mascotas
               mascotas.map((mascota) => (
@@ -156,69 +243,74 @@ const SolicitudPaseo = ({ route, navigation }) => {
             )}
           </View>
 
+          {/* Separator */}
           <View style={styles.separator} />
 
-          <View style={styles.horaContainer}>
-            <Text style={styles.label}>Selecciona la hora del paseo:</Text>
-            <View style={styles.inputContainer}>
-              <Icon name="time-outline" size={20} color="black" />
-              <TextInput
-                value={selectedHour}
-                onChangeText={(text) => setSelectedHour(text)}
-                style={styles.textInput}
-                placeholder="HH:MM"
-                placeholderTextColor="#ccc"
-              />
-            </View>
+          {/* Hora Section */}
+          <View style={styles.sectionContainer}>
+            <Text style={styles.sectionTitle}>Selecciona la hora del paseo</Text>
+            {renderTimePickerButton()}
+            <DateTimePickerModal
+              isVisible={isDatePickerVisible}
+              mode="time"
+              onConfirm={handleConfirm}
+              onCancel={hideDatePicker}
+              headerTextIOS="Elige la hora del paseo"
+              confirmTextIOS="Confirmar"
+              cancelTextIOS="Cancelar"
+              locale="es_ES"
+            />
+            {renderHourPicker()}
           </View>
 
+          {/* Separator */}
           <View style={styles.separator} />
 
-          <View style={styles.packageContainer}>
-            <Text style={styles.label}>Selecciona el paquete:</Text>
-            <TouchableOpacity
-              style={[styles.packageOption, selectedPackage === 'diario' ? styles.selectedOption : null]}
-              onPress={() => setSelectedPackage('diario')}
-            >
-              <Icon name="journal-outline" size={20} color="black" />
-              <Text style={styles.packageOptionText}>Diario</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.packageOption, selectedPackage === 'semanal' ? styles.selectedOption : null]}
-              onPress={() => setSelectedPackage('semanal')}
-            >
-              <Icon name="calendar-outline" size={20} color="black" />
-              <Text style={styles.packageOptionText}>Semanal</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.packageOption, selectedPackage === 'mensual' ? styles.selectedOption : null]}
-              onPress={() => setSelectedPackage('mensual')}
-            >
-              <Icon name="calendar-sharp" size={20} color="black" />
-              <Text style={styles.packageOptionText}>Mensual</Text>
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.separator} />
-
-          <View style={styles.detallesContainer}>
-            <Text style={styles.label}>Agrega más detalles aquí:</Text>
+          {/* Observaciones Section */}
+          <View style={styles.sectionContainer}>
+            <Text style={styles.sectionTitle}>Observaciones</Text>
             <TextInput
+              style={styles.observacionesInput}
+              multiline
+              placeholder="Escribe aquí cualquier observación adicional."
               value={observaciones}
               onChangeText={(text) => setObservaciones(text)}
-              multiline={true}
-              numberOfLines={4}
-              style={[styles.textInput, { height: 100 }]}
-              placeholder="Agrega detalles (opcional)"
-              placeholderTextColor="#ccc"
             />
           </View>
 
+          {/* Separator */}
           <View style={styles.separator} />
 
-          <View style={styles.buttonContainer}>
-            <TouchableOpacity style={styles.button} onPress={solicitarPaseo}>
-              <Text style={styles.buttonText}>¡A PASEAR!</Text>
+          {/* Paquete Section */}
+          <View style={styles.sectionContainer}>
+            <Text style={styles.sectionTitle}>Selecciona el paquete</Text>
+            <TouchableOpacity
+              style={[styles.paqueteOption, selectedPackage === 'diario' ? styles.selectedPaqueteOption : null]}
+              onPress={() => setSelectedPackage('diario')}
+            >
+              <Text style={styles.paqueteOptionText}>Diario</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.paqueteOption, selectedPackage === 'semanal' ? styles.selectedPaqueteOption : null]}
+              onPress={() => setSelectedPackage('semanal')}
+            >
+              <Text style={styles.paqueteOptionText}>Semanal</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.paqueteOption, selectedPackage === 'mensual' ? styles.selectedPaqueteOption : null]}
+              onPress={() => setSelectedPackage('mensual')}
+            >
+              <Text style={styles.paqueteOptionText}>Mensual</Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* Separator */}
+          <View style={styles.separator} />
+
+          {/* Submit Button */}
+          <View style={styles.submitContainer}>
+            <TouchableOpacity style={styles.submitButton} onPress={solicitarPaseo}>
+              <Text style={styles.submitButtonText}>Solicitar Paseo</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -231,119 +323,123 @@ const styles = {
   backgroundImage: {
     flex: 1,
     resizeMode: 'cover',
-    justifyContent: 'center',
   },
   container: {
-    padding: 16,
+    padding: 20,
   },
   panelContainer: {
-    margin: 16,
-    backgroundColor: 'rgba(255, 255, 255, 0.8)', // Fondo blanco semitransparente
-    borderRadius: 16,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: 'black',
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    borderRadius: 10,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.5,
+    shadowRadius: 5,
+    elevation: 5,
   },
-  calendarContainer: {
-    marginBottom: 16,
+  sectionContainer: {
+    marginBottom: 20,
   },
-  calendar: {},
-  separator: {
-    height: 16,
-  },
-  mascotaContainer: {
-    marginBottom: 16,
-  },
-  horaContainer: {
-    marginBottom: 16,
-  },
-  packageContainer: {
-    marginBottom: 16,
-  },
-  label: {
+  sectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: 'black',
+    marginBottom: 10,
+    color: '#333',
+  },
+  separator: {
+    height: 1,
+    backgroundColor: '#ccc',
+    marginVertical: 20,
   },
   mascota: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: 10,
   },
   mascotaNombre: {
+    marginLeft: 10,
     fontSize: 16,
-    color: 'black',
-    marginLeft: 8,
+    color: '#333',
   },
   noMascotasText: {
+    marginBottom: 10,
     fontSize: 16,
-    fontStyle: 'italic',
-    color: 'black',
+    color: '#333',
   },
   registrarMascotaButton: {
-    backgroundColor: '#2F9FFA',
-    padding: 10,
-    borderRadius: 4,
-    width: 200,
-    alignSelf: 'center',
-    marginTop: 16,
+    backgroundColor: '#007bff',
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: 5,
+    alignItems: 'center',
   },
   registrarMascotaButtonText: {
-    color: '#FFFFFF',
-    fontWeight: 'bold',
+    color: '#fff',
     fontSize: 16,
-    textAlign: 'center',
+    fontWeight: 'bold',
   },
-  packageOption: {
+  timePickerButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#000',
-    borderRadius: 5,
-    padding: 12,
-    marginBottom: 8,
+    marginBottom: 10,
   },
-  packageOptionText: {
-    marginLeft: 8,
-    color: 'black',
-  },
-  selectedOption: {
-    backgroundColor: '#F5F5F5',
-  },
-  textInput: {
-    borderWidth: 1,
-    borderColor: '#000',
-    borderRadius: 5,
-    padding: 8,
-    color: 'black',
-    flex: 1,
-    marginLeft: 8,
-  },
-  detallesContainer: {
-    marginBottom: 16,
-  },
-  inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  buttonContainer: {
-    marginTop: 16,
-    alignItems: 'center',
-  },
-  button: {
-    backgroundColor: '#2F9FFA',
-    padding: 12,
-    borderRadius: 8,
-    width: 200,
-    alignSelf: 'center',
-    alignItems: 'center',
-  },
-  buttonText: {
-    color: '#FFFFFF',
-    fontWeight: 'bold',
+  timePickerText: {
     fontSize: 16,
+    marginRight: 10,
+    color: '#333',
+  },
+  hourOption: {
+    backgroundColor: '#f0f0f0',
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: 5,
+    marginRight: 10,
+  },
+  selectedHourOption: {
+    backgroundColor: '#007bff',
+  },
+  hourOptionText: {
+    fontSize: 16,
+    color: '#333',
+  },
+  observacionesInput: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    padding: 10,
+    minHeight: 100,
+    fontSize: 16,
+  },
+  paqueteOption: {
+    backgroundColor: '#f0f0f0',
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: 5,
+    marginBottom: 10,
+  },
+  selectedPaqueteOption: {
+    backgroundColor: '#007bff',
+  },
+  paqueteOptionText: {
+    fontSize: 16,
+    color: '#333',
+  },
+  submitContainer: {
+    marginTop: 20,
+    alignItems: 'center',
+  },
+  submitButton: {
+    backgroundColor: '#4CAF50',
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+    alignItems: 'center',
+  },
+  submitButtonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
 };
-
 
 export default SolicitudPaseo;
