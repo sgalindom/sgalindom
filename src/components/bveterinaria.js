@@ -46,7 +46,11 @@ const VeterinariaScreen = () => {
   }, [selectedBarrio]);
 
   const handleExplorarPress = (veterinariaId) => {
-    navigation.navigate('verveterinarias', { veterinariaId });
+    if (veterinariaId === '1') {
+      navigation.navigate('vet1'); // Navegar a la pantalla VET1.js
+    } else {
+      navigation.navigate('verveterinarias', { veterinariaId });
+    }
   };
 
   const openModal = () => {
@@ -329,4 +333,3 @@ const styles = StyleSheet.create({
 });
 
 export default VeterinariaScreen;
-  

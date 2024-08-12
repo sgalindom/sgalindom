@@ -235,40 +235,24 @@ const MainPanel = ({ navigation }) => {
       fetchGuarderiasAndAdiestramiento();
     }, []);
     
-    const handleProductPress = (productId, vetId, productType) => {
-      if (productType === 'comida') {
-        navigation.navigate('vet1comida', { productId, vetId });
+   
+  
+    const handleVetPress = (vetId) => {
+      if (vetId === veterinarias[0].id) {
+        // Para la primera veterinaria, navega al panel específico
+        navigation.navigate('vet1', { veterinariaId: vetId });
       } else {
-        let route = '';
-        switch (productType) {
-          case 'accesorios':
-            route = vetId === 1 ? 'vet1accesorios' : vetId === 2 ? 'vet2accesorios' : 'vet3accesorios';
-            break;
-          case 'productos':
-            route = vetId === 1 ? 'vet1juguetes' : vetId === 2 ? 'vet2productos' : 'vet3productos';
-            break;
-          default:
-            console.error('Tipo de producto no reconocido');
-            break;
-        }
-    
-        if (route !== '') {
-          navigation.navigate(route);
-        } else {
-          console.error('Ruta de navegación no válida');
-        }
+        // Para el resto, navega al panel "VerveterinariasScreen"
+        navigation.navigate('verveterinarias', { veterinariaId: vetId });
       }
     };
     
 
-    const handleVetPress = (vetId) => {
-      navigation.navigate('verveterinarias', { veterinariaId: vetId });
-    };
-
     const handleGuarderiaAdiestramientoPress = (id) => {
       const route = `Adieguar${id}`;
-      navigation.navigate(route);
+      navigation.navigate(route, { adieguarId: id }); // Pasa el parámetro aquí
     };
+    
 
    
     return (
@@ -310,7 +294,7 @@ const MainPanel = ({ navigation }) => {
                   <Text style={styles.tarjetaText}>Gato</Text>
                 </View>
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => navigation.navigate('perro')} style={styles.tarjeta}>
+              <TouchableOpacity onPress={() => navigation.navigate('proximamente')} style={styles.tarjeta}>
                 <View style={styles.tarjetaContent}>
                   <Image source={require('./imagenes/perro.jpg')} style={styles.tarjetaImage} />
                   <Text style={styles.tarjetaText}>Perro</Text>
@@ -326,7 +310,11 @@ const MainPanel = ({ navigation }) => {
             </View>
             <ScrollView horizontal={true}>
               {veterinarias.map(vet => (
-                <TouchableOpacity key={vet.id} style={styles.veterinariaCard} onPress={() => handleVetPress(vet.id)}>
+                <TouchableOpacity
+                  key={vet.id}
+                  style={styles.veterinariaCard}
+                  onPress={() => handleVetPress(vet.id)}
+                >
                   <Image source={{ uri: vet.Foto }} style={styles.veterinariaImage} />
                   <Text style={styles.veterinariaName}>{vet.Nombre}</Text>
                 </TouchableOpacity>

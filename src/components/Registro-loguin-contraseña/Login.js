@@ -1,16 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  Image,
-  ImageBackground,
-  StyleSheet,
-  Dimensions,
-  ActivityIndicator,
-  Animated,
-} from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Image, ImageBackground, StyleSheet, Dimensions, ActivityIndicator, Animated } from 'react-native';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -22,17 +11,16 @@ function Login({ navigation }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [buttonScale] = useState(new Animated.Value(1));
-  const [hidePassword, setHidePassword] = useState(true); 
-  const [fadeAnim] = useState(new Animated.Value(0)); // Animación de desvanecimiento
+  const [hidePassword, setHidePassword] = useState(true);
+  const [fadeAnim] = useState(new Animated.Value(0));
 
   useEffect(() => {
     const unsubscribe = auth().onAuthStateChanged(async (user) => {
       if (user) {
         try {
           const isAdmin = await checkAdminStatus(user.email);
-
           if (isAdmin) {
             console.log('Inicio de sesión exitoso - Administrador');
             navigation.navigate('paneladmin');
@@ -46,7 +34,6 @@ function Login({ navigation }) {
         }
       }
       setIsLoading(false);
-      // Iniciar animación de desvanecimiento cuando los datos estén cargados
       Animated.timing(fadeAnim, {
         toValue: 1,
         duration: 500,
@@ -58,12 +45,17 @@ function Login({ navigation }) {
   }, [navigation, fadeAnim]);
 
   const checkAdminStatus = async (userEmail) => {
-    const adminSnapshot = await firestore()
-      .collection('Administradores')
-      .doc(userEmail)
-      .get();
+    try {
+      const adminSnapshot = await firestore()
+        .collection('Administradores')
+        .doc(userEmail)
+        .get();
 
-    return adminSnapshot.exists;
+      return adminSnapshot.exists;
+    } catch (error) {
+      console.error('Error al verificar el estado del usuario', error);
+      throw new Error('Error al verificar el estado del usuario');
+    }
   };
 
   const handleLogin = async () => {
@@ -72,21 +64,34 @@ function Login({ navigation }) {
       return;
     }
 
+    if (!isValidEmail(email)) {
+      setError('Por favor, ingresa un correo electrónico válido.');
+      return;
+    }
+
     try {
       setIsLoading(true);
-
-      const userCredential = await auth().signInWithEmailAndPassword(email, password);
-      const user = userCredential.user;
-
-      if (!user) {
-        throw new Error('Usuario no encontrado');
-      }
+      await auth().signInWithEmailAndPassword(email, password);
+      // Después de iniciar sesión, el usuario será redirigido según su rol en useEffect
     } catch (error) {
       console.error('Error al iniciar sesión', error);
-      setError('Inicio de sesión fallido. Verifica tus credenciales.');
+      if (error.code === 'auth/invalid-email') {
+        setError('El correo electrónico es inválido.');
+      } else if (error.code === 'auth/wrong-password') {
+        setError('La contraseña es incorrecta.');
+      } else if (error.code === 'auth/user-not-found') {
+        setError('No se encontró una cuenta con ese correo electrónico.');
+      } else {
+        setError('Inicio de sesión fallido. Verifica tus credenciales.');
+      }
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const isValidEmail = (email) => {
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailPattern.test(email);
   };
 
   const handleRecuperarContraseña = () => {
@@ -138,14 +143,14 @@ function Login({ navigation }) {
             <Icon name="lock" size={20} color="gray" style={styles.icon} />
             <TextInput
               placeholder="Contraseña"
-              secureTextEntry={hidePassword} 
+              secureTextEntry={hidePassword}
               onChangeText={(text) => setPassword(text)}
               value={password}
               style={styles.input}
               placeholderTextColor="#333"
             />
             <TouchableOpacity
-              onPress={() => setHidePassword(!hidePassword)} 
+              onPress={() => setHidePassword(!hidePassword)}
               style={styles.eyeIconContainer}
             >
               <Icon name={hidePassword ? 'eye' : 'eye-slash'} size={20} color="gray" />
@@ -217,10 +222,10 @@ const styles = StyleSheet.create({
   welcomeText: {
     fontSize: 32,
     fontWeight: 'bold',
-    color: '#FFFFFF', 
+    color: '#FFFFFF',
     marginBottom: 20,
     textAlign: 'center',
-    textShadowColor: '#000000', 
+    textShadowColor: '#000000',
     textShadowOffset: { width: 2, height: 2 },
     textShadowRadius: 3,
   },
@@ -231,9 +236,9 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     borderRadius: 10,
     paddingHorizontal: 15,
-    backgroundColor: '#FFFFFF', // Fondo blanco
+    backgroundColor: '#FFFFFF',
     borderWidth: 1,
-    borderColor: '#333', 
+    borderColor: '#333',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
@@ -242,13 +247,13 @@ const styles = StyleSheet.create({
   },
   icon: {
     marginRight: 10,
-    color: '#333', // Color del icono gris
+    color: '#333',
   },
   input: {
     flex: 1,
     height: 40,
     paddingLeft: 10,
-    color: '#333', // Texto gris
+    color: '#333',
   },
   button: {
     backgroundColor: '#007BFF',
@@ -261,62 +266,45 @@ const styles = StyleSheet.create({
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.4,
-    shadowRadius: 5,
+    shadowRadius: 8,
     elevation: 10,
   },
   buttonText: {
     color: '#FFFFFF',
+    fontSize: 18,
     fontWeight: 'bold',
+  },
+  errorText: {
+    color: '#FF0000',
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  eyeIconContainer: {
+    position: 'absolute',
+    right: 10,
+  },
+  enlaceRecuperarContraseña: {
+    marginVertical: 10,
+  },
+  enlaceRecuperarContraseñaTexto: {
+    color: 'black',
     fontSize: 16,
   },
   registerButton: {
     marginTop: 20,
   },
   registerButtonText: {
-    color: '#FFFFFF',
-    fontWeight: 'bold',
+    color: 'black',
     fontSize: 16,
-    textAlign: 'center',
-    textShadowColor: '#000000', 
-    textShadowOffset: { width: 2, height: 2 },
-    textShadowRadius: 3,
-  },
-  enlaceRecuperarContraseña: {
-    marginTop: 10,
-  },
-  enlaceRecuperarContraseñaTexto: {
-    color: '#FFFFFF',
-    fontWeight: 'bold',
-    fontSize: 16,
-    textAlign: 'center',
-    textShadowColor: '#000000', 
-    textShadowOffset: { width: 2, height: 2 },
-    textShadowRadius: 3,
-  },
-  errorText: {
-    color: 'red',
-    fontWeight: 'bold',
-    fontSize: 14,
-    marginBottom: 20,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  eyeIconContainer: {
-    position: 'absolute',
-    right: 10,
   },
   bottomRightTextContainer: {
     position: 'absolute',
     bottom: 10,
-    right: 20,
+    right: 10,
   },
   bottomRightText: {
-    color: 'white',
-    fontSize: 12,
-    fontWeight: 'bold',
+    color: '#FFFFFF',
+    fontSize: 14,
   },
 });
 

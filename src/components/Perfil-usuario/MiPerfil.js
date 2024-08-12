@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ImageBackground, Image } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ImageBackground, Image, Alert } from 'react-native';
 import auth from '@react-native-firebase/auth';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 
@@ -34,10 +34,17 @@ const MiPerfil = ({ navigation }) => {
 
   const handleCerrarSesion = async () => {
     try {
-      await auth().signOut();
-      navigation.navigate('Login');
+      const currentUser = auth().currentUser;
+
+      if (currentUser) {
+        await auth().signOut();
+        navigation.navigate('Login');
+      } else {
+        console.warn('No hay un usuario actualmente autenticado.');
+      }
     } catch (error) {
       console.error('Error al cerrar sesión', error);
+      Alert.alert('Error', 'No se pudo cerrar sesión. Inténtalo de nuevo.');
     }
   };
 

@@ -3,45 +3,31 @@ import { View, Text, StyleSheet, ImageBackground, Image, TouchableOpacity, Linki
 import Icon from 'react-native-vector-icons/Ionicons';
 import firestore from '@react-native-firebase/firestore';
 
-const VerveterinariasScreen = ({ route }) => {
-  const { veterinariaId } = route.params;
+const VerveterinariasScreen = ({ route, navigation }) => {
+  const { veterinariaId } = route.params || {};
   const [veterinaria, setVeterinaria] = useState(null);
 
   useEffect(() => {
-    const obtenerDatosVeterinaria = async () => {
-      try {
-        const snapshot = await firestore().collection('Veterinarias').doc(veterinariaId).get();
+    if (veterinariaId) {
+      const obtenerDatosVeterinaria = async () => {
+        try {
+          const snapshot = await firestore().collection('Veterinarias').doc(veterinariaId).get();
 
-        if (snapshot.exists) {
-          setVeterinaria(snapshot.data());
-        } else {
-          console.log('No se encontró la veterinaria con el ID proporcionado.');
+          if (snapshot.exists) {
+            setVeterinaria(snapshot.data());
+          } else {
+            console.log('No se encontró la veterinaria con el ID proporcionado.');
+          }
+        } catch (error) {
+          console.error('Error al obtener datos de la veterinaria:', error);
         }
-      } catch (error) {
-        console.error('Error al obtener datos de la veterinaria:', error);
-      }
-    };
+      };
 
-    obtenerDatosVeterinaria();
+      obtenerDatosVeterinaria();
+    } else {
+      console.log('No se ha proporcionado un ID válido.');
+    }
   }, [veterinariaId]);
-
-  const llamarTelefono = () => {
-    if (veterinaria && veterinaria.Telefono) {
-      Linking.openURL(`tel:${veterinaria.Telefono}`);
-    }
-  };
-
-  const abrirMapa = () => {
-    if (veterinaria && veterinaria.Maps) {
-      Linking.openURL(veterinaria.Maps);
-    }
-  };
-
-  const abrirPagina = () => {
-    if (veterinaria && veterinaria.Pagina) {
-      Linking.openURL(veterinaria.Pagina);
-    }
-  };
 
   if (!veterinaria) {
     return (
@@ -75,24 +61,22 @@ const VerveterinariasScreen = ({ route }) => {
                 <Text key={index} style={styles.service}>{servicio.trim()}</Text>
               ))}
             </View>
-            <TouchableOpacity style={styles.button} onPress={llamarTelefono}>
+            <TouchableOpacity style={styles.button} onPress={() => Linking.openURL(`tel:${veterinaria.Telefono}`)}>
               <Icon name="call" size={20} color="white" style={styles.icon} />
               <Text style={styles.buttonText}>Llamar</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.button} onPress={abrirMapa}>
+            <TouchableOpacity style={styles.button} onPress={() => Linking.openURL(veterinaria.Maps)}>
               <Icon name="map" size={20} color="white" style={styles.icon} />
               <Text style={styles.buttonText}>Abrir Mapa</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.button} onPress={abrirPagina}>
-              <Icon name="globe" size={20} color="white" style={styles.icon} />
-              <Text style={styles.buttonText}>Abrir Página Web</Text>
-            </TouchableOpacity>
+            {/* Agrega más botones si es necesario */}
           </View>
         </View>
       </ScrollView>
     </ImageBackground>
   );
 };
+
 
 const styles = StyleSheet.create({
   background: {

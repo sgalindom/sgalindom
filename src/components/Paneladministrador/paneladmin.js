@@ -25,55 +25,25 @@ const Paneladmin = () => {
       <Text style={styles.title}>Panel de Administrador</Text>
 
       <ScrollView contentContainerStyle={styles.scrollViewContainer}>
-        <TouchableOpacity style={styles.card} onPress={() => navigateTo('pepetshop')}>
-          <Icon name="shopping-cart" size={30} color="#2F9FFA" />
-          <Text style={styles.cardText}>Pedidos Pet Shop</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.card} onPress={() => navigateTo('despapetshop')}>
-          <Icon name="truck" size={30} color="#2F9FFA" />
-          <Text style={styles.cardText}>Pedidos Despachados</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.card} onPress={() => navigateTo('citasbaños')}>
-          <Icon name="bathtub" size={30} color="#2F9FFA" />
-          <Text style={styles.cardText}>Citas Baño</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.card} onPress={() => navigateTo('citasbañoatendidas')}>
-          <Icon name="check-circle" size={30} color="#2F9FFA" />
-          <Text style={styles.cardText}>Citas Baño Atendidas</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.card} onPress={() => navigateTo('citasdr')}>
-          <Icon name="user-md" size={30} color="#2F9FFA" />
-          <Text style={styles.cardText}>Citas Dr</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.card} onPress={() => navigateTo('citasdratendidas')}>
-          <Icon name="check-circle" size={30} color="#2F9FFA" />
-          <Text style={styles.cardText}>Citas Dr Atendidas</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.card} onPress={() => navigateTo('proximamente')}>
-          <Icon name="qrcode" size={30} color="#2F9FFA" />
-          <Text style={styles.cardText}>Cupones QR</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.card} onPress={() => navigateTo('productostiendaañadir')}>
-          <Icon name="plus-square" size={30} color="#2F9FFA" />
-          <Text style={styles.cardText}>Añadir Productos</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.card} onPress={() => navigateTo('misproductos')}>
-          <Icon name="list-alt" size={30} color="#2F9FFA" />
-          <Text style={styles.cardText}>Mis Productos</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.card} onPress={() => navigateTo('solicitudpaseos')}>
-          <Icon name="paw" size={30} color="#2F9FFA" />
-          <Text style={styles.cardText}>Paseos</Text>
-        </TouchableOpacity>
+        <View style={styles.cardsContainer}>
+          {[
+            { screen: 'pepetshop', icon: 'shopping-cart', label: 'Pedidos Pet Shop' },
+            { screen: 'despapetshop', icon: 'truck', label: 'Pedidos Despachados' },
+            { screen: 'citasbaños', icon: 'bathtub', label: 'Citas Baño' },
+            { screen: 'citasbañoatendidas', icon: 'check-circle', label: 'Citas Baño Atendidas' },
+            { screen: 'citasdr', icon: 'user-md', label: 'Citas Dr' },
+            { screen: 'citasdratendidas', icon: 'check-circle', label: 'Citas Dr Atendidas' },
+            { screen: 'proximamente', icon: 'qrcode', label: 'Cupones QR' },
+            { screen: 'productostiendaañadir', icon: 'plus-square', label: 'Añadir Productos' },
+            { screen: 'misproductos', icon: 'list-alt', label: 'Mis Productos' },
+            { screen: 'solicitudpaseos', icon: 'paw', label: 'Paseos' }
+          ].map(({ screen, icon, label }) => (
+            <TouchableOpacity key={screen} style={styles.card} onPress={() => navigateTo(screen)}>
+              <Icon name={icon} size={30} color="#ffffff" />
+              <Text style={styles.cardText}>{label}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
       </ScrollView>
 
       <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
@@ -91,44 +61,49 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   title: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: 'bold',
     textAlign: 'center',
     marginVertical: 20,
-    color: '#000',
+    color: '#FFFFFF',
   },
   scrollViewContainer: {
+    flexGrow: 1,
     alignItems: 'center',
-    justifyContent: 'center',
     paddingVertical: 20,
   },
+  cardsContainer: {
+    width: '100%',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+  },
   card: {
-    backgroundColor: 'white',
-    borderRadius: 8,
+    backgroundColor: '#4A90E2',
+    borderRadius: 12,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'flex-start',
     paddingHorizontal: 20,
-    paddingVertical: 12,
+    paddingVertical: 16,
     marginBottom: 16,
-    width: '90%',
+    width: '100%',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 2,
-    elevation: 2,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
   },
   cardText: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: 'bold',
-    color: '#2F9FFA',
-    marginLeft: 20,
+    color: '#FFFFFF',
+    marginLeft: 16,
   },
   logoutButton: {
-    backgroundColor: '#2F9FFA',
-    padding: 12,
+    backgroundColor: '#FF4D4D',
+    padding: 14,
     borderRadius: 8,
-    width: '90%',
+    width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 20,
@@ -136,7 +111,7 @@ const styles = StyleSheet.create({
   logoutButtonText: {
     color: '#FFFFFF',
     fontWeight: 'bold',
-    fontSize: 16,
+    fontSize: 18,
   },
 });
 

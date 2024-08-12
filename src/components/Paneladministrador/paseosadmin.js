@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, ImageBackground } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
-import SwipeButton from 'rn-swipe-button';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const backgroundImage = require('../imagenes/fondomain.jpg');
@@ -26,37 +25,22 @@ const Paseosadmin = () => {
     fetchPaseos();
   }, []);
 
-  const handleStartPaseo = async (id) => {
+  const handlePaseoRealizado = async (id) => {
     try {
+      // Aquí puedes actualizar el campo 'realizado' en Firestore
       await firestore().collection('paseos').doc(id).update({
-        estado: 'en_curso', // Cambiar estado a "en_curso" al iniciar el paseo
+        realizado: true,
       });
+      // Actualizar localmente el estado de paseos para reflejar el cambio
       const updatedPaseos = paseos.map(paseo => {
         if (paseo.id === id) {
-          return { ...paseo, estado: 'en_curso' };
+          return { ...paseo, realizado: true };
         }
         return paseo;
       });
       setPaseos(updatedPaseos);
     } catch (error) {
-      console.error('Error starting paseo:', error);
-    }
-  };
-
-  const handleFinishPaseo = async (id) => {
-    try {
-      await firestore().collection('paseos').doc(id).update({
-        estado: 'finalizado', // Cambiar estado a "finalizado" al finalizar el paseo
-      });
-      const updatedPaseos = paseos.map(paseo => {
-        if (paseo.id === id) {
-          return { ...paseo, estado: 'finalizado' };
-        }
-        return paseo;
-      });
-      setPaseos(updatedPaseos);
-    } catch (error) {
-      console.error('Error finishing paseo:', error);
+      console.error('Error marking paseo as realizado:', error);
     }
   };
 
@@ -72,26 +56,17 @@ const Paseosadmin = () => {
         <Text style={styles.cardText}>Teléfono: {item.telefono}</Text>
         <Text style={styles.cardText}>Dirección: {item.direccion}</Text>
       </View>
-      <View style={styles.swipeButtonContainer}>
-        {item.estado === 'pendiente' && (
-          <SwipeButton
-            containerStyles={styles.swipeButton}
-            thumbIconComponent={<Icon name="directions-walk" size={24} color="#fff" />}
-            railBackgroundColor="#dc3545"
-            thumbIconBackgroundColor="#dc3545"
-            title="Iniciar Paseo"
-            onSwipeSuccess={() => handleStartPaseo(item.id)}
-          />
-        )}
-        {item.estado === 'en_curso' && (
-          <SwipeButton
-            containerStyles={styles.swipeButton}
-            thumbIconComponent={<Icon name="check-circle" size={24} color="#fff" />}
-            railBackgroundColor="#28a745"
-            thumbIconBackgroundColor="#28a745"
-            title="Finalizar Paseo"
-            onSwipeSuccess={() => handleFinishPaseo(item.id)}
-          />
+      <View style={styles.cardActions}>
+        {item.realizado ? (
+          <Icon name="check-circle" size={24} color="#28a745" style={styles.statusIcon} />
+        ) : (
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => handlePaseoRealizado(item.id)}
+            disabled={item.realizado}
+          >
+            <Text style={styles.buttonText}>Paseo Realizado</Text>
+          </TouchableOpacity>
         )}
       </View>
     </View>
@@ -149,20 +124,30 @@ const styles = StyleSheet.create({
   cardDetails: {
     flex: 1,
   },
+  cardActions: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   cardText: {
     fontSize: 16,
     color: '#333',
     marginBottom: 5,
   },
-  swipeButtonContainer: {
+  statusIcon: {
+    marginLeft: 10,
+  },
+  button: {
+    backgroundColor: '#007bff',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  swipeButton: {
-    width: 120,
-    height: 40,
-    borderRadius: 20,
-    marginBottom: 10,
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
 

@@ -1,10 +1,9 @@
-
-
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Alert, TouchableOpacity, ActivityIndicator } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
 import storage from '@react-native-firebase/storage';
+import auth from '@react-native-firebase/auth';
 import FastImage from 'react-native-fast-image';
 
 const Inicio = () => {
@@ -32,8 +31,20 @@ const Inicio = () => {
       }
     };
 
+    const checkAuthStatus = () => {
+      const unsubscribe = auth().onAuthStateChanged(user => {
+        if (user) {
+          // Si el usuario está autenticado, navega al MainPanel
+          navigation.navigate('MainPanel');
+        }
+      });
+      // Cleanup subscription on unmount
+      return () => unsubscribe();
+    };
+
     fetchImages();
-  }, []);
+    checkAuthStatus();
+  }, [navigation]);
 
   const navigateToLogin = () => {
     navigation.navigate('Login');

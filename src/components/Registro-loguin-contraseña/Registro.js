@@ -11,6 +11,7 @@ import {
   ScrollView,
   Animated,
   Alert,
+  ActivityIndicator, // Importar el componente ActivityIndicator
 } from 'react-native';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
@@ -29,37 +30,44 @@ const Registro = ({ navigation }) => {
   const [edad, setEdad] = useState('');
   const [hidePassword, setHidePassword] = useState(true);
   const [errorField, setErrorField] = useState(null);
+  const [loading, setLoading] = useState(false); // Estado para manejar la carga
 
   const handleRegistro = async () => {
+    setLoading(true); // Activar el estado de carga
+
     try {
       // Validar que todos los campos estén llenos
       if (!email || !password || !confirmPassword || !nombreCompleto || !telefono || !direccion || !edad) {
         Alert.alert('Error', 'Por favor completa todos los campos');
+        setLoading(false); // Desactivar el estado de carga
         return;
       }
-  
+
       // Validar que la contraseña tenga al menos 6 caracteres
       if (password.length < 6) {
         Alert.alert('Error', 'La contraseña debe tener al menos 6 caracteres');
+        setLoading(false); // Desactivar el estado de carga
         return;
       }
-  
+
       if (password !== confirmPassword) {
         Alert.alert('Error', 'Las contraseñas no coinciden');
+        setLoading(false); // Desactivar el estado de carga
         return;
       }
-  
+
       // Validar formato de email
       if (!validateEmail(email)) {
         Alert.alert('Error', 'Por favor ingresa un correo electrónico válido');
+        setLoading(false); // Desactivar el estado de carga
         return;
       }
-  
+
       await auth().createUserWithEmailAndPassword(email, password);
       console.log('Registro exitoso');
-  
+
       const user = auth().currentUser;
-  
+
       if (user) {
         const userData = {
           nombreCompleto,
@@ -67,7 +75,7 @@ const Registro = ({ navigation }) => {
           direccion,
           edad,
         };
-  
+
         await firestore().collection('usuarios').doc(user.email).collection('datos').add(userData);
         Alert.alert('Éxito', 'Usuario registrado exitosamente');
         navigation.navigate('MainPanel');
@@ -75,26 +83,25 @@ const Registro = ({ navigation }) => {
     } catch (error) {
       Alert.alert('Error', 'Ocurrió un error al registrar el usuario. Por favor intenta nuevamente.');
       console.error('Error al registrar usuario', error);
+    } finally {
+      setLoading(false); // Desactivar el estado de carga
     }
   };
 
   // Función para validar formato de email
   const validateEmail = (email) => {
-    // Expresión regular para validar formato de email
     const emailRegex = /\S+@\S+\.\S+/;
     return emailRegex.test(email);
   };
 
   // Función para validar que solo se ingresen números en el teléfono y la edad
   const validateNumberInput = (value) => {
-    // Expresión regular para validar que solo sean números
     const numberRegex = /^[0-9]*$/;
     return numberRegex.test(value);
   };
 
   // Función para validar que solo se ingresen letras en el nombre
   const validateNameInput = (value) => {
-    // Expresión regular para validar que solo sean letras
     const nameRegex = /^[A-Za-z\s]+$/;
     return nameRegex.test(value);
   };
@@ -217,9 +224,13 @@ const Registro = ({ navigation }) => {
               <Icon name={hidePassword ? 'eye-slash' : 'eye'} size={20} color="#000000" />
             </TouchableOpacity>
           </View>
-          <TouchableOpacity onPress={handleRegistro} style={styles.button}>
-            <Text style={styles.buttonText}>¡Regístrate ahora!</Text>
-          </TouchableOpacity>
+          {loading ? (
+            <ActivityIndicator size="large" color="#2F9FFA" style={styles.loadingIndicator} />
+          ) : (
+            <TouchableOpacity onPress={handleRegistro} style={styles.button} disabled={loading}>
+              <Text style={styles.buttonText}>¡Regístrate ahora!</Text>
+            </TouchableOpacity>
+          )}
         </Animated.View>
       </ScrollView>
     </ImageBackground>
@@ -242,49 +253,40 @@ const styles = StyleSheet.create({
     height: windowHeight,
   },
   logoContainer: {
-    width: '100%',
-    alignItems: 'center',
     marginBottom: 20,
   },
   logo: {
-    width: '100%',
-    height: 180,
-    resizeMode: 'contain',
+    width: 120,
+    height: 120,
+    borderRadius: 60,
   },
   title: {
-    fontSize: 30,
+    fontSize: 24,
     fontWeight: 'bold',
-    color: 'black',
+    color: '#000000',
     marginBottom: 20,
-    textAlign: 'center',
   },
   formContainer: {
     width: '80%',
-    alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    borderRadius: 10,
     padding: 20,
-    backgroundColor: '#FFFFFF', // Fondo blanco
-    borderRadius: 10, // Bordes redondeados
-    shadowColor: '#000000',
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
-    elevation: 5,
   },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    width: '100%',
     marginBottom: 15,
     borderBottomWidth: 1,
     borderBottomColor: '#000000',
-    paddingBottom: 5,
-  },
-  icon: {
-    marginRight: 10,
   },
   input: {
     flex: 1,
     fontSize: 16,
+    padding: 10,
     color: '#000000',
+  },
+  icon: {
+    marginRight: 10,
   },
   eyeIconContainer: {
     position: 'absolute',
@@ -294,17 +296,18 @@ const styles = StyleSheet.create({
     backgroundColor: '#2F9FFA',
     padding: 15,
     borderRadius: 10,
-    width: '100%',
     alignItems: 'center',
-    marginTop: 20,
   },
   buttonText: {
     color: '#FFFFFF',
+    fontSize: 18,
     fontWeight: 'bold',
-    fontSize: 16,
+  },
+  loadingIndicator: {
+    marginVertical: 20,
   },
   error: {
-    borderBottomColor: 'red', // Cambia el color del borde del campo en caso de error
+    borderBottomColor: 'red',
   },
 });
 
