@@ -1,6 +1,9 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Dimensions } from 'react-native';
+import { black } from 'react-native-paper/lib/typescript/styles/themes/v2/colors';
 import Icon from 'react-native-vector-icons/Ionicons';
+
+const { width } = Dimensions.get('window');
 
 const GatoScreen = ({ navigation }) => {
   const tarjetas = [
@@ -35,7 +38,7 @@ const GatoScreen = ({ navigation }) => {
                 source={tarjeta.rutaImagen}
                 style={styles.tarjetaImage}
               />
-              <Text>{tarjeta.nombre}</Text>
+              <Text style={styles.tarjetaText} numberOfLines={2}>{tarjeta.nombre}</Text>
             </TouchableOpacity>
           ))}
         </View>
@@ -66,13 +69,16 @@ const styles = StyleSheet.create({
   headerImage: {
     width: '100%',
     height: 150,
+    
   },
   barra: {
-    fontSize: 24,
+    fontSize: 22,
     marginTop: 10,
     marginBottom: 10,
     fontFamily: 'Roboto',
     textAlign: 'center',
+    paddingHorizontal: 20,
+    color: '#000',
   },
   tarjetasContainer: {
     flexDirection: 'row',
@@ -82,19 +88,25 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   tarjeta: {
-    width: '45%',
+    width: (width / 2) - 20,
     height: 150,
     backgroundColor: '#f0f0f0',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 10,
     borderRadius: 10,
+    padding: 5,
   },
   tarjetaImage: {
     width: '100%',
     height: '80%',
     borderRadius: 10,
     marginBottom: 5,
+  },
+  tarjetaText: {
+    fontSize: 14,
+    textAlign: 'center',
+    color: '#000',
   },
   profileBar: {
     flexDirection: 'row',

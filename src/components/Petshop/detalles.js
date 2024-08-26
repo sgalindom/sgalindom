@@ -108,19 +108,23 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 10,
+    color: '#000',
   },
   subtitulo: {
     fontSize: 18,
     fontWeight: 'bold',
     marginTop: 10,
+    color: '#000',
   },
   descripcion: {
     fontSize: 16,
     marginBottom: 20,
+    color: '#000',
   },
   precio: {
     fontSize: 16,
     marginBottom: 20,
+    color: '#000',
   },
   cantidadContainer: {
     flexDirection: 'row',
@@ -130,6 +134,7 @@ const styles = StyleSheet.create({
   cantidad: {
     fontSize: 20,
     marginHorizontal: 10,
+    color: '#000',
   },
   botonCarrito: {
     backgroundColor: '#007bff',

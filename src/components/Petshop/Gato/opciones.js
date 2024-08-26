@@ -84,6 +84,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
     marginBottom: 20,
     textAlign: 'center',
+    color: '#000',
   },
   opcionesContainer: {
     flexDirection: 'row',
@@ -118,6 +119,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
     marginBottom: 10,
     textAlign: 'center',
+    color: '#000',
   },
 });
 

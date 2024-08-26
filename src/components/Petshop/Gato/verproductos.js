@@ -138,6 +138,9 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     textAlign: 'center',
+    color: '#000',
+    fontWeight: 'bold',
+    marginBottom: 10,
   },
   productosContainer: {
     paddingHorizontal: 10,
@@ -165,18 +168,23 @@ const styles = StyleSheet.create({
   productoInfo: {
     flex: 1,
     padding: 10,
+    color: '#000',
+    
   },
   productoNombre: {
     fontSize: 18,
     fontWeight: 'bold',
+    color: '#000',
   },
   productoPrecio: {
     fontSize: 16,
     marginTop: 5,
+    color: '#000',
   },
   precioKg: {
     fontSize: 14,
     color: '#666',
+    
   },
 });
 
