@@ -186,13 +186,13 @@ const MainPanel = ({ navigation }) => {
           <Icon name="person" size={30} color="#000" />
           <Text style={styles.profileButtonText}>Perfil</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate('Pedidos')} style={styles.profileButton}>
+        <TouchableOpacity onPress={() => navigation.navigate('pago')} style={styles.profileButton}>
           <Icon name="cart" size={30} color="#000" />
           <Text style={styles.profileButtonText}>Pedidos</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate('Notifications')} style={styles.profileButton}>
-          <Icon name="notifications" size={30} color="#000" />
-          <Text style={styles.profileButtonText}>Notificaciones</Text>
+        <TouchableOpacity onPress={() => navigation.navigate('Contactanos')} style={styles.profileButton}>
+          <Icon name="logo-whatsapp" size={30} color="#000" />
+          <Text style={styles.profileButtonText}>Contactanos</Text>
         </TouchableOpacity>
       </View>
     </ImageBackground>
@@ -216,10 +216,13 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   welcomeText: {
-    fontSize: 24,
+    fontSize: 32,
     fontWeight: 'bold',
-    color: '#fff',
+    color: '#fff', // Texto blanco
     textAlign: 'center',
+    textShadowColor: 'black', // Sombra oscura
+    textShadowOffset: { width: -4, height: 1 }, // Desplazamiento de la sombra
+    textShadowRadius: 10, // Difuminado de la sombra
     marginBottom: 20,
   },
   carouselContainer: {

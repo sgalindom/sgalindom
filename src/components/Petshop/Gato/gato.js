@@ -1,6 +1,5 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Dimensions } from 'react-native';
-import { black } from 'react-native-paper/lib/typescript/styles/themes/v2/colors';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 const { width } = Dimensions.get('window');
@@ -69,7 +68,6 @@ const styles = StyleSheet.create({
   headerImage: {
     width: '100%',
     height: 150,
-    
   },
   barra: {
     fontSize: 22,
@@ -78,7 +76,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Roboto',
     textAlign: 'center',
     paddingHorizontal: 20,
-    color: '#000',
+    color: '#000', // Cambiado a negro
   },
   tarjetasContainer: {
     flexDirection: 'row',
@@ -96,6 +94,11 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     borderRadius: 10,
     padding: 5,
+    shadowColor: '#000', // Añadir sombra para que las tarjetas se vean mejor
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
+    elevation: 5, // Añadir elevación en Android
   },
   tarjetaImage: {
     width: '100%',
@@ -106,7 +109,7 @@ const styles = StyleSheet.create({
   tarjetaText: {
     fontSize: 14,
     textAlign: 'center',
-    color: '#000',
+    color: '#000', // Cambiado a negro
   },
   profileBar: {
     flexDirection: 'row',
@@ -120,6 +123,7 @@ const styles = StyleSheet.create({
   },
   profileButtonText: {
     fontSize: 12,
+    color: '#000', // Cambiado a negro
   },
 });
 
