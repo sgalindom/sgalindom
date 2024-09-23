@@ -11,11 +11,12 @@ import {
   ScrollView,
   Animated,
   Alert,
-  ActivityIndicator, // Importar el componente ActivityIndicator
+  ActivityIndicator,
 } from 'react-native';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import LinearGradient from 'react-native-linear-gradient';  // Para el gradiente
 
 const logoImage = require('../imagenes/fondoperfil.jpg');
 const backgroundImage = require('../imagenes/fondomain.jpg');
@@ -29,42 +30,31 @@ const Registro = ({ navigation }) => {
   const [direccion, setDireccion] = useState('');
   const [edad, setEdad] = useState('');
   const [hidePassword, setHidePassword] = useState(true);
-  const [errorField, setErrorField] = useState(null);
-  const [loading, setLoading] = useState(false); // Estado para manejar la carga
+  const [loading, setLoading] = useState(false);
 
   const handleRegistro = async () => {
-    setLoading(true); // Activar el estado de carga
+    setLoading(true);
 
     try {
-      // Validar que todos los campos estén llenos
       if (!email || !password || !confirmPassword || !nombreCompleto || !telefono || !direccion || !edad) {
         Alert.alert('Error', 'Por favor completa todos los campos');
-        setLoading(false); // Desactivar el estado de carga
+        setLoading(false);
         return;
       }
 
-      // Validar que la contraseña tenga al menos 6 caracteres
       if (password.length < 6) {
         Alert.alert('Error', 'La contraseña debe tener al menos 6 caracteres');
-        setLoading(false); // Desactivar el estado de carga
+        setLoading(false);
         return;
       }
 
       if (password !== confirmPassword) {
         Alert.alert('Error', 'Las contraseñas no coinciden');
-        setLoading(false); // Desactivar el estado de carga
-        return;
-      }
-
-      // Validar formato de email
-      if (!validateEmail(email)) {
-        Alert.alert('Error', 'Por favor ingresa un correo electrónico válido');
-        setLoading(false); // Desactivar el estado de carga
+        setLoading(false);
         return;
       }
 
       await auth().createUserWithEmailAndPassword(email, password);
-      console.log('Registro exitoso');
 
       const user = auth().currentUser;
 
@@ -82,28 +72,9 @@ const Registro = ({ navigation }) => {
       }
     } catch (error) {
       Alert.alert('Error', 'Ocurrió un error al registrar el usuario. Por favor intenta nuevamente.');
-      console.error('Error al registrar usuario', error);
     } finally {
-      setLoading(false); // Desactivar el estado de carga
+      setLoading(false);
     }
-  };
-
-  // Función para validar formato de email
-  const validateEmail = (email) => {
-    const emailRegex = /\S+@\S+\.\S+/;
-    return emailRegex.test(email);
-  };
-
-  // Función para validar que solo se ingresen números en el teléfono y la edad
-  const validateNumberInput = (value) => {
-    const numberRegex = /^[0-9]*$/;
-    return numberRegex.test(value);
-  };
-
-  // Función para validar que solo se ingresen letras en el nombre
-  const validateNameInput = (value) => {
-    const nameRegex = /^[A-Za-z\s]+$/;
-    return nameRegex.test(value);
   };
 
   return (
@@ -114,121 +85,94 @@ const Registro = ({ navigation }) => {
         </View>
         <Text style={styles.title}>¡Únete a nosotros!</Text>
         <Animated.View style={styles.formContainer}>
-          <View style={[styles.inputContainer, errorField === 'nombreCompleto' && styles.error]}>
-            <Icon name="user" size={20} color="#000000" style={styles.icon} />
+          <View style={styles.inputContainer}>
+            <Icon name="user" size={20} color="#555" style={styles.icon} />
             <TextInput
               placeholder="Nombre completo"
               onChangeText={setNombreCompleto}
               style={styles.input}
-              placeholderTextColor="#000000"
-              keyboardType="default"
-              maxLength={50}
-              editable
-              autoCapitalize="words"
-              returnKeyType="next"
-              blurOnSubmit={false}
+              placeholderTextColor="#888"
             />
           </View>
+
           <View style={styles.inputContainer}>
-            <Icon name="phone" size={20} color="#000000" style={styles.icon} />
+            <Icon name="phone" size={20} color="#555" style={styles.icon} />
             <TextInput
               placeholder="Teléfono"
-              onChangeText={(value) => {
-                if (validateNumberInput(value) || value === '') {
-                  setTelefono(value);
-                }
-              }}
+              onChangeText={setTelefono}
               style={styles.input}
-              placeholderTextColor="#000000"
+              placeholderTextColor="#888"
               keyboardType="phone-pad"
-              maxLength={10}
-              returnKeyType="next"
-              blurOnSubmit={false}
             />
           </View>
+
           <View style={styles.inputContainer}>
-            <Icon name="home" size={20} color="#000000" style={styles.icon} />
+            <Icon name="home" size={20} color="#555" style={styles.icon} />
             <TextInput
               placeholder="Dirección"
               onChangeText={setDireccion}
               style={styles.input}
-              placeholderTextColor="#000000"
-              keyboardType="default"
-              maxLength={100}
-              returnKeyType="next"
-              blurOnSubmit={false}
+              placeholderTextColor="#888"
             />
           </View>
+
           <View style={styles.inputContainer}>
-            <Icon name="birthday-cake" size={20} color="#000000" style={styles.icon} />
+            <Icon name="birthday-cake" size={20} color="#555" style={styles.icon} />
             <TextInput
               placeholder="Edad"
-              onChangeText={(value) => {
-                if (validateNumberInput(value) || value === '') {
-                  setEdad(value);
-                }
-              }}
+              onChangeText={setEdad}
               style={styles.input}
-              placeholderTextColor="#000000"
+              placeholderTextColor="#888"
               keyboardType="numeric"
-              maxLength={3}
-              returnKeyType="next"
-              blurOnSubmit={false}
             />
           </View>
+
           <View style={styles.inputContainer}>
-            <Icon name="envelope" size={20} color="#000000" style={styles.icon} />
+            <Icon name="envelope" size={20} color="#555" style={styles.icon} />
             <TextInput
               placeholder="Correo electrónico"
               onChangeText={setEmail}
               style={styles.input}
-              placeholderTextColor="#000000"
+              placeholderTextColor="#888"
               keyboardType="email-address"
-              maxLength={50}
-              autoCapitalize="none"
-              returnKeyType="next"
-              blurOnSubmit={false}
             />
           </View>
+
           <View style={styles.inputContainer}>
-            <Icon name="lock" size={20} color="#000000" style={styles.icon} />
+            <Icon name="lock" size={20} color="#555" style={styles.icon} />
             <TextInput
               placeholder="Contraseña"
               secureTextEntry={hidePassword}
               onChangeText={setPassword}
               style={styles.input}
-              placeholderTextColor="#000000"
-              keyboardType="default"
-              maxLength={50}
-              autoCapitalize="none"
-              returnKeyType="next"
+              placeholderTextColor="#888"
             />
             <TouchableOpacity onPress={() => setHidePassword(!hidePassword)} style={styles.eyeIconContainer}>
-              <Icon name={hidePassword ? 'eye-slash' : 'eye'} size={20} color="#000000" />
+              <Icon name={hidePassword ? 'eye-slash' : 'eye'} size={20} color="#555" />
             </TouchableOpacity>
           </View>
+
           <View style={styles.inputContainer}>
-            <Icon name="lock" size={20} color="#000000" style={styles.icon} />
+            <Icon name="lock" size={20} color="#555" style={styles.icon} />
             <TextInput
               placeholder="Confirmar contraseña"
               secureTextEntry={hidePassword}
               onChangeText={setConfirmPassword}
               style={styles.input}
-              placeholderTextColor="#000000"
-              keyboardType="default"
-              maxLength={50}
-              autoCapitalize="none"
-              returnKeyType="done"
+              placeholderTextColor="#888"
             />
             <TouchableOpacity onPress={() => setHidePassword(!hidePassword)} style={styles.eyeIconContainer}>
-              <Icon name={hidePassword ? 'eye-slash' : 'eye'} size={20} color="#000000" />
+              <Icon name={hidePassword ? 'eye-slash' : 'eye'} size={20} color="#555" />
             </TouchableOpacity>
           </View>
+
           {loading ? (
-            <ActivityIndicator size="large" color="#2F9FFA" style={styles.loadingIndicator} />
+            <ActivityIndicator size="large" color="#2F9FFA" />
           ) : (
-            <TouchableOpacity onPress={handleRegistro} style={styles.button} disabled={loading}>
-              <Text style={styles.buttonText}>¡Regístrate ahora!</Text>
+            <TouchableOpacity onPress={handleRegistro} style={styles.gradientButton}>
+              <LinearGradient colors={['#6DD5FA', '#2980B9']} style={styles.gradientButton}>
+                <Text style={styles.buttonText}>¡Regístrate ahora!</Text>
+              </LinearGradient>
             </TouchableOpacity>
           )}
         </Animated.View>
@@ -254,36 +198,45 @@ const styles = StyleSheet.create({
   },
   logoContainer: {
     marginBottom: 20,
+    width: '100%',
+    height: 150,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   logo: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
+    width: '80%',
+    height: '100%',
+    resizeMode: 'contain', // Asegura que el logo mantenga su proporción
   },
   title: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: 'bold',
     color: '#000000',
     marginBottom: 20,
   },
   formContainer: {
-    width: '80%',
-    backgroundColor: 'rgba(255, 255, 255, 0.8)',
-    borderRadius: 10,
+    width: '85%',
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    borderRadius: 20,
     padding: 20,
+    elevation: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
   },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 15,
     borderBottomWidth: 1,
-    borderBottomColor: '#000000',
+    borderBottomColor: '#ccc',
   },
   input: {
     flex: 1,
     fontSize: 16,
     padding: 10,
-    color: '#000000',
+    color: '#333',
   },
   icon: {
     marginRight: 10,
@@ -292,22 +245,20 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: 10,
   },
-  button: {
-    backgroundColor: '#2F9FFA',
+  gradientButton: {
+    marginTop: 20,
     padding: 15,
     borderRadius: 10,
     alignItems: 'center',
+    justifyContent: 'center',
   },
   buttonText: {
-    color: '#FFFFFF',
+    color: '#FFF',
     fontSize: 18,
     fontWeight: 'bold',
   },
   loadingIndicator: {
     marginVertical: 20,
-  },
-  error: {
-    borderBottomColor: 'red',
   },
 });
 

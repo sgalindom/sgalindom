@@ -28,7 +28,6 @@ const MiInformacion = () => {
 
           if (!userDocs.empty) {
             const docId = userDocs.docs[0].id;
-
             const userDoc = await firestore()
               .collection('usuarios')
               .doc(userEmail)
@@ -42,11 +41,7 @@ const MiInformacion = () => {
               if (userData.perfilImagen) {
                 setProfileImage(userData.perfilImagen);
               }
-            } else {
-              console.log('No se encontró el documento con el ID:', docId);
             }
-          } else {
-            console.log('No se encontraron documentos en la colección "datos".');
           }
         }
       } catch (error) {
@@ -65,9 +60,7 @@ const MiInformacion = () => {
         height: 300,
         mediaType: 'photo',
       });
-      if (!image) {
-        return;
-      }
+      if (!image) return;
       uploadImage(image.path);
     } catch (error) {
       console.error('Error al tomar la foto: ', error);
@@ -82,9 +75,7 @@ const MiInformacion = () => {
         height: 300,
         mediaType: 'photo',
       });
-      if (!image) {
-        return;
-      }
+      if (!image) return;
       uploadImage(image.path);
     } catch (error) {
       console.error('Error al seleccionar la imagen: ', error);
@@ -143,8 +134,6 @@ const MiInformacion = () => {
           .set({ perfilImagen: url }, { merge: true });
         setProfileImage(url);
         setModalVisible(false);
-      } else {
-        console.log('No se encontraron documentos en la colección "datos".');
       }
     } catch (error) {
       console.error('Error al subir la imagen a Firebase Storage: ', error);
@@ -152,58 +141,54 @@ const MiInformacion = () => {
   };
 
   return (
-    <ImageBackground
-      source={require('../imagenes/fondomain.jpg')}
-      style={styles.container}
-    >
-      <View style={styles.topContainer}>
-        <TouchableOpacity style={styles.profileImageContainer} onPress={() => setModalVisible(true)}>
-          {profileImage ? (
-            <Image source={{ uri: profileImage }} style={styles.profileImage} />
-          ) : (
-            <View style={styles.profileImagePlaceholder}>
-              <Text style={styles.profileImageText}>+</Text>
+    <ImageBackground source={require('../imagenes/fondomain.jpg')} style={styles.backgroundImage}>
+      <View style={styles.centeredContainer}>
+        <View style={styles.cardWrapper}>
+          <View style={styles.profileSection}>
+            <View style={styles.imageContainer}>
+              <TouchableOpacity style={styles.profileImageContainer}>
+                {profileImage ? (
+                  <Image source={{ uri: profileImage }} style={styles.profileImage} />
+                ) : (
+                  <View style={styles.profileImagePlaceholder}>
+                    <Icon name="user-circle" size={100} color="#888" />
+                  </View>
+                )}
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.cameraIconContainer} onPress={() => setModalVisible(true)}>
+                <Icon name="camera" size={20} color="white" />
+              </TouchableOpacity>
             </View>
-          )}
-        </TouchableOpacity>
-        <Text style={styles.emailText}>{userEmail}</Text>
-      </View>
-      <View style={styles.bottomContainer}>
-        <ScrollView contentContainerStyle={styles.scrollContainer}>
-          <View style={styles.userDataContainer}>
+            <Text style={styles.emailText}>{userEmail}</Text>
+          </View>
+
+          <View style={styles.cardSection}>
             {userData ? (
-              <View>
-                <Text style={styles.title}>Mi Información</Text>
-                <View style={[styles.userInfoRow, styles.userInfoContainer]}>
-                  <Icon name="user" size={20} color="black" style={styles.icon} />
-                  <Text style={styles.userInfo}><Text style={styles.bold}>Nombre Completo:</Text> {userData.nombreCompleto}</Text>
+              <>
+                <View style={styles.card}>
+                  <Icon name="user" size={24} color="#3498db" style={styles.cardIcon} />
+                  <Text style={styles.cardText}>Nombre: {userData.nombreCompleto}</Text>
                 </View>
-                <View style={[styles.userInfoRow, styles.userInfoContainer]}>
-                  <Icon name="calendar-alt" size={20} color="black" style={styles.icon} />
-                  <Text style={styles.userInfo}><Text style={styles.bold}>Edad:</Text> {userData.edad}</Text>
+                <View style={styles.card}>
+                  <Icon name="birthday-cake" size={24} color="#3498db" style={styles.cardIcon} />
+                  <Text style={styles.cardText}>Edad: {userData.edad}</Text>
                 </View>
-                <View style={[styles.userInfoRow, styles.userInfoContainer]}>
-                  <Icon name="map-marker-alt" size={20} color="black" style={styles.icon} />
-                  <Text style={styles.userInfo}><Text style={styles.bold}>Dirección:</Text> {userData.direccion}</Text>
+                <View style={styles.card}>
+                  <Icon name="home" size={24} color="#3498db" style={styles.cardIcon} />
+                  <Text style={styles.cardText}>Dirección: {userData.direccion}</Text>
                 </View>
-                <View style={[styles.userInfoRow, styles.userInfoContainer]}>
-                  <Icon name="phone" size={20} color="black" style={styles.icon} />
-                  <Text style={styles.userInfo}><Text style={styles.bold}>Teléfono:</Text> {userData.telefono}</Text>
+                <View style={styles.card}>
+                  <Icon name="phone" size={24} color="#3498db" style={styles.cardIcon} />
+                  <Text style={styles.cardText}>Teléfono: {userData.telefono}</Text>
                 </View>
-              </View>
+              </>
             ) : (
               <Text style={styles.infoText}>Cargando...</Text>
             )}
           </View>
-        </ScrollView>
-      </View>
+        </View>
 
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
-        >
+        <Modal animationType="fade" transparent={true} visible={modalVisible} onRequestClose={() => setModalVisible(false)}>
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
               <TouchableOpacity style={styles.modalItem} onPress={takePhoto}>
@@ -221,120 +206,128 @@ const MiInformacion = () => {
             </View>
           </View>
         </Modal>
-      </ImageBackground>
-    );
-  };
-  
-  const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      alignItems: 'center',
-    },
-    topContainer: {
-      flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
-      width: '100%',
-    },
-    bottomContainer: {
-      flex: 1,
-      width: '100%',
-      borderTopLeftRadius: 30,
-      borderTopRightRadius: 30,
-      overflow: 'hidden',
-      backgroundColor: '#fff', // Color de fondo blanco
-    },
-    scrollContainer: {
-      flexGrow: 1,
-      alignItems: 'center',
-      backgroundColor: 'transparent',
-      paddingBottom: 20,
-    },
-    userDataContainer: {
-      padding: 16,
-      width: '100%',
-    },
-    title: {
-      fontSize: 24,
-      fontWeight: 'bold',
-      marginBottom: 10,
-      color: 'black',
-      textAlign: 'center',
-    },
-    userInfoRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-    },
-    icon: {
-      marginRight: 10,
-    },
-    userInfo: {
-      fontSize: 18,
-      marginVertical: 5,
-      color: 'black',
-    },
-    bold: {
-      fontWeight: 'bold',
-    },
-    infoText: {
-      fontSize: 18,
-      fontWeight: 'bold',
-      margin: 10,
-    },
-    profileImageContainer: {
-      alignItems: 'center',
-    },
-    profileImage: {
-      width: 150,
-      height: 150,
-      borderRadius: 75,
-      marginVertical: 10,
-    },
-    profileImagePlaceholder: {
-      width: 150,
-      height: 150,
-      borderRadius: 75,
-      backgroundColor: 'lightgray',
-      justifyContent: 'center',
-      alignItems: 'center',
-      marginVertical: 10,
-    },
-    profileImageText: {
-      fontSize: 30,
-      fontWeight: 'bold',
-      color: 'white',
-    },
-    modalContainer: {
-      flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
-      backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    },
-    modalContent: {
-      backgroundColor: 'white',
-      borderRadius: 8,
-      padding: 16,
-      width: '80%',
-    },
-    modalItem: {
-      paddingVertical: 10,
-      borderBottomWidth: 1,
-      borderBottomColor: 'lightgray',
-    },
-    modalItemText: {
-      fontSize: 18,
-      textAlign: 'center',
-      color: 'black',
-    },
-    userInfoContainer: {
-      marginBottom: 30,
-    },
-    emailText: {
-      fontSize: 18,
-      fontWeight: 'bold',
-      color: 'black',
-    },
-  });
-  
-  export default MiInformacion;
-  
+      </View>
+    </ImageBackground>
+  );
+};
+
+const styles = StyleSheet.create({
+  backgroundImage: {
+    flex: 1,
+    resizeMode: 'cover',
+  },
+  centeredContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  cardWrapper: {
+    backgroundColor: '#fff',
+    borderRadius: 15,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.15,
+    shadowRadius: 10,
+    elevation: 8,
+    width: '90%',
+    marginBottom: 30,
+  },
+  profileSection: {
+    alignItems: 'center',
+    marginBottom: 30,
+  },
+  imageContainer: {
+    position: 'relative', // Necessary for absolute positioning of the camera icon
+  },
+  profileImageContainer: {
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: '#888',
+    borderRadius: 100,
+    padding: 5,
+  },
+  profileImage: {
+    width: 150,
+    height: 150,
+    borderRadius: 75,
+  },
+  profileImagePlaceholder: {
+    width: 150,
+    height: 150,
+    borderRadius: 75,
+    backgroundColor: '#f0f0f0',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  cameraIconContainer: {
+    position: 'absolute',
+    bottom: 10,
+    right: 10,
+    backgroundColor: '#3498db',
+    borderRadius: 15,
+    padding: 5,
+    elevation: 5,
+  },
+  emailText: {
+    fontSize: 18,
+    color: '#3498db',
+    fontWeight: 'bold',
+  },
+  cardSection: {
+    width: '100%',
+    alignItems: 'center',
+  },
+  card: {
+    width: '90%',
+    padding: 15,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    marginVertical: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f8f8f8',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 4,
+  },
+  cardIcon: {
+    marginRight: 20,
+  },
+  cardText: {
+    fontSize: 16,
+    color: '#333',
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    borderRadius: 10,
+    padding: 20,
+    width: '80%',
+  },
+  modalItem: {
+    paddingVertical: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+  },
+  modalItemText: {
+    fontSize: 18,
+    textAlign: 'center',
+    color: '#3498db',
+  },
+  infoText: {
+    fontSize: 18,
+    color: '#333',
+    marginTop: 20,
+  },
+});
+
+export default MiInformacion;

@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ImageBackground, Image, TouchableOpacity, Linking, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ImageBackground, Image, TouchableOpacity, Linking, ScrollView, Animated } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import firestore from '@react-native-firebase/firestore';
 
 const VerveterinariasScreen = ({ route, navigation }) => {
   const { veterinariaId } = route.params || {};
   const [veterinaria, setVeterinaria] = useState(null);
+  const [fadeAnim] = useState(new Animated.Value(0)); // Animación para desvanecimiento
 
   useEffect(() => {
     if (veterinariaId) {
@@ -15,6 +16,11 @@ const VerveterinariasScreen = ({ route, navigation }) => {
 
           if (snapshot.exists) {
             setVeterinaria(snapshot.data());
+            Animated.timing(fadeAnim, {
+              toValue: 1,
+              duration: 800,
+              useNativeDriver: true,
+            }).start(); // Animar desvanecimiento
           } else {
             console.log('No se encontró la veterinaria con el ID proporcionado.');
           }
@@ -31,29 +37,34 @@ const VerveterinariasScreen = ({ route, navigation }) => {
 
   if (!veterinaria) {
     return (
-      <View style={styles.container}>
-        <Text>Cargando...</Text>
+      <View style={styles.loadingContainer}>
+        <Text style={styles.loadingText}>Cargando...</Text>
       </View>
     );
   }
 
   return (
     <ImageBackground source={require('../imagenes/fondomain.jpg')} style={styles.background}>
-      <ScrollView style={styles.scrollView}>
-        <View style={styles.container}>
-          <Image source={{ uri: veterinaria.Foto }} style={styles.image} />
-          <Text style={styles.title}>{veterinaria.Nombre}</Text>
-          <View style={styles.descriptionCard}>
-            <Text style={styles.description}>{veterinaria.Descripcion}</Text>
-          </View>
-          <View style={styles.infoContainer}>
-            <View style={styles.infoRow}>
-              <Icon name="location" size={20} color="black" style={styles.icon} />
-              <Text style={styles.infoText}>{veterinaria.Barrio}</Text>
+      <ScrollView contentContainerStyle={styles.scrollView}>
+        <Animated.View style={[styles.container, { opacity: fadeAnim }]}>
+          <View style={styles.cardContainer}>
+            {/* Contenedor para centrar la imagen */}
+            <View style={styles.imageWrapper}>
+              <Image source={{ uri: veterinaria.Foto }} style={styles.image} />
             </View>
-            <View style={styles.infoRow}>
-              <Icon name="location-sharp" size={20} color="black" style={styles.icon} />
-              <Text style={styles.infoText}>{veterinaria.Direccion}</Text>
+            <Text style={styles.title}>{veterinaria.Nombre}</Text>
+            <View style={styles.descriptionCard}>
+              <Text style={styles.description}>{veterinaria.Descripcion}</Text>
+            </View>
+            <View style={styles.infoContainer}>
+              <View style={styles.infoRow}>
+                <Icon name="location" size={20} color="#2AC9FA" style={styles.icon} />
+                <Text style={styles.infoText}>{veterinaria.Barrio}</Text>
+              </View>
+              <View style={styles.infoRow}>
+                <Icon name="location-sharp" size={20} color="#2AC9FA" style={styles.icon} />
+                <Text style={styles.infoText}>{veterinaria.Direccion}</Text>
+              </View>
             </View>
             <View style={styles.card}>
               <Text style={styles.cardTitle}>Servicios</Text>
@@ -65,18 +76,16 @@ const VerveterinariasScreen = ({ route, navigation }) => {
               <Icon name="call" size={20} color="white" style={styles.icon} />
               <Text style={styles.buttonText}>Llamar</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.button} onPress={() => Linking.openURL(veterinaria.Maps)}>
-              <Icon name="map" size={20} color="white" style={styles.icon} />
-              <Text style={styles.buttonText}>Abrir Mapa</Text>
+            <TouchableOpacity style={styles.buttonOutline} onPress={() => Linking.openURL(veterinaria.Maps)}>
+              <Icon name="map" size={20} color="#2AC9FA" style={styles.icon} />
+              <Text style={styles.buttonOutlineText}>Abrir Mapa</Text>
             </TouchableOpacity>
-            {/* Agrega más botones si es necesario */}
           </View>
-        </View>
+        </Animated.View>
       </ScrollView>
     </ImageBackground>
   );
 };
-
 
 const styles = StyleSheet.create({
   background: {
@@ -84,43 +93,66 @@ const styles = StyleSheet.create({
     resizeMode: 'cover',
   },
   scrollView: {
-    flex: 1,
+    flexGrow: 1,
+    paddingHorizontal: 20,
+    paddingVertical: 40,
   },
   container: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 40,
   },
-  image: {
-    width: 200,
-    height: 200,
-    borderRadius: 100,
+  cardContainer: {
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    padding: 15,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.25,
+    shadowRadius: 10,
+    elevation: 8,
+    width: '100%',
+  },
+  imageWrapper: {
+    justifyContent: 'center', // Centra verticalmente
+    alignItems: 'center', // Centra horizontalmente
     marginBottom: 20,
   },
+  image: {
+    width: '50%',
+    height: 200,
+    borderRadius: 15,
+    shadowColor: '#2AC9FA', // Sombra color neón
+    shadowOpacity: 0.6,
+    shadowOffset: { width: 5, height: 8 },
+    shadowRadius: 16,
+  },
   title: {
-    fontSize: 24,
+    fontSize: 30,
     fontWeight: 'bold',
-    marginBottom: 10,
-    color: 'black',
+    color: '#2AC9FA', // Verde neón
+    marginBottom: 15,
     textAlign: 'center',
   },
   descriptionCard: {
-    backgroundColor: 'white',
-    padding: 20,
-    borderRadius: 10,
+    backgroundColor: '#fff',
+    padding: 15,
+    borderRadius: 15,
     marginBottom: 20,
     width: '100%',
-    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.15,
+    shadowRadius: 10,
+    elevation: 8,
   },
   description: {
-    fontSize: 18,
-    color: 'black',
+    fontSize: 16,
+    color: '#333',
     textAlign: 'justify',
   },
   infoContainer: {
-    alignItems: 'center',
+    width: '100%',
   },
   infoRow: {
     flexDirection: 'row',
@@ -132,41 +164,76 @@ const styles = StyleSheet.create({
   },
   infoText: {
     fontSize: 16,
-    color: 'black',
+    color: '#333',
   },
   card: {
-    backgroundColor: 'white',
-    padding: 20,
-    borderRadius: 10,
+    backgroundColor: '#f8f8f8',
+    padding: 15,
+    borderRadius: 15,
     marginBottom: 20,
     width: '100%',
-    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 4,
   },
   cardTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: 'black',
+    color: '#2AC9FA', // Verde neón
     marginBottom: 10,
   },
   service: {
     fontSize: 16,
-    color: 'black',
+    color: '#333',
     marginBottom: 5,
   },
   button: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#2AC9FA',
+    backgroundColor: '#2AC9FA', // Verde neón
     paddingVertical: 15,
     paddingHorizontal: 30,
     borderRadius: 30,
     marginVertical: 10,
+    width: '100%',
+    shadowColor: '#2AC9FA', // Sombras neón
+    shadowOpacity: 0.4,
+    shadowOffset: { width: 0, height: 5 },
+    shadowRadius: 10,
   },
   buttonText: {
     color: 'white',
     marginLeft: 5,
     fontWeight: 'bold',
+  },
+  buttonOutline: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: '#2AC9FA', // Borde neón
+    paddingVertical: 15,
+    paddingHorizontal: 30,
+    borderRadius: 30,
+    marginVertical: 10,
+    width: '100%',
+  },
+  buttonOutlineText: {
+    color: '#2AC9FA', // Texto neón
+    marginLeft: 5,
+    fontWeight: 'bold',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    fontSize: 20,
+    color: '#fff',
   },
 });
 

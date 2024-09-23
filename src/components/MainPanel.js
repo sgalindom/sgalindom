@@ -9,7 +9,7 @@ const MainPanel = ({ navigation }) => {
   const [accessoryProducts, setAccessoryProducts] = useState([]);
   const [allProductProducts, setProductProducts] = useState([]);
   const [veterinarias, setVeterinarias] = useState([]);
-  
+
   const [fadeAnim] = useState(new Animated.Value(0));
 
   const services = [
@@ -29,12 +29,9 @@ const MainPanel = ({ navigation }) => {
     { id: 5, text: 'Consejo 5: Cuida la higiene de tu mascota regularmente.' },
     { id: 6, text: 'Consejo 6: Identifica a tu mascota con collar y microchip.' },
     { id: 7, text: 'Consejo 7: Dedica tiempo al entrenamiento y socialización.' },
-    { id: 8, text: 'Consejo 8: Proporciona un ambiente seguro en tu hogar.' },
+    { id: 8, text: 'Proporciona un ambiente seguro en tu hogar.' },
     { id: 9, text: 'Consejo 9: Brinda juguetes interactivos para estimular a tu mascota.' },
     { id: 10, text: 'Consejo 10: Asegúrate de que tu mascota descanse adecuadamente.' },
-    { id: 11, text: 'Consejo 11: Estimula mentalmente a tu mascota con juegos y desafíos.' },
-    { id: 12, text: 'Consejo 12: Fomenta la interacción social con otras mascotas.' },
-    { id: 13, text: 'Consejo 13: Supervisa a tu mascota al aire libre para prevenir riesgos.' },
   ];
 
   useEffect(() => {
@@ -132,6 +129,12 @@ const MainPanel = ({ navigation }) => {
           </ScrollView>
         </Animated.View>
 
+        {/* Indicadores del Carrusel */}
+        <View style={styles.indicatorContainer}>
+          {services.map((_, i) => (
+            <View key={i} style={[styles.indicator, i === currentServiceIndex ? styles.activeIndicator : {}]} />
+          ))}
+        </View>
 
         {/* Consejos */}
         <View style={styles.tipContainer}>
@@ -139,7 +142,6 @@ const MainPanel = ({ navigation }) => {
             <Text style={styles.tipText}>{tips[currentServiceIndex % tips.length].text}</Text>
           </View>
         </View>
-        
 
         {/* ¿Para quién es la compra? */}
         <View style={styles.compraParaContainer}>
@@ -155,8 +157,6 @@ const MainPanel = ({ navigation }) => {
             </TouchableOpacity>
           </View>
         </View>
-
-        
 
         {/* Veterinarias */}
         <View style={styles.veterinariasContainer}>
@@ -218,11 +218,11 @@ const styles = StyleSheet.create({
   welcomeText: {
     fontSize: 32,
     fontWeight: 'bold',
-    color: '#fff', // Texto blanco
+    color: '#fff',
     textAlign: 'center',
-    textShadowColor: 'black', // Sombra oscura
-    textShadowOffset: { width: -4, height: 1 }, // Desplazamiento de la sombra
-    textShadowRadius: 10, // Difuminado de la sombra
+    textShadowColor: 'black',
+    textShadowOffset: { width: -4, height: 1 },
+    textShadowRadius: 10,
     marginBottom: 20,
   },
   carouselContainer: {
@@ -252,7 +252,21 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
   },
-
+  indicatorContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: 10,
+  },
+  indicator: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#ccc',
+    marginHorizontal: 5,
+  },
+  activeIndicator: {
+    backgroundColor: '#E4784A',
+  },
   tipContainer: {
     marginBottom: 20,
   },
@@ -269,7 +283,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#000',
   },
-  
   compraParaContainer: {
     marginBottom: 20,
   },
@@ -304,7 +317,6 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     color: '#000',
   },
-  
   veterinariasContainer: {
     marginBottom: 20,
   },

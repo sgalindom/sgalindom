@@ -45,9 +45,10 @@ const VeterinariaScreen = () => {
     obtenerVeterinarias();
   }, [selectedBarrio]);
 
+  // Aseguramos que la primera veterinaria navegue a 'vet1.js'
   const handleExplorarPress = (veterinariaId) => {
-    if (veterinariaId === '1') {
-      navigation.navigate('vet1'); // Navegar a la pantalla VET1.js
+    if (veterinariaId === veterinarias[0].id) {
+      navigation.navigate('vet1'); // Navegar a la pantalla VET1.js para la primera veterinaria
     } else {
       navigation.navigate('verveterinarias', { veterinariaId });
     }
@@ -85,7 +86,7 @@ const VeterinariaScreen = () => {
       <TouchableOpacity
         key={index}
         style={styles.servicioCard}
-        onPress={() => handleExplorarPress(veterinaria.id)}
+        onPress={() => handleExplorarPress(veterinaria.id)} // Navegación correcta para la primera veterinaria
       >
         <View style={styles.imageContainer}>
           {veterinaria.Foto && <Image source={{ uri: veterinaria.Foto }} style={styles.servicioImage} />}
@@ -117,7 +118,7 @@ const VeterinariaScreen = () => {
         >
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>Filtrar por Barrio</Text>
+              <Text style={styles.modalTitle}>Selecciona un Barrio</Text>
               <ScrollView contentContainerStyle={styles.barriosContainer}>
                 {barriosUnicos.map((barrio, index) => (
                   <Pressable
@@ -138,7 +139,7 @@ const VeterinariaScreen = () => {
         </Modal>
 
         <View style={styles.titleContainer}>
-          <Text style={styles.title}>Filtrar por barrio</Text>
+          <Text style={styles.title}>Veterinarias</Text>
           <TouchableOpacity style={styles.filterButton} onPress={openModal}>
             <Icon name="filter" size={20} color="white" />
           </TouchableOpacity>
@@ -150,7 +151,7 @@ const VeterinariaScreen = () => {
         </View>
 
         {loading ? (
-          <ActivityIndicator size="large" color="#2AC9FA" />
+          <ActivityIndicator size="large" color="#00A7E1" />
         ) : (
           renderedVeterinarias
         )}
@@ -174,29 +175,35 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 20,
+    justifyContent: 'space-between',
+    width: '90%',
   },
   title: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: 'bold',
-    color: '#000',
-    marginRight: 'auto',
+    color: '#1E1E2D',
   },
   filterButton: {
-    backgroundColor: '#2AC9FA',
+    backgroundColor: '#007AFF',
     paddingVertical: 10,
     paddingHorizontal: 15,
-    borderRadius: 4,
-    marginHorizontal: 10,
+    borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
+    shadowColor: '#007AFF',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 10,
   },
   removeFilterButton: {
-    backgroundColor: '#FF5050',
+    backgroundColor: '#FF3B30',
     paddingVertical: 10,
     paddingHorizontal: 15,
-    borderRadius: 4,
+    borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
+    marginLeft: 10,
   },
   removeFilterButtonText: {
     color: 'white',
@@ -205,21 +212,21 @@ const styles = StyleSheet.create({
   },
   servicioCard: {
     flexDirection: 'row',
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-    borderRadius: 10,
+    backgroundColor: '#ffffff',
+    borderRadius: 15,
     overflow: 'hidden',
     marginVertical: 10,
     width: '90%',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 5,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
     elevation: 5,
   },
   imageContainer: {
     width: 120,
     height: 120,
-    borderRadius: 10,
+    borderRadius: 15,
     overflow: 'hidden',
     marginRight: 10,
   },
@@ -231,40 +238,44 @@ const styles = StyleSheet.create({
   infoContainer: {
     flex: 1,
     justifyContent: 'center',
-    paddingVertical: 10,
-    paddingHorizontal: 15,
+    paddingVertical: 15,
+    paddingHorizontal: 20,
   },
   servicioTitle: {
     fontSize: 20,
     fontWeight: 'bold',
+    color: '#1E1E2D',
     marginBottom: 5,
-    color: '#333',
   },
   servicioDescription: {
     fontSize: 16,
-    color: '#555',
+    color: '#707070',
     marginBottom: 5,
   },
   abiertoText: {
-    color: 'green',
+    color: '#34C759',
     fontSize: 14,
     fontWeight: 'bold',
   },
   cerradoText: {
-    color: 'red',
+    color: '#FF3B30',
     fontSize: 14,
     fontWeight: 'bold',
   },
   explorarButtonStyle: {
-    backgroundColor: '#2AC9FA',
+    backgroundColor: '#007AFF',
     paddingVertical: 10,
-    paddingHorizontal: 15,
-    borderRadius: 8,
+    paddingHorizontal: 20,
+    borderRadius: 10,
     marginTop: 10,
-    width: '100%',
+    flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    flexDirection: 'row',
+    shadowColor: '#007AFF',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 5,
   },
   explorarButtonText: {
     color: 'white',
@@ -276,25 +287,25 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
   },
   modalContent: {
     backgroundColor: 'white',
-    borderRadius: 10,
-    padding: 20,
-    width: '90%',
+    borderRadius: 15,
+    padding: 25,
+    width: '85%',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 10,
   },
   modalTitle: {
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 16,
+    marginBottom: 20,
     textAlign: 'center',
-    color: '#333',
+    color: '#1E1E2D',
   },
   barriosContainer: {
     flexDirection: 'row',
@@ -302,10 +313,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   barrioButton: {
-    backgroundColor: '#2AC9FA',
+    backgroundColor: '#007AFF',
     paddingVertical: 12,
     paddingHorizontal: 20,
-    borderRadius: 6,
+    borderRadius: 10,
     margin: 5,
     alignItems: 'center',
     flexDirection: 'row',
@@ -317,10 +328,10 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   modalCloseButton: {
-    backgroundColor: '#FF5050',
+    backgroundColor: '#FF3B30',
     paddingVertical: 12,
     paddingHorizontal: 20,
-    borderRadius: 6,
+    borderRadius: 10,
     alignItems: 'center',
     marginTop: 20,
   },

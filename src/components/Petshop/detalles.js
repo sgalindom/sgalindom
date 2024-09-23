@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ImageBackground, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, Alert, ImageBackground } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
@@ -21,7 +21,7 @@ const Detalle = ({ route }) => {
   }, []);
 
   const handleChangeCantidad = (value) => {
-    setCantidad(value);
+    setCantidad(prevCantidad => (value < 1 ? 1 : value));
   };
 
   const agregarAlCarrito = async (producto) => {
@@ -34,21 +34,18 @@ const Detalle = ({ route }) => {
       const usuarioId = usuario.email;
       const pedidosRef = firestore().collection(`usuarios/${usuarioId}/pedidos`);
 
-      // Verificar si el producto está definido
       if (!producto || !producto.Nombre || !producto.Descripcion || !producto.Precio) {
         throw new Error('El producto es inválido');
       }
 
-      // Obtener la hora actual
       const horaActual = new Date().toLocaleTimeString();
 
-      // Agregar los detalles del producto al pedido, incluyendo la hora actual
       await pedidosRef.add({
         nombre: producto.Nombre,
         descripcion: producto.Descripcion,
         precio: producto.Precio,
         cantidad: cantidad,
-        hora: horaActual, // Agregar la hora al pedido
+        hora: horaActual,
       });
 
       Alert.alert('Éxito', 'Producto añadido al carrito exitosamente.', [
@@ -61,70 +58,95 @@ const Detalle = ({ route }) => {
   };
 
   return (
-    <View style={styles.container}>
-      <ImageBackground
-        source={{ uri: producto.Foto }}
-        style={styles.productoImagen}
-      >
-        {/* Contenido adicional del fondo de la imagen */}
-      </ImageBackground>
-      <View style={styles.infoContainer}>
-        <Text style={styles.nombre}>{producto.Nombre}</Text>
-        <Text style={styles.subtitulo}>Descripción:</Text>
-        <Text style={styles.descripcion}>{producto.Descripcion}</Text>
-        <Text style={styles.subtitulo}>Precio:</Text>
-        <Text style={styles.precio}>{producto.Precio}</Text>
-        <Text style={styles.subtitulo}>Cantidad:</Text>
-        <TouchableOpacity style={styles.cantidadContainer}>
-          <Icon name="remove-circle" size={30} onPress={() => handleChangeCantidad(cantidad - 1)} />
-          <Text style={styles.cantidad}>{cantidad}</Text>
-          <Icon name="add-circle" size={30} onPress={() => handleChangeCantidad(cantidad + 1)} />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.botonCarrito} onPress={() => agregarAlCarrito(producto)}>
-          <Text style={styles.textoBotonCarrito}>Añadir al carrito</Text>
-        </TouchableOpacity>
+    <ImageBackground source={require('../imagenes/fondomain.jpg')} style={styles.backgroundImage}>
+      <View style={styles.container}>
+        <View style={styles.card}>
+          {/* Imagen del producto */}
+          <Image
+            source={{ uri: producto.Foto }}
+            style={styles.productoImagen}
+          />
+          <View style={styles.infoContainer}>
+            <Text style={styles.nombre}>{producto.Nombre}</Text>
+            <Text style={styles.precio}>${producto.Precio}</Text>
+          </View>
+
+          <View style={styles.descripcionContainer}>
+            <Text style={styles.subtitulo}>Descripción</Text>
+            <Text style={styles.descripcion}>{producto.Descripcion}</Text>
+          </View>
+
+          {/* Control de cantidad */}
+          <View style={styles.cantidadContainer}>
+            <Icon name="remove-circle-outline" size={40} color="#ff4757" onPress={() => handleChangeCantidad(cantidad - 1)} />
+            <Text style={styles.cantidad}>{cantidad}</Text>
+            <Icon name="add-circle-outline" size={40} color="#2ed573" onPress={() => handleChangeCantidad(cantidad + 1)} />
+          </View>
+
+          {/* Botón de añadir al carrito */}
+          <TouchableOpacity style={styles.botonCarrito} onPress={() => agregarAlCarrito(producto)}>
+            <Text style={styles.textoBotonCarrito}>Añadir al carrito</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-    </View>
+    </ImageBackground>
   );
 };
 
 const styles = StyleSheet.create({
+  backgroundImage: {
+    flex: 1,
+    resizeMode: 'cover',
+    justifyContent: 'center',
+  },
   container: {
     flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+  },
+  card: {
     backgroundColor: '#fff',
+    borderRadius: 20,
+    elevation: 10,
+    width: '100%',
+    padding: 20,
+    alignItems: 'center',
   },
   productoImagen: {
-    width: '100%',
-    height: 300,
-    justifyContent: 'flex-end',
-    alignItems: 'flex-start',
-    paddingHorizontal: 20,
-    paddingBottom: 20,
+    width: '50%',
+    height: 250,
+    borderRadius: 20,
+    marginBottom: 20,
   },
   infoContainer: {
-    padding: 20,
+    alignItems: 'center',
+    marginBottom: 10,
   },
   nombre: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 10,
-    color: '#000',
+    color: '#333',
+  },
+  precio: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#ff4757',
+  },
+  descripcionContainer: {
+    width: '100%',
+    marginBottom: 20,
   },
   subtitulo: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
-    marginTop: 10,
-    color: '#000',
+    color: '#333',
+    marginBottom: 10,
   },
   descripcion: {
     fontSize: 16,
-    marginBottom: 20,
-    color: '#000',
-  },
-  precio: {
-    fontSize: 16,
-    marginBottom: 20,
-    color: '#000',
+    color: '#555',
+    textAlign: 'justify',
   },
   cantidadContainer: {
     flexDirection: 'row',
@@ -132,15 +154,18 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   cantidad: {
-    fontSize: 20,
-    marginHorizontal: 10,
-    color: '#000',
+    fontSize: 26,
+    fontWeight: 'bold',
+    color: '#2f3542',
+    marginHorizontal: 20,
   },
   botonCarrito: {
-    backgroundColor: '#007bff',
+    backgroundColor: '#1e90ff',
     paddingVertical: 15,
-    borderRadius: 10,
+    borderRadius: 50,
     alignItems: 'center',
+    width: '100%',
+    elevation: 10,
   },
   textoBotonCarrito: {
     color: '#fff',
