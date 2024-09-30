@@ -19,22 +19,17 @@ const VeterinariaScreen = () => {
     const obtenerVeterinarias = async () => {
       setLoading(true);
       try {
-        let query = firestore().collection('Veterinarias');
-
-        if (selectedBarrio) {
-          query = query.where('Barrio', '==', selectedBarrio);
-        }
-
-        const snapshot = await query.get();
+        const snapshot = await firestore().collection('Veterinarias').get();
 
         if (!snapshot.empty) {
           const datosVeterinarias = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
           setVeterinarias(datosVeterinarias);
 
+          // Obtener barrios únicos de todas las veterinarias
           const uniqueBarrios = new Set(datosVeterinarias.map(veterinaria => veterinaria.Barrio));
           setBarriosUnicos(Array.from(uniqueBarrios));
         } else {
-          console.log(`No se encontraron veterinarias${selectedBarrio ? ` en el barrio: ${selectedBarrio}` : ''}`);
+          console.log('No se encontraron veterinarias');
         }
       } catch (error) {
         console.error('Error al obtener datos:', error);
@@ -43,12 +38,11 @@ const VeterinariaScreen = () => {
     };
 
     obtenerVeterinarias();
-  }, [selectedBarrio]);
+  }, []);
 
-  // Aseguramos que la primera veterinaria navegue a 'vet1.js'
   const handleExplorarPress = (veterinariaId) => {
     if (veterinariaId === veterinarias[0].id) {
-      navigation.navigate('vet1'); // Navegar a la pantalla VET1.js para la primera veterinaria
+      navigation.navigate('vet1');
     } else {
       navigation.navigate('verveterinarias', { veterinariaId });
     }
@@ -64,11 +58,12 @@ const VeterinariaScreen = () => {
 
   const handleBarrioSelect = (barrio) => {
     setSelectedBarrio(barrio);
-    closeModal();
+    closeModal(); // Cierra el modal al seleccionar un barrio
   };
 
-  const handleRemoveFilter = () => {
+  const handleRemoveFilters = () => {
     setSelectedBarrio(null);
+    closeModal();
   };
 
   const isAbierto = (horario) => {
@@ -76,36 +71,37 @@ const VeterinariaScreen = () => {
       const now = moment();
       const horaActual = now.format('HH:mm');
       return horaActual >= horario.apertura && horaActual <= horario.cierre;
-    } else {
-      return false;
     }
+    return false;
   };
 
   const renderedVeterinarias = useMemo(() => {
-    return veterinarias.map((veterinaria, index) => (
-      <TouchableOpacity
-        key={index}
-        style={styles.servicioCard}
-        onPress={() => handleExplorarPress(veterinaria.id)} // Navegación correcta para la primera veterinaria
-      >
-        <View style={styles.imageContainer}>
-          {veterinaria.Foto && <Image source={{ uri: veterinaria.Foto }} style={styles.servicioImage} />}
-        </View>
-        <View style={styles.infoContainer}>
-          <Text style={styles.servicioTitle}>{veterinaria.Nombre}</Text>
-          <Text style={styles.servicioDescription}>{veterinaria.Barrio}</Text>
-          <Text style={styles.servicioDescription}>{veterinaria.Direccion}</Text>
-          <Text style={[styles.servicioDescription, isAbierto(veterinaria.Horario) ? styles.abiertoText : styles.cerradoText]}>
-            {isAbierto(veterinaria.Horario) ? 'Abierto' : 'Cerrado'}
-          </Text>
-          <TouchableOpacity style={styles.explorarButtonStyle} onPress={() => handleExplorarPress(veterinaria.id)}>
-            <Icon name="search" size={20} color="white" />
-            <Text style={styles.explorarButtonText}>Explorar</Text>
-          </TouchableOpacity>
-        </View>
-      </TouchableOpacity>
-    ));
-  }, [veterinarias]);
+    return veterinarias
+      .filter(veterinaria => !selectedBarrio || veterinaria.Barrio === selectedBarrio) // Filtrar por barrio
+      .map((veterinaria, index) => (
+        <TouchableOpacity
+          key={index}
+          style={styles.servicioCard}
+          onPress={() => handleExplorarPress(veterinaria.id)}
+        >
+          <View style={styles.imageContainer}>
+            {veterinaria.Foto && <Image source={{ uri: veterinaria.Foto }} style={styles.servicioImage} />}
+          </View>
+          <View style={styles.infoContainer}>
+            <Text style={styles.servicioTitle}>{veterinaria.Nombre}</Text>
+            <Text style={styles.servicioDescription}>{veterinaria.Barrio}</Text>
+            <Text style={styles.servicioDescription}>{veterinaria.Direccion}</Text>
+            <Text style={[styles.servicioDescription, isAbierto(veterinaria.Horario) ? styles.abiertoText : styles.cerradoText]}>
+              {isAbierto(veterinaria.Horario) ? 'Abierto' : 'Cerrado'}
+            </Text>
+            <TouchableOpacity style={styles.explorarButtonStyle} onPress={() => handleExplorarPress(veterinaria.id)}>
+              <Icon name="search" size={20} color="white" />
+              <Text style={styles.explorarButtonText}>Explorar</Text>
+            </TouchableOpacity>
+          </View>
+        </TouchableOpacity>
+      ));
+  }, [veterinarias, selectedBarrio]);
 
   return (
     <ImageBackground source={fondoVeterinariasImage} style={styles.backgroundImage}>
@@ -123,14 +119,17 @@ const VeterinariaScreen = () => {
                 {barriosUnicos.map((barrio, index) => (
                   <Pressable
                     key={index}
-                    style={styles.barrioButton}
-                    onPress={() => handleBarrioSelect(barrio)}
+                    style={[styles.barrioButton, selectedBarrio === barrio && styles.selectedBarrioButton]}
+                    onPress={() => handleBarrioSelect(barrio)} // Cierra el modal al seleccionar
                   >
                     <Icon name="location" size={20} color="#ffffff" style={styles.icon} />
                     <Text style={styles.barrioButtonText}>{barrio}</Text>
                   </Pressable>
                 ))}
               </ScrollView>
+              <Pressable style={styles.modalCloseButton} onPress={handleRemoveFilters}>
+                <Text style={styles.modalCloseButtonText}>Eliminar Filtros</Text>
+              </Pressable>
               <Pressable style={styles.modalCloseButton} onPress={closeModal}>
                 <Text style={styles.modalCloseButtonText}>Cerrar</Text>
               </Pressable>
@@ -143,11 +142,6 @@ const VeterinariaScreen = () => {
           <TouchableOpacity style={styles.filterButton} onPress={openModal}>
             <Icon name="filter" size={20} color="white" />
           </TouchableOpacity>
-          {selectedBarrio && (
-            <TouchableOpacity style={styles.removeFilterButton} onPress={handleRemoveFilter}>
-              <Text style={styles.removeFilterButtonText}>Eliminar Filtro</Text>
-            </TouchableOpacity>
-          )}
         </View>
 
         {loading ? (
@@ -195,20 +189,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 5,
     elevation: 10,
-  },
-  removeFilterButton: {
-    backgroundColor: '#FF3B30',
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    borderRadius: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginLeft: 10,
-  },
-  removeFilterButtonText: {
-    color: 'white',
-    fontWeight: 'bold',
-    fontSize: 16,
   },
   servicioCard: {
     flexDirection: 'row',
@@ -326,6 +306,9 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 16,
     textAlign: 'center',
+  },
+  selectedBarrioButton: {
+    backgroundColor: '#0056b3', // Color diferente para el barrio seleccionado
   },
   modalCloseButton: {
     backgroundColor: '#FF3B30',

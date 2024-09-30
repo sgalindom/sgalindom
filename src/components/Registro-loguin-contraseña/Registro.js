@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -9,71 +9,156 @@ import {
   StyleSheet,
   Dimensions,
   ScrollView,
-  Animated,
-  Alert,
   ActivityIndicator,
 } from 'react-native';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import LinearGradient from 'react-native-linear-gradient';  // Para el gradiente
+import LinearGradient from 'react-native-linear-gradient';
+import Modal from 'react-native-modal';
+import DatePicker from 'react-native-date-picker';
 
 const logoImage = require('../imagenes/fondoperfil.jpg');
 const backgroundImage = require('../imagenes/fondomain.jpg');
 
 const Registro = ({ navigation }) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [nombreCompleto, setNombreCompleto] = useState('');
-  const [telefono, setTelefono] = useState('');
-  const [direccion, setDireccion] = useState('');
-  const [edad, setEdad] = useState('');
+  // Definir estados iniciales
+  const initialFormState = {
+    email: '',
+    password: '',
+    confirmPassword: '',
+    nombreCompleto: '',
+    telefono: '',
+    direccion: '',
+    dateOfBirth: new Date(),
+  };
+
+  const [form, setForm] = useState(initialFormState);
   const [hidePassword, setHidePassword] = useState(true);
   const [loading, setLoading] = useState(false);
+  const [isModalVisible, setModalVisible] = useState(false);
+  const [modalMessage, setModalMessage] = useState('');
+  const [modalSuccess, setModalSuccess] = useState(false); // Estado para diferenciar entre éxito o error
+  const [openDatePicker, setOpenDatePicker] = useState(false); // Estado para controlar el modal del DatePicker
+
+  // Restablecer el formulario cada vez que se monta el componente
+  useEffect(() => {
+    // Reiniciar los valores del formulario cuando el componente se monta
+    setForm(initialFormState);
+  }, []);
+
+  // Función para manejar la entrada del nombre, permitiendo solo letras y espacios
+  const handleNombreInput = (value) => {
+    const formattedValue = value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, ''); // Solo permite letras y espacios
+    setForm({ ...form, nombreCompleto: formattedValue });
+  };
+
+  // Función para manejar la entrada del teléfono, permitiendo solo números y el símbolo "+"
+  const handleTelefonoInput = (value) => {
+    const formattedValue = value.replace(/[^0-9+]/g, ''); // Solo permite números y el símbolo "+"
+    setForm({ ...form, telefono: formattedValue });
+  };
+
+  // Función para manejar la validación de la contraseña, eliminando espacios
+  const handlePasswordInput = (value) => {
+    const formattedValue = value.replace(/\s/g, ''); // Elimina todos los espacios
+    setForm({ ...form, password: formattedValue });
+  };
+
+  const handleConfirmPasswordInput = (value) => {
+    setForm({ ...form, confirmPassword: value });
+  };
+
+  const handleEmailInput = (value) => {
+    setForm({ ...form, email: value });
+  };
+
+  const handleDireccionInput = (value) => {
+    setForm({ ...form, direccion: value });
+  };
+
+  const handlePasswordValidation = () => {
+    const passwordPattern = /^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{6,})/;
+    if (!passwordPattern.test(form.password)) {
+      setModalMessage('La contraseña debe tener al menos 6 caracteres, una mayúscula, un número y un carácter especial.');
+      setModalSuccess(false);
+      setModalVisible(true);
+      return false;
+    }
+    return true;
+  };
 
   const handleRegistro = async () => {
     setLoading(true);
-
+  
     try {
-      if (!email || !password || !confirmPassword || !nombreCompleto || !telefono || !direccion || !edad) {
-        Alert.alert('Error', 'Por favor completa todos los campos');
+      if (!form.email || !form.password || !form.confirmPassword || !form.nombreCompleto || !form.telefono || !form.direccion || !form.dateOfBirth) {
+        setModalMessage('Por favor completa todos los campos.');
+        setModalSuccess(false);
+        setModalVisible(true);
         setLoading(false);
         return;
       }
-
-      if (password.length < 6) {
-        Alert.alert('Error', 'La contraseña debe tener al menos 6 caracteres');
+  
+      if (!handlePasswordValidation()) {
         setLoading(false);
         return;
       }
-
-      if (password !== confirmPassword) {
-        Alert.alert('Error', 'Las contraseñas no coinciden');
+  
+      if (form.password !== form.confirmPassword) {
+        setModalMessage('Las contraseñas no coinciden.');
+        setModalSuccess(false);
+        setModalVisible(true);
         setLoading(false);
         return;
       }
-
-      await auth().createUserWithEmailAndPassword(email, password);
-
+  
+      // Cálculo de la edad a partir de la fecha de nacimiento
+      const today = new Date();
+      const birthDate = new Date(form.dateOfBirth);
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const monthDifference = today.getMonth() - birthDate.getMonth();
+  
+      if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
+        age--; // Ajuste para el caso en que el cumpleaños aún no ha pasado este año
+      }
+  
+      await auth().createUserWithEmailAndPassword(form.email, form.password);
+  
       const user = auth().currentUser;
-
+  
       if (user) {
         const userData = {
-          nombreCompleto,
-          telefono,
-          direccion,
-          edad,
+          nombreCompleto: form.nombreCompleto,
+          telefono: form.telefono,
+          direccion: form.direccion,
+          fechaNacimiento: form.dateOfBirth, // Fecha de nacimiento completa
+          edad: age, // Edad calculada
         };
-
+  
         await firestore().collection('usuarios').doc(user.email).collection('datos').add(userData);
-        Alert.alert('Éxito', 'Usuario registrado exitosamente');
-        navigation.navigate('MainPanel');
+  
+        // Mostrar modal de éxito, pero NO navegar aún al MainPanel
+        setModalMessage('Usuario registrado exitosamente');
+        setModalSuccess(true);
+        setModalVisible(true);
+        setLoading(false);
       }
     } catch (error) {
-      Alert.alert('Error', 'Ocurrió un error al registrar el usuario. Por favor intenta nuevamente.');
-    } finally {
+      setModalMessage('Ocurrió un error al registrar el usuario. Por favor intenta nuevamente.');
+      setModalSuccess(false);
+      setModalVisible(true);
       setLoading(false);
+    }
+  };
+  
+
+  const handleCloseModal = () => {
+    setModalVisible(false);
+
+    // Navegar al MainPanel solo si el registro fue exitoso
+    if (modalSuccess) {
+      navigation.navigate('MainPanel');
     }
   };
 
@@ -84,12 +169,13 @@ const Registro = ({ navigation }) => {
           <Image source={logoImage} style={styles.logo} />
         </View>
         <Text style={styles.title}>¡Únete a nosotros!</Text>
-        <Animated.View style={styles.formContainer}>
+        <View style={styles.formContainer}>
           <View style={styles.inputContainer}>
             <Icon name="user" size={20} color="#555" style={styles.icon} />
             <TextInput
               placeholder="Nombre completo"
-              onChangeText={setNombreCompleto}
+              onChangeText={handleNombreInput}
+              value={form.nombreCompleto}
               style={styles.input}
               placeholderTextColor="#888"
             />
@@ -99,7 +185,8 @@ const Registro = ({ navigation }) => {
             <Icon name="phone" size={20} color="#555" style={styles.icon} />
             <TextInput
               placeholder="Teléfono"
-              onChangeText={setTelefono}
+              onChangeText={handleTelefonoInput}
+              value={form.telefono}
               style={styles.input}
               placeholderTextColor="#888"
               keyboardType="phone-pad"
@@ -110,28 +197,44 @@ const Registro = ({ navigation }) => {
             <Icon name="home" size={20} color="#555" style={styles.icon} />
             <TextInput
               placeholder="Dirección"
-              onChangeText={setDireccion}
+              onChangeText={handleDireccionInput}
+              value={form.direccion}
               style={styles.input}
               placeholderTextColor="#888"
             />
           </View>
 
+          {/* Botón para abrir el DatePicker */}
           <View style={styles.inputContainer}>
-            <Icon name="birthday-cake" size={20} color="#555" style={styles.icon} />
-            <TextInput
-              placeholder="Edad"
-              onChangeText={setEdad}
-              style={styles.input}
-              placeholderTextColor="#888"
-              keyboardType="numeric"
-            />
+            <Icon name="calendar" size={20} color="#555" style={styles.icon} />
+            <TouchableOpacity onPress={() => setOpenDatePicker(true)}>
+              <Text style={styles.input}>{form.dateOfBirth ? form.dateOfBirth.toDateString() : 'Seleccionar fecha de nacimiento'}</Text>
+            </TouchableOpacity>
           </View>
+
+          {/* Modal del DatePicker */}
+          <DatePicker
+            modal
+            open={openDatePicker}
+            date={form.dateOfBirth}
+            mode="date"
+            minimumDate={new Date(1900, 0, 1)}
+            maximumDate={new Date()}
+            onConfirm={(date) => {
+              setOpenDatePicker(false);
+              setForm({ ...form, dateOfBirth: date });
+            }}
+            onCancel={() => {
+              setOpenDatePicker(false);
+            }}
+          />
 
           <View style={styles.inputContainer}>
             <Icon name="envelope" size={20} color="#555" style={styles.icon} />
             <TextInput
               placeholder="Correo electrónico"
-              onChangeText={setEmail}
+              onChangeText={handleEmailInput}
+              value={form.email}
               style={styles.input}
               placeholderTextColor="#888"
               keyboardType="email-address"
@@ -143,11 +246,12 @@ const Registro = ({ navigation }) => {
             <TextInput
               placeholder="Contraseña"
               secureTextEntry={hidePassword}
-              onChangeText={setPassword}
+              onChangeText={handlePasswordInput}
+              value={form.password}
               style={styles.input}
               placeholderTextColor="#888"
             />
-            <TouchableOpacity onPress={() => setHidePassword(!hidePassword)} style={styles.eyeIconContainer}>
+            <TouchableOpacity onPress={() => setHidePassword(!hidePassword)} style={styles.largerTouchArea}>
               <Icon name={hidePassword ? 'eye-slash' : 'eye'} size={20} color="#555" />
             </TouchableOpacity>
           </View>
@@ -157,11 +261,12 @@ const Registro = ({ navigation }) => {
             <TextInput
               placeholder="Confirmar contraseña"
               secureTextEntry={hidePassword}
-              onChangeText={setConfirmPassword}
+              onChangeText={handleConfirmPasswordInput}
+              value={form.confirmPassword}
               style={styles.input}
               placeholderTextColor="#888"
             />
-            <TouchableOpacity onPress={() => setHidePassword(!hidePassword)} style={styles.eyeIconContainer}>
+            <TouchableOpacity onPress={() => setHidePassword(!hidePassword)} style={styles.largerTouchArea}>
               <Icon name={hidePassword ? 'eye-slash' : 'eye'} size={20} color="#555" />
             </TouchableOpacity>
           </View>
@@ -175,7 +280,22 @@ const Registro = ({ navigation }) => {
               </LinearGradient>
             </TouchableOpacity>
           )}
-        </Animated.View>
+
+          {/* Modal personalizado para mostrar alertas bonitas */}
+          <Modal isVisible={isModalVisible}>
+            <View style={styles.modalContent}>
+              <Icon
+                name={modalSuccess ? 'check-circle' : 'times-circle'}
+                size={60}
+                color={modalSuccess ? 'green' : 'red'}
+              />
+              <Text style={styles.modalMessage}>{modalMessage}</Text>
+              <TouchableOpacity onPress={handleCloseModal} style={styles.modalButton}>
+                <Text style={styles.modalButtonText}>Cerrar</Text>
+              </TouchableOpacity>
+            </View>
+          </Modal>
+        </View>
       </ScrollView>
     </ImageBackground>
   );
@@ -204,9 +324,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   logo: {
-    width: '80%',
-    height: '100%',
-    resizeMode: 'contain', // Asegura que el logo mantenga su proporción
+    width: '120%',
+    height: '120%',
+    resizeMode: 'contain',
   },
   title: {
     fontSize: 28,
@@ -241,9 +361,10 @@ const styles = StyleSheet.create({
   icon: {
     marginRight: 10,
   },
-  eyeIconContainer: {
+  largerTouchArea: {
+    padding: 10,
     position: 'absolute',
-    right: 10,
+    right: 0,
   },
   gradientButton: {
     marginTop: 20,
@@ -257,8 +378,26 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
   },
-  loadingIndicator: {
-    marginVertical: 20,
+  modalContent: {
+    backgroundColor: 'white',
+    padding: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 10,
+  },
+  modalMessage: {
+    fontSize: 16,
+    marginVertical: 10,
+  },
+  modalButton: {
+    marginTop: 10,
+    backgroundColor: '#2980B9',
+    padding: 10,
+    borderRadius: 5,
+  },
+  modalButtonText: {
+    color: 'black',
+    fontSize: 16,
   },
 });
 

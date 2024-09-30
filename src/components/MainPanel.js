@@ -1,16 +1,19 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView, ImageBackground, Animated } from 'react-native';
+import React, { useEffect, useState, useRef } from 'react';
+import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView, ImageBackground, Animated, Dimensions } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 import Icon from 'react-native-vector-icons/Ionicons';
 
+const { width } = Dimensions.get('window'); // Obtener el ancho de la pantalla
+
 const MainPanel = ({ navigation }) => {
   const [currentServiceIndex, setCurrentServiceIndex] = useState(0);
+  const [currentTipIndex, setCurrentTipIndex] = useState(0); // Índice de consejos
   const [foodProducts, setFoodProducts] = useState([]);
   const [accessoryProducts, setAccessoryProducts] = useState([]);
   const [allProductProducts, setProductProducts] = useState([]);
   const [veterinarias, setVeterinarias] = useState([]);
-
-  const [fadeAnim] = useState(new Animated.Value(0));
+  const scrollViewRef = useRef(null); // Referencia al ScrollView de los servicios
+  const fadeAnim = useRef(new Animated.Value(0)).current; // Animación de opacidad
 
   const services = [
     { id: 1, title: 'Veterinarias y Pets Shops', image: require('./imagenes/Veterinario.jpg'), route: 'bveterinaria' },
@@ -22,25 +25,37 @@ const MainPanel = ({ navigation }) => {
   ];
 
   const tips = [
-    { id: 1, text: 'Consejo 1: Mantén a tu mascota hidratada en todo momento.' },
-    { id: 2, text: 'Consejo 2: Asegúrate de que tu mascota haga ejercicio regularmente.' },
-    { id: 3, text: 'Consejo 3: Proporciona a tu mascota una alimentación equilibrada.' },
-    { id: 4, text: 'Consejo 4: Realiza visitas veterinarias de forma periódica.' },
-    { id: 5, text: 'Consejo 5: Cuida la higiene de tu mascota regularmente.' },
-    { id: 6, text: 'Consejo 6: Identifica a tu mascota con collar y microchip.' },
-    { id: 7, text: 'Consejo 7: Dedica tiempo al entrenamiento y socialización.' },
-    { id: 8, text: 'Proporciona un ambiente seguro en tu hogar.' },
-    { id: 9, text: 'Consejo 9: Brinda juguetes interactivos para estimular a tu mascota.' },
-    { id: 10, text: 'Consejo 10: Asegúrate de que tu mascota descanse adecuadamente.' },
+    { id: 1, text: 'Mantén a tu mascota hidratada en todo momento.' },
+    { id: 2, text: 'Proporciónale una dieta balanceada.' },
+    { id: 3, text: 'Asegúrate de llevar a tu mascota al veterinario regularmente.' },
+    { id: 4, text: 'Cepilla los dientes de tu mascota para mantener su salud dental.' },
+    { id: 5, text: 'Ejercita a tu mascota diariamente para mantenerla en forma.' },
+    { id: 6, text: 'Dale juguetes para estimular su mente y evitar el aburrimiento.' },
+    { id: 7, text: 'Mantén su espacio limpio para prevenir enfermedades.' },
+    { id: 8, text: 'Usa productos antipulgas y antigarrapatas según las recomendaciones.' },
+    { id: 9, text: 'Asegúrate de tener su cartilla de vacunación al día.' },
+    { id: 10, text: 'Enseña a tu mascota comandos básicos para su seguridad.' },
   ];
 
+  // Rotación de servicios cada 3 segundos
   useEffect(() => {
     const intervalId = setInterval(() => {
-      setCurrentServiceIndex(prevIndex => (prevIndex + 1) % services.length);
+      const nextIndex = (currentServiceIndex + 1) % services.length;
+      scrollViewRef.current.scrollTo({ x: nextIndex * width * 0.8, animated: true });
+      setCurrentServiceIndex(nextIndex);
     }, 3000);
 
     return () => clearInterval(intervalId);
-  }, [services.length]);
+  }, [currentServiceIndex]);
+
+  // Rotación de consejos cada 3 segundos
+  useEffect(() => {
+    const tipIntervalId = setInterval(() => {
+      setCurrentTipIndex(prevIndex => (prevIndex + 1) % tips.length);
+    }, 3000);
+
+    return () => clearInterval(tipIntervalId);
+  }, [tips.length]);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -51,16 +66,15 @@ const MainPanel = ({ navigation }) => {
               .collection('Veterinarias')
               .doc(vetId.toString())
               .collection(category);
-    
+
             const snapshot = await vetProductsRef.get();
-    
             return snapshot.docs.map(doc => ({
               id: doc.id,
               vetId: vetId,
               ...doc.data(),
             }));
           });
-    
+
           const productsData = await Promise.all(productRefs);
           return productsData.reduce((acc, val) => acc.concat(val), []);
         };
@@ -106,40 +120,37 @@ const MainPanel = ({ navigation }) => {
         <View style={styles.logoContainer}>
           <Image source={require('./imagenes/fondoperfil.jpg')} style={styles.logoImage} />
         </View>
-        
-        {/* Bienvenidos */}
-        <Text style={styles.welcomeText}>BIENVENIDOS</Text>
 
-        {/* Carrusel de Servicios */}
-        <Animated.View style={[styles.carouselContainer, { opacity: fadeAnim }]}>
-          <ScrollView horizontal={true} pagingEnabled showsHorizontalScrollIndicator={false}>
-            {services.map((service, index) => (
-              <TouchableOpacity
-                key={service.id}
-                style={[styles.serviceCard, index === currentServiceIndex && styles.activeServiceCard]}
-                onPress={() => navigation.navigate(service.route)}
-              >
-                <ImageBackground source={service.image} style={styles.serviceImage} imageStyle={{ borderRadius: 15 }}>
-                  <View style={styles.serviceOverlay}>
-                    <Text style={styles.serviceTitle}>{service.title}</Text>
-                  </View>
+        <View style={styles.welcomeTextContainer}>
+          <Text style={styles.welcomeText}>¡Encuentra todo lo que tu mejor amigo necesita!</Text>
+        </View>
+
+
+        {/* Carrusel de Servicios con animación */}
+        <Animated.ScrollView
+          ref={scrollViewRef}
+          horizontal
+          pagingEnabled
+          showsHorizontalScrollIndicator={false}
+          snapToAlignment="center"
+          decelerationRate="fast"
+          contentContainerStyle={styles.carouselContainer}
+        >
+          {services.map((service, index) => (
+            <Animated.View key={service.id} style={[styles.serviceCard, { opacity: fadeAnim }]}>
+              <TouchableOpacity onPress={() => navigation.navigate(service.route)}>
+                <ImageBackground source={service.image} style={styles.serviceImage}>
+                  <Text style={styles.serviceTitle}>{service.title}</Text>
                 </ImageBackground>
               </TouchableOpacity>
-            ))}
-          </ScrollView>
-        </Animated.View>
-
-        {/* Indicadores del Carrusel */}
-        <View style={styles.indicatorContainer}>
-          {services.map((_, i) => (
-            <View key={i} style={[styles.indicator, i === currentServiceIndex ? styles.activeIndicator : {}]} />
+            </Animated.View>
           ))}
-        </View>
+        </Animated.ScrollView>
 
         {/* Consejos */}
         <View style={styles.tipContainer}>
           <View style={styles.tipCard}>
-            <Text style={styles.tipText}>{tips[currentServiceIndex % tips.length].text}</Text>
+            <Text style={styles.tipText}>{tips[currentTipIndex].text}</Text>
           </View>
         </View>
 
@@ -192,7 +203,7 @@ const MainPanel = ({ navigation }) => {
         </TouchableOpacity>
         <TouchableOpacity onPress={() => navigation.navigate('Contactanos')} style={styles.profileButton}>
           <Icon name="logo-whatsapp" size={30} color="#000" />
-          <Text style={styles.profileButtonText}>Contactanos</Text>
+          <Text style={styles.profileButtonText}>Contáctanos</Text>
         </TouchableOpacity>
       </View>
     </ImageBackground>
@@ -202,70 +213,63 @@ const MainPanel = ({ navigation }) => {
 const styles = StyleSheet.create({
   backgroundImage: {
     flex: 1,
+    resizeMode: 'cover',
   },
   container: {
+    flexGrow: 1,
     padding: 15,
   },
   logoContainer: {
+    width: '100%',
+    height: 140, // La altura puede variar si lo deseas
+    justifyContent: 'flex-start', // Para que esté pegado arriba
     alignItems: 'center',
-    marginBottom: 20,
+    paddingTop: 0, // Sin padding superior
+    marginTop: 0, // Sin margen superior
   },
   logoImage: {
-    width: 400,
-    height: 150,
-    borderRadius: 10,
+    width: '110%', // Ocupar todo el ancho del dispositivo
+    height: '100%', // Ocupar toda la altura disponible en el contenedor
+    resizeMode: 'cover', // Ajustar la imagen sin distorsionar
   },
   welcomeText: {
     fontSize: 32,
     fontWeight: 'bold',
-    color: '#fff',
+    color: '#fff', // Texto blanco
     textAlign: 'center',
-    textShadowColor: 'black',
-    textShadowOffset: { width: -4, height: 1 },
-    textShadowRadius: 10,
     marginBottom: 20,
+    textShadowColor: 'rgba(0, 0, 0, 0.8)', // Color de la sombra, negro con opacidad
+    textShadowOffset: { width: 2, height: 2 }, // Desplazamiento de la sombra
+    textShadowRadius: 3, // Difusión de la sombra
   },
+
   carouselContainer: {
-    marginBottom: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   serviceCard: {
-    width: 250,
+    width: width * 0.8, // 80% del ancho de la pantalla
+    height: 200, // Altura de las tarjetas
     marginHorizontal: 10,
-    borderRadius: 15,
+    borderRadius: 10,
     overflow: 'hidden',
-  },
-  activeServiceCard: {
-    borderWidth: 2,
-    borderColor: '#E4784A',
+    backgroundColor: '#fff',
+    elevation: 3,
   },
   serviceImage: {
     width: '100%',
-    height: 150,
-    justifyContent: 'flex-end',
-  },
-  serviceOverlay: {
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    padding: 10,
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   serviceTitle: {
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
     color: '#fff',
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
-  },
-  indicatorContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginTop: 10,
-  },
-  indicator: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: '#ccc',
-    marginHorizontal: 5,
-  },
-  activeIndicator: {
-    backgroundColor: '#E4784A',
+    textAlign: 'center',
+    paddingVertical: 5,
+    width: '100%',
   },
   tipContainer: {
     marginBottom: 20,
@@ -299,17 +303,17 @@ const styles = StyleSheet.create({
   },
   tarjeta: {
     alignItems: 'center',
-    width: '45%',
+    width: '40%',
     backgroundColor: '#fff',
     borderRadius: 10,
     overflow: 'hidden',
     elevation: 3,
-    marginHorizontal: 10,
+    marginHorizontal: 5,
     padding: 10,
   },
   tarjetaImage: {
     width: '100%',
-    height: 150,
+    height: 130,
   },
   tarjetaText: {
     fontSize: 16,
@@ -346,8 +350,8 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   veterinariaImage: {
-    width: 150,
-    height: 150,
+    width: 160,
+    height: 120,
     borderRadius: 10,
   },
   veterinariaName: {

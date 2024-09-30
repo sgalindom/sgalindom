@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, ImageBackground, Alert, Animated, Easing } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, Alert, Animated, Easing, Modal } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
@@ -8,8 +8,30 @@ const Pago = ({ navigation }) => {
   const [pedidos, setPedidos] = useState([]);
   const [totalPagar, setTotalPagar] = useState('0');
   const [elevationAnim] = useState(new Animated.Value(0)); // Animación de elevación
+  const [modalVisible, setModalVisible] = useState(false); // Estado para el modal
+  const [datosUsuario, setDatosUsuario] = useState(null); // Información del usuario
 
   useEffect(() => {
+    const obtenerDatosUsuario = async () => {
+      try {
+        const usuarioAutenticado = auth().currentUser;
+        if (usuarioAutenticado) {
+          const usuarioRef = firestore().collection('usuarios').doc(usuarioAutenticado.email);
+          const datosSnapshot = await usuarioRef.collection('datos').get();
+          if (!datosSnapshot.empty) {
+            const datos = datosSnapshot.docs[0].data(); // Obtener los datos del primer documento
+            setDatosUsuario({
+              nombreCompleto: datos.nombreCompleto || 'Usuario',
+              correo: usuarioAutenticado.email,
+              telefono: datos.telefono || 'Teléfono no disponible',
+            });
+          }
+        }
+      } catch (error) {
+        console.error('Error al obtener datos del usuario:', error);
+      }
+    };
+
     const obtenerPedidos = async () => {
       try {
         const usuarioAutenticado = auth().currentUser;
@@ -41,6 +63,7 @@ const Pago = ({ navigation }) => {
       }
     };
 
+    obtenerDatosUsuario();
     obtenerPedidos();
   }, []);
 
@@ -54,176 +77,354 @@ const Pago = ({ navigation }) => {
   }, [pedidos]);
 
   const handleHacerPedido = async () => {
-    // Código de confirmación de pedido (igual que antes)
+    Alert.alert('Confirmación', '¿Deseas realizar este pedido?', [
+      { text: 'Cancelar', style: 'cancel' },
+      {
+        text: 'Confirmar', onPress: async () => {
+          try {
+            // Mostrar modal
+            setModalVisible(true);
+  
+            // Obtener el usuario actual
+            const usuarioAutenticado = auth().currentUser;
+  
+            if (usuarioAutenticado && datosUsuario) {
+              // Obtener la colección global `mispedidos`
+              const misPedidosRef = firestore().collection('mispedidos');
+  
+              // Obtener el número de pedidos anteriores para generar un ID secuencial
+              const pedidosSnapshot = await misPedidosRef.get();
+              const nuevoPedidoId = pedidosSnapshot.size + 1; // Asignar ID secuencial
+  
+              // Crear un nuevo pedido en la colección global `mispedidos`
+              await misPedidosRef.doc(`pedido_${nuevoPedidoId}`).set({
+                id: nuevoPedidoId,
+                usuario: {
+                  email: datosUsuario.correo,
+                  nombre: datosUsuario.nombreCompleto,
+                  telefono: datosUsuario.telefono,
+                },
+                pedido: pedidos, // Información de los productos
+                total: totalPagar,
+                fecha: new Date().toLocaleString(),
+              });
+  
+              // Crear un nuevo pedido en la colección `usuarios/{email}/mispedidos`
+              const usuarioMisPedidosRef = firestore()
+                .collection('usuarios')
+                .doc(usuarioAutenticado.email)
+                .collection('mispedidos');
+  
+              await usuarioMisPedidosRef.doc(`pedido_${nuevoPedidoId}`).set({
+                id: nuevoPedidoId,
+                pedido: pedidos,
+                total: totalPagar,
+                fecha: new Date().toLocaleString(),
+              });
+  
+              // Limpiar el carrito en `usuarios/{email}/pedidos`
+              const pedidosRef = firestore()
+                .collection('usuarios')
+                .doc(usuarioAutenticado.email)
+                .collection('pedidos');
+              const pedidosDocs = await pedidosRef.get();
+  
+              // Eliminar cada documento en la colección de pedidos
+              pedidosDocs.forEach(async (doc) => {
+                await doc.ref.delete();
+              });
+  
+              // Vaciar el estado de pedidos después de eliminarlos
+              setPedidos([]);
+            }
+          } catch (error) {
+            console.error('Error al realizar el pedido:', error);
+            Alert.alert('Error', 'Hubo un problema al procesar el pedido. Por favor, inténtelo de nuevo más tarde.');
+            setModalVisible(false);
+          }
+        }
+      }
+    ]);
   };
+  
 
   const handleEliminarPedido = async (id) => {
-    // Código para eliminar un pedido (igual que antes)
+    Alert.alert('Confirmación', '¿Deseas eliminar este producto del carrito?', [
+      { text: 'Cancelar', style: 'cancel' },
+      {
+        text: 'Eliminar', onPress: async () => {
+          try {
+            const usuarioAutenticado = auth().currentUser;
+
+            if (usuarioAutenticado) {
+              const pedidosRef = firestore()
+                .collection('usuarios')
+                .doc(usuarioAutenticado.email)
+                .collection('pedidos')
+                .doc(id);
+
+              await pedidosRef.delete();
+
+              // Actualiza el estado para eliminar el pedido visualmente
+              setPedidos((prevPedidos) => prevPedidos.filter(pedido => pedido.id !== id));
+
+              Alert.alert('Éxito', 'Producto eliminado del carrito.');
+            }
+          } catch (error) {
+            console.error('Error al eliminar el pedido:', error);
+            Alert.alert('Error', 'No se pudo eliminar el producto. Por favor, inténtelo de nuevo.');
+          }
+        }
+      }
+    ]);
   };
 
   const renderItem = ({ item }) => (
-    <Animated.View style={[styles.itemContainer, styles.neumorphicCard, { transform: [{ scale: elevationAnim }] }]}>
+    <Animated.View style={[styles.itemContainer, { transform: [{ scale: elevationAnim }] }]}>
       <View style={styles.cardContent}>
-        <Text style={styles.texto}>Producto: {item.nombre}</Text>
-        <Text style={styles.texto}>Precio: ${item.precio}</Text>
-        <Text style={styles.texto}>Cantidad: {item.cantidad}</Text>
-        <TouchableOpacity
-          onPress={() => handleEliminarPedido(item.id)}
-          style={styles.botonEliminar}
-        >
-          <Icon name="trash-outline" size={20} color="white" />
-          <Text style={styles.textoBotonEliminar}>Eliminar</Text>
-        </TouchableOpacity>
+        <Image source={{ uri: item.foto }} style={styles.productImage} />
+        <View style={styles.productDetails}>
+          <Text style={styles.productTitle}>{item.nombre}</Text>
+          <Text style={styles.productPrice}>Precio: ${item.precio}</Text>
+          <Text style={styles.productQuantity}>Cantidad: {item.cantidad}</Text>
+          <TouchableOpacity
+            onPress={() => handleEliminarPedido(item.id)}
+            style={styles.botonEliminar}
+          >
+            <Icon name="trash-outline" size={20} color="white" />
+            <Text style={styles.textoBotonEliminar}>Eliminar</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </Animated.View>
   );
 
   return (
-    <ImageBackground source={require('../imagenes/fondomain.jpg')} style={styles.backgroundImage}>
-      <View style={styles.container}>
+    <View style={styles.container}>
+      {pedidos.length === 0 ? (
+        <View style={styles.emptyContainer}>
+          <Icon name="cart-outline" size={80} color="#D3D3D3" />
+          <Text style={styles.emptyText}>No hay pedidos</Text>
+          <TouchableOpacity
+            style={styles.goBackButton}
+            onPress={() => navigation.goBack()}
+          >
+            <Text style={styles.goBackButtonText}>Regresar</Text>
+          </TouchableOpacity>
+        </View>
+      ) : (
         <FlatList
           data={pedidos}
           renderItem={renderItem}
           keyExtractor={(item) => item.id}
           ListHeaderComponent={() => (
-            <View style={styles.encabezado}>
-              <Text style={styles.titulo}>Detalle del Pedido</Text>
+            <View style={styles.header}>
+              <Text style={styles.headerTitle}>Carrito de compras</Text>
             </View>
           )}
           ListFooterComponent={() => (
-            <View style={styles.pie}>
-              <Text style={styles.totalText}>Total a Pagar: ${totalPagar}</Text>
+            <View style={styles.footer}>
+              <View style={styles.subtotalContainer}>
+                <Text style={styles.subtotalText}>Subtotal</Text>
+                <Text style={styles.subtotalAmount}>${totalPagar}</Text>
+              </View>
               <TouchableOpacity
                 onPress={pedidos.length > 0 ? handleHacerPedido : null}
                 style={[styles.botonHacerPedido, pedidos.length === 0 && styles.botonDeshabilitado]}
                 disabled={pedidos.length === 0}
               >
-                <Icon name="checkmark-circle-outline" size={20} color="white" />
-                <Text style={styles.textoBoton}>HACER PEDIDO</Text>
+                <Text style={styles.textoBoton}>Iniciar compra</Text>
               </TouchableOpacity>
             </View>
           )}
         />
-      </View>
-    </ImageBackground>
+      )}
+
+      {/* Modal de confirmación de pedido */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Icon name="checkmark-circle-outline" size={80} color="green" />
+            <Text style={styles.modalText}>¡Pedido realizado con éxito!</Text>
+            <TouchableOpacity
+              style={styles.modalButton}
+              onPress={() => {
+                setModalVisible(false);
+                navigation.navigate('MainPanel'); // Navegar a MainPanel
+              }}
+            >
+              <Text style={styles.modalButtonText}>Aceptar</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
-  },
-  backgroundImage: {
-    flex: 1,
-    resizeMode: 'cover',
-    justifyContent: 'center',
-  },
-  encabezado: {
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  titulo: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#ffffff',
-    textShadowColor: '#000',
-    textShadowOffset: { width: 2, height: 2 },
-    textShadowRadius: 4,
-    backgroundColor: '#1E90FF',
-    padding: 10,
-    borderRadius: 12,
-  },
-  itemContainer: {
-    padding: 16,
-    marginBottom: 20,
-    backgroundColor: '#F0F0F3',
-    borderRadius: 20,
-    elevation: 5,
-    shadowColor: '#A3B1C6',
-    shadowOffset: { width: 3, height: 3 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-  },
-  cardContent: {
-    backgroundColor: '#F0F0F3',
-    borderRadius: 20,
+    backgroundColor: '#F7F7F7',
     padding: 20,
-    alignItems: 'center',
-    shadowColor: '#A3B1C6',
-    shadowOffset: { width: -2, height: -2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
   },
-  pie: {
-    marginTop: 16,
-    borderTopWidth: 1,
-    borderTopColor: '#A9A9A9',
-    paddingTop: 16,
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
     alignItems: 'center',
   },
-  totalText: {
-    fontSize: 20,
+  emptyText: {
+    fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 8,
+    color: '#D3D3D3',
+    marginVertical: 20,
+  },
+  goBackButton: {
+    backgroundColor: '#6A0DAD',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 20,
+  },
+  goBackButtonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  header: {
+    marginBottom: 20,
+    alignItems: 'center',
+  },
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
     color: '#333',
   },
-  botonHacerPedido: {
-    backgroundColor: '#1E90FF',
-    paddingVertical: 12,
-    paddingHorizontal: 25,
-    borderRadius: 20,
-    alignItems: 'center',
-    flexDirection: 'row',
-    justifyContent: 'center',
+  itemContainer: {
+    marginBottom: 20,
+    padding: 10,
+    backgroundColor: '#fff',
+    borderRadius: 10,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 5 },
-    shadowOpacity: 0.4,
-    shadowRadius: 10,
-    elevation: 8,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 3,
   },
-  botonDeshabilitado: {
-    backgroundColor: '#D3D3D3',
+  cardContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
-  textoBoton: {
-    color: 'white',
-    fontWeight: 'bold',
-    marginLeft: 5,
+  productImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 10,
+    marginRight: 15,
+  },
+  productDetails: {
+    flex: 1,
+  },
+  productTitle: {
     fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 5,
+  },
+  productPrice: {
+    fontSize: 16,
+    color: '#333',
+    marginBottom: 5,
+  },
+  productQuantity: {
+    fontSize: 16,
+    color: '#333',
+    marginBottom: 10,
   },
   botonEliminar: {
     backgroundColor: '#FF4757',
-    paddingVertical: 12,
-    paddingHorizontal: 20,
+    paddingVertical: 5,
+    paddingHorizontal: 15,
     borderRadius: 20,
-    alignItems: 'center',
     flexDirection: 'row',
-    justifyContent: 'center',
-    marginTop: 10,
-    shadowColor: '#FF6B81',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.6,
-    shadowRadius: 10,
+    alignItems: 'center',
   },
   textoBotonEliminar: {
     color: 'white',
     fontWeight: 'bold',
     marginLeft: 5,
-    fontSize: 16,
   },
-  texto: {
-    color: '#2F3542',
+  footer: {
+    padding: 20,
+    backgroundColor: '#fff',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 3,
+  },
+  subtotalContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 16,
+  },
+  subtotalText: {
+    fontSize: 18,
+    color: '#333',
+    fontWeight: 'bold',
+  },
+  subtotalAmount: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#000',
+  },
+  botonHacerPedido: {
+    backgroundColor: '#6A0DAD',
+    paddingVertical: 15,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  botonDeshabilitado: {
+    backgroundColor: '#D3D3D3',
+  },
+  textoBoton: {
+    color: '#fff',
     fontSize: 18,
     fontWeight: 'bold',
   },
-  neumorphicCard: {
-    backgroundColor: '#F0F0F3',
-    borderRadius: 20,
-    shadowColor: '#A3B1C6',
-    shadowOffset: { width: -6, height: -6 },
-    shadowOpacity: 0.4,
-    shadowRadius: 10,
-    elevation: 5,
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    padding: 30,
+    alignItems: 'center',
+  },
+  modalText: {
+    fontSize: 20,
+    marginTop: 20,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  modalButton: {
+    marginTop: 20,
+    backgroundColor: '#6A0DAD',
+    padding: 15,
+    borderRadius: 10,
+  },
+  modalButtonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
 });
 

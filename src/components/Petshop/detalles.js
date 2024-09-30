@@ -30,24 +30,25 @@ const Detalle = ({ route }) => {
         Alert.alert('Error', 'Debe iniciar sesión para agregar productos al carrito.');
         return;
       }
-
+  
       const usuarioId = usuario.email;
       const pedidosRef = firestore().collection(`usuarios/${usuarioId}/pedidos`);
-
-      if (!producto || !producto.Nombre || !producto.Descripcion || !producto.Precio) {
-        throw new Error('El producto es inválido');
+  
+      if (!producto || !producto.Nombre || !producto.Descripcion || !producto.Precio || !producto.Foto) {
+        throw new Error('El producto es inválido o no tiene una imagen asociada');
       }
-
+  
       const horaActual = new Date().toLocaleTimeString();
-
+  
       await pedidosRef.add({
         nombre: producto.Nombre,
         descripcion: producto.Descripcion,
         precio: producto.Precio,
+        foto: producto.Foto,  // Asegúrate de que este campo se está agregando
         cantidad: cantidad,
         hora: horaActual,
       });
-
+  
       Alert.alert('Éxito', 'Producto añadido al carrito exitosamente.', [
         { text: 'OK', onPress: () => navigation.navigate('gato') }
       ]);
@@ -56,6 +57,7 @@ const Detalle = ({ route }) => {
       Alert.alert('Error', 'Hubo un problema al agregar el producto al carrito. Por favor, inténtelo de nuevo más tarde.');
     }
   };
+  
 
   return (
     <ImageBackground source={require('../imagenes/fondomain.jpg')} style={styles.backgroundImage}>

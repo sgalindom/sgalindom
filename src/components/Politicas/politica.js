@@ -88,46 +88,59 @@ const Politica = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    padding: 16,
   },
   backgroundImage: {
     flex: 1,
     resizeMode: 'cover',
-    justifyContent: 'center',
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 20,
-    color: 'black',
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  paragraph: {
+    fontSize: 16,
+    marginBottom: 16,
+    textAlign: 'justify',
   },
   card: {
-    backgroundColor: 'white',
-    borderRadius: 10,
-    padding: 20,
-    marginBottom: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    borderRadius: 8,
+    padding: 16,
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5,
   },
   cardTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    marginBottom: 10,
-    color: 'black',
+    marginBottom: 8,
   },
   cardText: {
     fontSize: 16,
-    color: 'black',
+    textAlign: 'justify',
   },
   button: {
-    backgroundColor: '#0000FF',
-    padding: 15,
-    borderRadius: 10,
-    marginTop: 20,
-    alignItems: 'center',
+    backgroundColor: '#2F9FFA', // Color del botón
+    borderRadius: 8, // Esquinas redondeadas
+    paddingVertical: 10, // Espaciado vertical dentro del botón
+    paddingHorizontal: 20, // Espaciado horizontal dentro del botón
+    marginTop: 20, // Espacio arriba del botón
+    marginBottom: 40, // Espacio abajo del botón
+    alignSelf: 'center', // Centrar el botón horizontalmente
   },
   buttonText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
+    color: '#FFFFFF', // Color del texto del botón
+    fontSize: 16, // Tamaño de fuente del texto del botón
+    fontWeight: 'bold', // Negrita para el texto del botón
   },
 });
 

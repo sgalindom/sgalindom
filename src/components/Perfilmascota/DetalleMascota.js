@@ -1,13 +1,15 @@
-import React from 'react';
-import { View, Text, StyleSheet, ImageBackground, TouchableOpacity, Alert } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, ImageBackground, TouchableOpacity, Alert, Modal } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
+import moment from 'moment';
 
 const DetalleMascota = ({ route, navigation }) => {
   const { mascota } = route.params;
 
-  // Verificar si la descripción está presente y no es null ni undefined
+  const [isModalVisible, setModalVisible] = useState(false); // Estado para el modal
+
   const descripcionMascota = mascota.descripcion ? mascota.descripcion : 'Sin descripción';
 
   const eliminarMascota = async () => {
@@ -28,6 +30,18 @@ const DetalleMascota = ({ route, navigation }) => {
     }
   };
 
+  const fechaNacimiento = moment(mascota.fechaNacimiento.seconds * 1000).format('DD/MM/YYYY');
+  const edad = mascota.edad || 0; // Asegúrate de manejar el caso donde la edad no esté definida
+
+  const handleEliminarPress = () => {
+    setModalVisible(true); // Mostrar modal cuando se presiona el botón de eliminar
+  };
+
+  const handleConfirmDelete = () => {
+    setModalVisible(false);
+    eliminarMascota(); // Ejecutar la eliminación cuando se confirme
+  };
+
   return (
     <ImageBackground
       source={require('../imagenes/fondomain.jpg')}
@@ -42,7 +56,11 @@ const DetalleMascota = ({ route, navigation }) => {
           </View>
           <View style={styles.detailItem}>
             <Icon name="calendar" size={20} color="black" style={styles.icon} />
-            <Text style={styles.detailText}>Edad: {mascota.edad}</Text>
+            <Text style={styles.detailText}>Fecha de Nacimiento: {fechaNacimiento}</Text>
+          </View>
+          <View style={styles.detailItem}>
+            <Icon name="calendar" size={20} color="black" style={styles.icon} />
+            <Text style={styles.detailText}>Edad: {edad} años</Text>
           </View>
           <View style={styles.detailItem}>
             <Icon name="balance-scale" size={20} color="black" style={styles.icon} />
@@ -52,11 +70,34 @@ const DetalleMascota = ({ route, navigation }) => {
             <Icon name="comment" size={20} color="black" style={styles.icon} />
             <Text style={styles.detailText}>Descripción: {descripcionMascota}</Text>
           </View>
+
           {/* Botón de eliminar mascota */}
-          <TouchableOpacity style={styles.eliminarButton} onPress={eliminarMascota}>
+          <TouchableOpacity style={styles.eliminarButton} onPress={handleEliminarPress}>
             <Text style={styles.eliminarButtonText}>Eliminar Mascota</Text>
           </TouchableOpacity>
-          {/* Otros detalles que quieras mostrar */}
+
+          {/* Modal de confirmación */}
+          <Modal
+            transparent={true}
+            visible={isModalVisible}
+            animationType="fade"
+            onRequestClose={() => setModalVisible(false)}
+          >
+            <View style={styles.modalContainer}>
+              <View style={styles.modalContent}>
+                <Icon name="exclamation-circle" size={60} color="#FF6347" />
+                <Text style={styles.modalText}>¿Estás seguro de que deseas eliminar esta mascota?</Text>
+                <View style={styles.modalButtons}>
+                  <TouchableOpacity style={styles.confirmButton} onPress={handleConfirmDelete}>
+                    <Text style={styles.confirmButtonText}>Sí, eliminar</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.cancelButton} onPress={() => setModalVisible(false)}>
+                    <Text style={styles.cancelButtonText}>Cancelar</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          </Modal>
         </View>
       </View>
     </ImageBackground>
@@ -86,6 +127,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: 'black', // Texto en color negro
     marginBottom: 20,
+    textAlign: 'center',
   },
   detailItem: {
     flexDirection: 'row',
@@ -111,6 +153,54 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     color: 'white',
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    padding: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+    width: '80%',
+  },
+  modalText: {
+    fontSize: 18,
+    textAlign: 'center',
+    marginVertical: 20,
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+  },
+  confirmButton: {
+    backgroundColor: '#FF6347',
+    padding: 10,
+    borderRadius: 5,
+    flex: 1,
+    marginRight: 10,
+    alignItems: 'center',
+  },
+  confirmButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  cancelButton: {
+    backgroundColor: '#888',
+    padding: 10,
+    borderRadius: 5,
+    flex: 1,
+    alignItems: 'center',
+  },
+  cancelButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
 

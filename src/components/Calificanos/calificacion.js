@@ -1,28 +1,17 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, ImageBackground, TextInput, TouchableOpacity } from 'react-native';
-import { RadioButton } from 'react-native-paper';
+import { useNavigation } from '@react-navigation/native';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { useNavigation } from '@react-navigation/native';
 
 const CalificacionPanel = () => {
   const navigation = useNavigation();
   const user = auth().currentUser;
 
-  const [respuestas, setRespuestas] = useState([3, 3, 3, 3, 3]);
+  const [respuesta, setRespuesta] = useState(3); // Solo una respuesta
   const [recomendacion, setRecomendacion] = useState('');
   const [calificacionEnviada, setCalificacionEnviada] = useState(false);
-
-  const handleRadioButtonChange = (index, value) => {
-    const nuevasRespuestas = [...respuestas];
-    nuevasRespuestas[index] = value;
-    setRespuestas(nuevasRespuestas);
-  };
-
-  const handleRecomendacionChange = (text) => {
-    setRecomendacion(text);
-  };
 
   const enviarCalificacion = async () => {
     try {
@@ -30,9 +19,8 @@ const CalificacionPanel = () => {
         await firestore().collection('Calificaciones').add({
           timestamp: firestore.FieldValue.serverTimestamp(),
           usuarioCorreo: user.email,
-          // Guardar solo la respuesta seleccionada
-          respuestas: respuestas.map((respuesta, index) => (index === respuestas[index] ? respuesta : null)),
-          recomendacion: recomendacion,
+          respuesta,
+          recomendacion,
         });
         setCalificacionEnviada(true);
       } else {
@@ -50,148 +38,164 @@ const CalificacionPanel = () => {
 
   return (
     <ImageBackground source={require('../imagenes/fondomain.jpg')} style={styles.backgroundImage}>
-      <ScrollView contentContainerStyle={styles.container}>
-        <View style={styles.contentContainer}>
-          <Text style={styles.title}>Califica tu experiencia</Text>
-          {!calificacionEnviada ? (
-            <>
-              <View style={styles.preguntaContainer}>
-                <Text style={styles.preguntaText}>¿Cómo calificarías la app?</Text>
-                <View style={styles.radioButtons}>
-                  {[1, 2, 3, 4, 5].map((value) => (
-                    <TouchableOpacity
-                      key={value}
-                      style={[styles.radioButton, { backgroundColor: respuestas[0] === value ? '#007BFF' : 'transparent' }]}
-                      onPress={() => handleRadioButtonChange(0, value)}
-                    >
-                      <Text style={styles.radioButtonText}>{value}</Text>
-                    </TouchableOpacity>
-                  ))}
+      <View style={styles.container}>
+        <ScrollView contentContainerStyle={styles.scrollContainer}>
+          <View style={styles.contentContainer}>
+            <Text style={styles.title}>Califica tu experiencia</Text>
+            {!calificacionEnviada ? (
+              <>
+                <View style={styles.card}>
+                  <Text style={styles.preguntaText}>¿Cómo calificarías la app?</Text>
+                  <View style={styles.radioButtons}>
+                    {[1, 2, 3, 4, 5].map(value => (
+                      <TouchableOpacity
+                        key={value}
+                        style={[styles.radioButton, { backgroundColor: respuesta === value ? '#007BFF' : 'transparent' }]}
+                        onPress={() => setRespuesta(value)}
+                      >
+                        <Text style={styles.radioButtonText}>{value}</Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
                 </View>
+                <View style={styles.card}>
+                  <TextInput
+                    style={styles.recomendacionInput}
+                    placeholder="Escribe aquí tu recomendación..."
+                    placeholderTextColor="gray" // Color del texto del placeholder
+                    multiline
+                    onChangeText={setRecomendacion}
+                    value={recomendacion}
+                  />
+                </View>
+                <TouchableOpacity style={styles.enviarButton} onPress={enviarCalificacion}>
+                  <Text style={styles.enviarButtonText}>Enviar Calificación</Text>
+                </TouchableOpacity>
+              </>
+            ) : (
+              <View style={styles.agradecimientoContainer}>
+                <Icon name="check-circle" size={50} color="#4BB543" />
+                <Text style={styles.agradecimientoText}>¡Gracias por tu calificación!</Text>
+                <TouchableOpacity style={styles.volverButton} onPress={volverAMiPerfil}>
+                  <Text style={styles.volverButtonText}>Volver a Mi Perfil</Text>
+                </TouchableOpacity>
               </View>
-              {/* Repite esto para las demás preguntas */}
-              {/* Agrega un campo de texto para la recomendación */}
-              <TextInput
-                style={styles.recomendacionInput}
-                placeholder="Escribe aquí tu recomendación..."
-                multiline
-                onChangeText={handleRecomendacionChange}
-                value={recomendacion}
-              />
-              {/* Botón de enviar */}
-              <TouchableOpacity style={styles.enviarButton} onPress={enviarCalificacion}>
-                <Text style={styles.enviarButtonText}>Enviar Calificación</Text>
-              </TouchableOpacity>
-            </>
-          ) : (
-            // Mensaje de agradecimiento si la calificación ya fue enviada
-            <View style={styles.agradecimientoContainer}>
-              <Icon name="check-circle" size={50} color="#4BB543" />
-              <Text style={styles.agradecimientoText}>¡Gracias por tu calificación!</Text>
-              {/* Botón para volver al perfil */}
-              <TouchableOpacity style={styles.volverButton} onPress={volverAMiPerfil}>
-                <Text style={styles.volverButtonText}>Volver a Mi Perfil</Text>
-              </TouchableOpacity>
-            </View>
-          )}
-        </View>
-      </ScrollView>
+            )}
+          </View>
+        </ScrollView>
+      </View>
     </ImageBackground>
   );
 };
 
 const styles = StyleSheet.create({
+  backgroundImage: {
+    flex: 1, // Hacer que la imagen de fondo ocupe todo el espacio
+    justifyContent: 'center',
+  },
   container: {
-    flexGrow: 1,
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
+  scrollContainer: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
   contentContainer: {
-    backgroundColor: 'rgba(255, 255, 255, 0.8)', // Fondo blanco semitransparente
+    backgroundColor: 'rgba(255, 255, 255, 0.9)', // Fondo blanco semitransparente
     borderRadius: 20,
     padding: 20,
     width: '90%',
+    elevation: 5, // Sombra para dar profundidad
+    alignItems: 'center', // Centrar el contenido
   },
   title: {
     fontSize: 28,
     fontWeight: 'bold',
     marginBottom: 20,
-    color: 'black', // Título en negro
+    color: '#333', // Título en un gris oscuro
     textAlign: 'center',
   },
-  preguntaContainer: {
+  card: {
     marginBottom: 20,
+    padding: 15,
+    backgroundColor: '#f9f9f9', // Fondo claro para las tarjetas
+    borderRadius: 10,
+    width: '100%', // Asegura que la tarjeta ocupe el ancho total
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 1.41,
+    elevation: 2, // Sombra para Android
   },
   preguntaText: {
     fontSize: 18,
     marginBottom: 10,
-    color: 'black', // Texto en negro
+    color: '#333', // Color del texto de la pregunta
+    textAlign: 'center',
   },
   radioButtons: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
   },
   radioButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    borderWidth: 1,
+    borderRadius: 50,
+    borderWidth: 2,
     borderColor: '#007BFF',
-    justifyContent: 'center',
-    alignItems: 'center',
+    padding: 10,
+    marginHorizontal: 5,
   },
   radioButtonText: {
-    fontSize: 18,
-    color: 'black',
+    color: '#333', // Color del texto de los botones de radio
   },
   recomendacionInput: {
     height: 100,
-    backgroundColor: 'white',
+    borderColor: 'gray',
+    borderWidth: 1,
     borderRadius: 10,
     padding: 10,
-    marginBottom: 20,
-    borderWidth: 1,
-    borderColor: 'gray', // Cambia el color del borde según tus preferencias
+    color: 'black', // Color del texto ingresado
+    textAlignVertical: 'top', // Alinear el texto en la parte superior
   },
-
   enviarButton: {
-    backgroundColor: '#007BFF', // Color azul
-    alignItems: 'center',
+    backgroundColor: '#007BFF',
+    borderRadius: 10,
     padding: 15,
-    borderRadius: 8,
-    marginTop: 10,
+    width: '100%',
+    alignItems: 'center',
+    marginTop: 20,
   },
   enviarButtonText: {
-    fontSize: 18,
+    color: 'white',
+    fontSize: 16,
     fontWeight: 'bold',
-    color: 'white', // Texto en blanco
   },
   agradecimientoContainer: {
-    alignItems: 'center',
-  },
-  agradecimientoText: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    color: 'black', // Texto en negro
-  },
-  volverButton: {
-    backgroundColor: '#007BFF', // Color azul
-    alignItems: 'center',
-    padding: 15,
-    borderRadius: 8,
-    marginTop: 10,
-  },
-  volverButtonText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: 'white', // Texto en blanco
-  },
-  // Estilo para la imagen de fondo
-  backgroundImage: {
-    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    marginTop: 20,
+  },
+  agradecimientoText: {
+    fontSize: 18,
+    marginTop: 10,
+    color: '#333',
+    textAlign: 'center',
+  },
+  volverButton: {
+    marginTop: 20,
+    backgroundColor: '#f0f0f0',
+    borderRadius: 10,
+    padding: 10,
+  },
+  volverButtonText: {
+    color: '#007BFF',
+    fontSize: 16,
   },
 });
 

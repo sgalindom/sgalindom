@@ -171,7 +171,11 @@ const MiInformacion = () => {
                 </View>
                 <View style={styles.card}>
                   <Icon name="birthday-cake" size={24} color="#3498db" style={styles.cardIcon} />
-                  <Text style={styles.cardText}>Edad: {userData.edad}</Text>
+                  <Text style={styles.cardText}>Fecha de Nacimiento: {new Date(userData.fechaNacimiento.seconds * 1000).toLocaleDateString()}</Text>
+                </View>
+                <View style={styles.card}>
+                  <Icon name="birthday-cake" size={24} color="#3498db" style={styles.cardIcon} />
+                  <Text style={styles.cardText}>Edad: {userData.edad} años</Text>
                 </View>
                 <View style={styles.card}>
                   <Icon name="home" size={24} color="#3498db" style={styles.cardIcon} />
@@ -188,21 +192,35 @@ const MiInformacion = () => {
           </View>
         </View>
 
+        {/* Modal con iconos */}
         <Modal animationType="fade" transparent={true} visible={modalVisible} onRequestClose={() => setModalVisible(false)}>
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
+              
+              {/* Tomar Foto */}
               <TouchableOpacity style={styles.modalItem} onPress={takePhoto}>
+                <Icon name="camera" size={24} color="#3498db" style={styles.modalIcon} />
                 <Text style={styles.modalItemText}>Tomar Foto</Text>
               </TouchableOpacity>
+
+              {/* Seleccionar de la Galería */}
               <TouchableOpacity style={styles.modalItem} onPress={pickImage}>
+                <Icon name="image" size={24} color="#3498db" style={styles.modalIcon} />
                 <Text style={styles.modalItemText}>Seleccionar de la Galería</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.modalItem} onPress={removePhoto}>
-                <Text style={styles.modalItemText}>Quitar Foto</Text>
+
+              {/* Quitar Foto */}
+              <TouchableOpacity style={[styles.modalItem, styles.modalRemove]} onPress={removePhoto}>
+                <Icon name="trash-alt" size={24} color="#e74c3c" style={styles.modalIcon} />
+                <Text style={[styles.modalItemText, { color: '#e74c3c' }]}>Quitar Foto</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.modalItem} onPress={() => setModalVisible(false)}>
+
+              {/* Cancelar */}
+              <TouchableOpacity style={[styles.modalItem, styles.modalCancel]} onPress={() => setModalVisible(false)}>
+                <Icon name="times-circle" size={24} color="#3498db" style={styles.modalIcon} />
                 <Text style={styles.modalItemText}>Cancelar</Text>
               </TouchableOpacity>
+
             </View>
           </View>
         </Modal>
@@ -310,23 +328,36 @@ const styles = StyleSheet.create({
   modalContent: {
     backgroundColor: 'white',
     borderRadius: 10,
-    padding: 20,
+    paddingVertical: 20,
+    paddingHorizontal: 30,
     width: '80%',
+    alignItems: 'center',
   },
   modalItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingVertical: 15,
     borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
+    borderBottomColor: '#eee',
+    width: '100%',
   },
   modalItemText: {
     fontSize: 18,
-    textAlign: 'center',
+    marginLeft: 10,
     color: '#3498db',
   },
-  infoText: {
-    fontSize: 18,
-    color: '#333',
+  modalIcon: {
+    marginRight: 10,
+  },
+  modalRemove: {
+    borderBottomWidth: 0, // Último ítem sin borde
+  },
+  modalCancel: {
     marginTop: 20,
+    borderTopWidth: 1,
+    borderTopColor: '#eee',
+    paddingTop: 15,
+    paddingBottom: 0,
   },
 });
 

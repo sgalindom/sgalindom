@@ -5,31 +5,31 @@ import Icon from 'react-native-vector-icons/FontAwesome5';
 
 const MiPerfil = ({ navigation }) => {
   const goToMiInformacion = () => {
-    navigation.navigate('MiInformacion');
+    navigation.navigate('MiInformacion'); // PascalCase
   };
 
   const goToMisMascotas = () => {
-    navigation.navigate('MisMascotas');
+    navigation.navigate('MisMascotas'); // PascalCase
   };
 
   const goToMisPedidos = () => {
-    navigation.navigate('mispedidos');
+    navigation.navigate('MisPedidos'); // PascalCase
   };
 
-  const goToPolíticas = () => {
-    navigation.navigate('politica');
+  const goToPoliticas = () => {
+    navigation.navigate('politica'); // PascalCase
   };
 
   const goToNotificaciones = () => {
-    navigation.navigate('notificaciones');
+    navigation.navigate('notificaciones'); // PascalCase
   };
 
   const goToCupones = () => {
-    navigation.navigate('vercupones');
+    navigation.navigate('vercupones'); // PascalCase
   };
 
   const goToCalificar = () => {
-    navigation.navigate('calificacion');
+    navigation.navigate('calificacion'); // PascalCase
   };
 
   const handleCerrarSesion = async () => {
@@ -40,7 +40,7 @@ const MiPerfil = ({ navigation }) => {
         await auth().signOut();
         navigation.navigate('Login');
       } else {
-        console.warn('No hay un usuario actualmente autenticado.');
+        Alert.alert('Atención', 'No hay un usuario actualmente autenticado.');
       }
     } catch (error) {
       console.error('Error al cerrar sesión', error);
@@ -48,8 +48,8 @@ const MiPerfil = ({ navigation }) => {
     }
   };
 
-  const renderOption = (iconName, text, onPress) => (
-    <TouchableOpacity style={styles.option} onPress={onPress} key={text}>
+  const renderOption = (iconName, text, onPress, uniqueKey) => (
+    <TouchableOpacity style={styles.option} onPress={onPress} key={uniqueKey}>
       <Icon name={iconName} size={24} color="#000000" style={styles.icon} />
       <Text style={styles.optionText}>{text}</Text>
     </TouchableOpacity>
@@ -65,13 +65,13 @@ const MiPerfil = ({ navigation }) => {
         <ScrollView contentContainerStyle={styles.contentContainer}>
           <View style={styles.innerContainer}>
             <Text style={styles.title}>Mi Perfil</Text>
-            {renderOption('user', 'Mi Información', goToMiInformacion)}
-            {renderOption('paw', 'Mis Mascotas', goToMisMascotas)}
-            {renderOption('shopping-cart', 'Mis Pedidos', goToMisPedidos)}
-            {renderOption('ticket-alt', 'Cupones', goToCupones)}
-            {renderOption('bell', 'Notificaciones', goToNotificaciones)}
-            {renderOption('file-alt', 'Políticas', goToPolíticas)}
-            {renderOption('star', 'Calificanos', goToCalificar)}
+            {renderOption('user', 'Mi Información', goToMiInformacion, 'miInformacion')}
+            {renderOption('paw', 'Mis Mascotas', goToMisMascotas, 'misMascotas')}
+            {renderOption('shopping-cart', 'Mis Pedidos', goToMisPedidos, 'misPedidos')}
+            {renderOption('ticket-alt', 'Cupones', goToCupones, 'verCupones')}
+            {renderOption('bell', 'Notificaciones', goToNotificaciones, 'notificaciones')}
+            {renderOption('file-alt', 'Políticas', goToPoliticas, 'politicas')}
+            {renderOption('star', 'Calificanos', goToCalificar, 'calificacion')}
             <TouchableOpacity style={styles.logoutButton} onPress={handleCerrarSesion}>
               <Text style={styles.logoutButtonText}>Cerrar Sesión</Text>
             </TouchableOpacity>

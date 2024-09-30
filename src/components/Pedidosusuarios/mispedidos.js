@@ -20,33 +20,22 @@ const MisPedidos = () => {
             .collection('mispedidos')
             .get();
 
-          const pedidosData = [];
-
-          // Iterar sobre los pedidos
-          pedidosSnapshot.forEach((pedidoDoc) => {
-            const productosRef = pedidoDoc.ref.collection('productos');
-
-            // Obtener productos de cada pedido
-            productosRef.get().then((productosSnapshot) => {
-              productosSnapshot.forEach((productoDoc) => {
-                // Construir objeto de pedido
-                const pedido = {
-                  id: productoDoc.id,
-                  cantidad: productoDoc.data().cantidad,
-                  nombre: productoDoc.data().nombre,
-                  precio: productoDoc.data().precio,
-                };
-
-                pedidosData.push(pedido);
-              });
-
-              setPedidos(pedidosData);
-              setLoading(false); // Actualizamos el estado de carga cuando se obtienen los pedidos
-            });
+          const pedidosData = pedidosSnapshot.docs.map((pedidoDoc) => {
+            const data = pedidoDoc.data();
+            return {
+              id: pedidoDoc.id,
+              pedido: data.pedido, // Este es el arreglo de productos
+              total: data.total,
+              fecha: data.fecha,
+            };
           });
+
+          setPedidos(pedidosData);
+          setLoading(false); // Actualizamos el estado de carga cuando se obtienen los pedidos
         }
       } catch (error) {
         console.error('Error al obtener mis pedidos:', error);
+        setLoading(false); // Asegurarse de que loading se setea a false incluso si hay un error
       }
     };
 
@@ -57,10 +46,15 @@ const MisPedidos = () => {
     <View style={styles.itemContainer}>
       <Icon name="shopping-cart" size={24} color="#2F9FFA" style={styles.icono} />
       <View style={styles.textoContainer}>
-        <Text style={styles.nombreProducto}>{item.nombre}</Text>
-        <Text style={styles.precio}>Precio: ${item.precio}</Text>
-        <Text style={styles.cantidad}>Cantidad: {item.cantidad}</Text>
-        {/* Otros detalles del pedido... */}
+        <Text style={styles.fecha}>Fecha: {item.fecha}</Text>
+        {item.pedido.map((producto, index) => (
+          <View key={index} style={styles.productoContainer}>
+            <Text style={styles.nombreProducto}>{producto.nombre}</Text>
+            <Text style={styles.precio}>Precio: ${producto.precio}</Text>
+            <Text style={styles.cantidad}>Cantidad: {producto.cantidad}</Text>
+          </View>
+        ))}
+        <Text style={styles.total}>Total: ${item.total}</Text>
       </View>
     </View>
   );
@@ -124,6 +118,9 @@ const styles = StyleSheet.create({
   textoContainer: {
     flex: 1,
   },
+  productoContainer: {
+    marginBottom: 8,
+  },
   nombreProducto: {
     fontSize: 18,
     fontWeight: 'bold',
@@ -136,6 +133,15 @@ const styles = StyleSheet.create({
   cantidad: {
     fontSize: 16,
     color: '#555',
+  },
+  total: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#2F9FFA',
+  },
+  fecha: {
+    fontSize: 14,
+    color: '#777',
   },
   emptyMessage: {
     fontSize: 20,
