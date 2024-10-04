@@ -35,10 +35,15 @@ const MiPerfil = ({ navigation }) => {
   const handleCerrarSesion = async () => {
     try {
       const currentUser = auth().currentUser;
-
+  
       if (currentUser) {
         await auth().signOut();
-        navigation.navigate('Login');
+        
+        // Restablecer el stack de navegación y navegar explícitamente al Login
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'Login' }], // Asegura que se limpie el stack y se redirige al Login
+        });
       } else {
         Alert.alert('Atención', 'No hay un usuario actualmente autenticado.');
       }
@@ -47,6 +52,7 @@ const MiPerfil = ({ navigation }) => {
       Alert.alert('Error', 'No se pudo cerrar sesión. Inténtalo de nuevo.');
     }
   };
+  
 
   const renderOption = (iconName, text, onPress, uniqueKey) => (
     <TouchableOpacity style={styles.option} onPress={onPress} key={uniqueKey}>

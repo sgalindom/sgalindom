@@ -36,7 +36,7 @@ const Paneladmin = () => {
             { screen: 'proximamente', icon: 'qrcode', label: 'Cupones QR' },
             { screen: 'productostiendaañadir', icon: 'plus-square', label: 'Añadir Productos' },
             { screen: 'misproductos', icon: 'list-alt', label: 'Mis Productos' },
-            { screen: 'solicitudpaseos', icon: 'paw', label: 'Paseos' }
+            { screen: 'Paseosadmin', icon: 'paw', label: 'Paseos' }
           ].map(({ screen, icon, label }) => (
             <TouchableOpacity key={screen} style={styles.card} onPress={() => navigateTo(screen)}>
               <Icon name={icon} size={30} color="#ffffff" />

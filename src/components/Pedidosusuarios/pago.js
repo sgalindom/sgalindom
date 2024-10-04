@@ -89,16 +89,11 @@ const Pago = ({ navigation }) => {
             const usuarioAutenticado = auth().currentUser;
   
             if (usuarioAutenticado && datosUsuario) {
-              // Obtener la colección global `mispedidos`
+              // Crear un nuevo pedido en la colección global `mispedidos`
               const misPedidosRef = firestore().collection('mispedidos');
   
-              // Obtener el número de pedidos anteriores para generar un ID secuencial
-              const pedidosSnapshot = await misPedidosRef.get();
-              const nuevoPedidoId = pedidosSnapshot.size + 1; // Asignar ID secuencial
-  
-              // Crear un nuevo pedido en la colección global `mispedidos`
-              await misPedidosRef.doc(`pedido_${nuevoPedidoId}`).set({
-                id: nuevoPedidoId,
+              // Crear un documento con un ID único generado automáticamente
+              const nuevoPedidoRef = await misPedidosRef.add({
                 usuario: {
                   email: datosUsuario.correo,
                   nombre: datosUsuario.nombreCompleto,
@@ -109,14 +104,16 @@ const Pago = ({ navigation }) => {
                 fecha: new Date().toLocaleString(),
               });
   
+              // Obtener el ID del nuevo documento generado
+              const nuevoPedidoId = nuevoPedidoRef.id;
+  
               // Crear un nuevo pedido en la colección `usuarios/{email}/mispedidos`
               const usuarioMisPedidosRef = firestore()
                 .collection('usuarios')
                 .doc(usuarioAutenticado.email)
                 .collection('mispedidos');
   
-              await usuarioMisPedidosRef.doc(`pedido_${nuevoPedidoId}`).set({
-                id: nuevoPedidoId,
+              await usuarioMisPedidosRef.doc(nuevoPedidoId).set({
                 pedido: pedidos,
                 total: totalPagar,
                 fecha: new Date().toLocaleString(),
@@ -146,6 +143,7 @@ const Pago = ({ navigation }) => {
       }
     ]);
   };
+  
   
 
   const handleEliminarPedido = async (id) => {

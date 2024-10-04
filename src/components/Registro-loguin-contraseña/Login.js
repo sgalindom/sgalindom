@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Image, ImageBackground, StyleSheet, Dimensions, ActivityIndicator, Animated } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Image, ImageBackground, StyleSheet, Dimensions, ActivityIndicator, Animated, Modal } from 'react-native';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -15,34 +15,51 @@ function Login({ navigation }) {
   const [buttonScale] = useState(new Animated.Value(1));
   const [hidePassword, setHidePassword] = useState(true);
   const [fadeAnim] = useState(new Animated.Value(0));
+  const [modalVisible, setModalVisible] = useState(false); // Estado para controlar el modal
+  const [modalMessage, setModalMessage] = useState(''); // Mensaje a mostrar en el modal
 
   useEffect(() => {
     const unsubscribe = auth().onAuthStateChanged(async (user) => {
       if (user) {
         try {
+          setIsLoading(true);  // Mostrar el indicador de carga mientras se verifica
           const isAdmin = await checkAdminStatus(user.email);
+          
           if (isAdmin) {
             console.log('Inicio de sesión exitoso - Administrador');
-            navigation.navigate('paneladmin');
+            navigation.reset({
+              index: 0,
+              routes: [{ name: 'paneladmin' }],  // Asegúrate de que el stack se limpie y navegue directamente a admin
+            });
           } else {
             console.log('Inicio de sesión exitoso - Usuario normal');
-            navigation.navigate('MainPanel');
+            navigation.reset({
+              index: 0,
+              routes: [{ name: 'MainPanel' }],  // Limpia el stack y navega al MainPanel
+            });
           }
         } catch (error) {
           console.error('Error al verificar el estado del usuario', error);
-          setError('Inicio de sesión fallido. Inténtalo de nuevo.');
+          showErrorModal('Inicio de sesión fallido. Inténtalo de nuevo.');
+        } finally {
+          setIsLoading(false);  // Ocultar el indicador de carga
         }
+      } else {
+        console.log('Usuario no autenticado, redirigiendo al Login');
+        navigation.navigate('Login');  // Redirigir al Login si no hay usuario autenticado
       }
-      setIsLoading(false);
+      
       Animated.timing(fadeAnim, {
         toValue: 1,
         duration: 500,
         useNativeDriver: true,
       }).start();
     });
-
+  
     return unsubscribe;
   }, [navigation, fadeAnim]);
+  
+  
 
   const checkAdminStatus = async (userEmail) => {
     try {
@@ -60,29 +77,28 @@ function Login({ navigation }) {
 
   const handleLogin = async () => {
     if (!email || !password) {
-      setError('Por favor, completa todos los campos.');
+      showErrorModal('Por favor, completa todos los campos.');
       return;
     }
 
     if (!isValidEmail(email)) {
-      setError('Por favor, ingresa un correo electrónico válido.');
+      showErrorModal('Por favor, ingresa un correo electrónico válido.');
       return;
     }
 
     try {
       setIsLoading(true);
       await auth().signInWithEmailAndPassword(email, password);
-      // Después de iniciar sesión, el usuario será redirigido según su rol en useEffect
     } catch (error) {
       console.error('Error al iniciar sesión', error);
       if (error.code === 'auth/invalid-email') {
-        setError('El correo electrónico es inválido.');
+        showErrorModal('El correo electrónico es inválido.');
       } else if (error.code === 'auth/wrong-password') {
-        setError('La contraseña es incorrecta.');
+        showErrorModal('La contraseña es incorrecta.');
       } else if (error.code === 'auth/user-not-found') {
-        setError('No se encontró una cuenta con ese correo electrónico.');
+        showErrorModal('No se encontró una cuenta con ese correo electrónico.');
       } else {
-        setError('Inicio de sesión fallido. Verifica tus credenciales.');
+        showErrorModal('Inicio de sesión fallido. Verifica tus credenciales.');
       }
     } finally {
       setIsLoading(false);
@@ -92,6 +108,11 @@ function Login({ navigation }) {
   const isValidEmail = (email) => {
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailPattern.test(email);
+  };
+
+  const showErrorModal = (message) => {
+    setModalMessage(message);
+    setModalVisible(true);
   };
 
   const handleRecuperarContraseña = () => {
@@ -136,7 +157,7 @@ function Login({ navigation }) {
               onChangeText={(text) => setEmail(text)}
               value={email}
               style={styles.input}
-              placeholderTextColor="#333"
+              keyboardType="email-address"
             />
           </View>
           <View style={styles.inputContainer}>
@@ -147,35 +168,40 @@ function Login({ navigation }) {
               onChangeText={(text) => setPassword(text)}
               value={password}
               style={styles.input}
-              placeholderTextColor="#333"
             />
-            <TouchableOpacity
-              onPress={() => setHidePassword(!hidePassword)}
-              style={styles.eyeIconContainer}
-            >
-              <Icon name={hidePassword ? 'eye' : 'eye-slash'} size={20} color="gray" />
-            </TouchableOpacity>
           </View>
 
-          {error && <Text style={styles.errorText}>{error}</Text>}
-          <Animated.View style={{ transform: [{ scale: buttonScale }] }}>
-            <TouchableOpacity
-              onPress={() => { handleLogin(); animateButton(); }}
-              style={styles.button}
-            >
-              <Text style={styles.buttonText}>Iniciar sesión</Text>
-            </TouchableOpacity>
-          </Animated.View>
-          <TouchableOpacity onPress={handleRecuperarContraseña} style={styles.enlaceRecuperarContraseña}>
-            <Text style={styles.enlaceRecuperarContraseñaTexto}>¿Olvidaste tu contraseña?</Text>
+          {/* Modal para errores */}
+          <Modal
+            animationType="slide"
+            transparent={true}
+            visible={modalVisible}
+            onRequestClose={() => setModalVisible(false)}
+          >
+            <View style={styles.modalContainer}>
+              <View style={styles.modalContent}>
+                <Icon name="exclamation-circle" size={50} color="red" />
+                <Text style={styles.modalText}>{modalMessage}</Text>
+                <TouchableOpacity
+                  style={styles.modalButton}
+                  onPress={() => setModalVisible(false)}
+                >
+                  <Text style={styles.modalButtonText}>Aceptar</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </Modal>
+
+          <TouchableOpacity onPress={handleLogin}>
+            <Animated.View style={[styles.button, { transform: [{ scale: buttonScale }] }]}>
+              <Text style={styles.buttonText}>Iniciar Sesión</Text>
+            </Animated.View>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => navigation.navigate('Registro')} style={styles.registerButton}>
-            <Text style={styles.registerButtonText}>¿No tienes una cuenta? Regístrate</Text>
+
+          <TouchableOpacity onPress={handleRecuperarContraseña}>
+            <Text style={styles.recuperarText}>¿Olvidaste tu contraseña?</Text>
           </TouchableOpacity>
         </Animated.View>
-      </View>
-      <View style={styles.bottomRightTextContainer}>
-        <Text style={styles.bottomRightText}>Versión 0.0.1</Text>
       </View>
     </ImageBackground>
   );
@@ -305,6 +331,34 @@ const styles = StyleSheet.create({
   bottomRightText: {
     color: '#FFFFFF',
     fontSize: 14,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    width: 300,
+    padding: 20,
+    backgroundColor: 'white',
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  modalText: {
+    fontSize: 18,
+    textAlign: 'center',
+    marginVertical: 20,
+  },
+  modalButton: {
+    backgroundColor: '#2F9FFA',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+  },
+  modalButtonText: {
+    color: 'white',
+    fontSize: 16,
   },
 });
 

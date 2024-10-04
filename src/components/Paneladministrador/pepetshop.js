@@ -1,151 +1,128 @@
+// Dentro de PedidosPetShopPanel
+
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
-import auth from '@react-native-firebase/auth';
+import { View, Text, FlatList, Image, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
+import Modal from 'react-native-modal';
 
 const PedidosPetShopPanel = () => {
   const [pedidos, setPedidos] = useState([]);
-  const [usuarioEmail, setUsuarioEmail] = useState('');
+  const [selectedPedido, setSelectedPedido] = useState(null);
+  const [isModalVisible, setIsModalVisible] = useState(false);
 
-  const obtenerUsuarioAutenticado = async () => {
-    const usuarioAutenticado = auth().currentUser;
-    if (usuarioAutenticado) {
-      setUsuarioEmail(usuarioAutenticado.email);
-    }
-  };
-
-  const obtenerPedidos = async () => {
-    try {
-      if (usuarioEmail) {
-        const pedidosSnapshot = await firestore()
-          .collection('Administradores')
-          .doc(usuarioEmail)
-          .collection('pedidospetshop')
-          .get();
-
-        const pedidosData = pedidosSnapshot.docs.map((doc) => ({
+  useEffect(() => {
+    // Función asincrónica para obtener pedidos de Firestore
+    const fetchPedidos = async () => {
+      try {
+        const pedidosSnapshot = await firestore().collection('mispedidos').get();
+        const pedidosList = pedidosSnapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data(),
         }));
-
-        setPedidos(pedidosData);
+        setPedidos(pedidosList);
+      } catch (error) {
+        console.error('Error fetching pedidos:', error);
+        Alert.alert('Error', 'Ocurrió un error al obtener los pedidos. Por favor, inténtalo de nuevo más tarde.');
       }
-    } catch (error) {
-      console.error('Error al obtener pedidos:', error);
-    }
-  };
+    };
 
-  useEffect(() => {
-    obtenerUsuarioAutenticado();
-  }, []);
+    // Llamar a la función fetchPedidos al montar el componente
+    fetchPedidos();
+  }, []); // El array vacío asegura que se ejecute solo una vez al montar
 
-  useEffect(() => {
-    obtenerPedidos();
-  }, [usuarioEmail]);
-
-  const confirmarDespacho = (pedidoId, pedidoInfo) => {
-    Alert.alert(
-      'Confirmar despacho',
-      '¿Estás seguro de que el pedido ha sido despachado?',
-      [
-        {
-          text: 'Cancelar',
-          style: 'cancel',
-        },
-        {
-          text: 'Confirmar',
-          onPress: () => despacharPedido(pedidoId, pedidoInfo),
-        },
-      ]
-    );
-  };
-
-  const despacharPedido = async (pedidoId, pedidoInfo) => {
+  // Función para despachar un pedido seleccionado
+  const despacharPedido = async () => {
     try {
-      const pedidoRef = firestore()
-        .collection('Administradores')
-        .doc(usuarioEmail)
-        .collection('pedidospetshop')
-        .doc(pedidoId);
+      if (!selectedPedido) {
+        Alert.alert('Error', 'No hay pedido seleccionado para despachar.');
+        return;
+      }
 
-      const pedidoDoc = await pedidoRef.get();
-      const pedidoData = pedidoDoc.data();
+      const pedidoId = selectedPedido.id;
 
+      // Obtener referencia del documento a despachar
+      const pedidoRef = firestore().collection('mispedidos').doc(pedidoId);
+
+      // Obtener los datos del pedido antes de eliminarlo
+      const pedidoData = (await pedidoRef.get()).data();
+
+      // Eliminar el pedido de la colección 'mispedidos'
       await pedidoRef.delete();
 
-      await firestore()
-        .collection('Administradores')
-        .doc(usuarioEmail)
-        .collection('Despachados')
-        .doc(pedidoId)
-        .set(pedidoData);
+      // Agregar el pedido despachado a la colección 'pedidosdespachados'
+      await firestore().collection('pedidosdespachados').add({
+        ...pedidoData,
+        despachado: true, // Asegurarse de que está marcado como despachado
+        fechaDespacho: new Date().toISOString(), // Agregar la fecha de despacho (opcional)
+      });
 
-      Alert.alert('Despacho confirmado', 'El pedido ha sido despachado correctamente.');
+      // Actualizar la lista de pedidos localmente eliminando el pedido despachado
+      const updatedPedidos = pedidos.filter(pedido => pedido.id !== pedidoId);
+      setPedidos(updatedPedidos);
 
-      // Usamos la función obtenerPedidos después de despachar para actualizar la lista
-      obtenerPedidos();
+      // Cerrar el modal y limpiar el pedido seleccionado
+      setIsModalVisible(false);
+      setSelectedPedido(null);
+
+      Alert.alert('Pedido Despachado', 'El pedido ha sido despachado exitosamente.');
     } catch (error) {
-      console.error('Error al despachar pedido:', error);
-      Alert.alert('Error', 'Hubo un error al despachar el pedido. Por favor, inténtelo nuevamente.');
+      console.error('Error despachando pedido:', error);
+      Alert.alert('Error', 'Ocurrió un error al despachar el pedido. Por favor, inténtalo de nuevo.');
     }
   };
 
-  const renderUsuarioInfo = (nombre, telefono) => (
-    <View style={styles.usuarioInfoContainer}>
-      <Text style={styles.usuarioInfoText}>Nombre: {nombre}</Text>
-      <Text style={styles.usuarioInfoText}>Teléfono: {telefono}</Text>
-    </View>
-  );
-
-  const renderProducto = (producto) => (
-    <View style={styles.productoCard}>
-      <Text style={styles.productoText}>Nombre: {producto.nombre}</Text>
-      <Text style={styles.productoText}>Descripción: {producto.descripcion}</Text>
-      <Text style={styles.productoText}>Cantidad: {producto.cantidad}</Text>
-      <Text style={styles.productoText}>Precio Unitario: ${producto.precioUnitario}</Text>
-    </View>
-  );
-
+  // Función para renderizar cada ítem de la lista de pedidos
   const renderItem = ({ item }) => (
     <View style={styles.card}>
-      <Text style={styles.cardTitle}>Pedido ID: {item.id}</Text>
-      <Text style={styles.cardText}>Usuario: {item.usuario}</Text>
-      <Text style={styles.cardText}>Nombre Completo: {item.nombreCompleto}</Text>
-      <Text style={styles.cardText}>Teléfono: {item.telefono}</Text>
-      <Text style={styles.cardText}>Total: ${item.total}</Text>
-  
-      <Text style={styles.subTitle}>Productos:</Text>
-      {item.productos.map((producto, index) => (
-        <View key={index} style={styles.productoCard}>
-          <Text style={styles.productoText}>Nombre: {producto.nombre}</Text>
-          <Text style={styles.productoText}>Cantidad: {producto.cantidad}</Text>
-          <Text style={styles.productoText}>Precio Unitario: ${parseFloat(producto.precio).toFixed(2)}</Text>
-        </View>
-      ))}
-  
-      <TouchableOpacity
-        style={styles.despachadoButton}
-        onPress={() => confirmarDespacho(item.id, item)}
-      >
-        <Text style={styles.despachadoButtonText}>Despachado</Text>
+      <TouchableOpacity onPress={() => {
+        setSelectedPedido(item);
+        setIsModalVisible(true);
+      }}>
+        {item.pedido.map((producto, index) => (
+          <View key={index}>
+            <Image source={{ uri: producto.foto }} style={styles.image} />
+            <View style={styles.info}>
+              <Text style={styles.title}>{producto.nombre}</Text>
+              <Text>Cantidad: {producto.cantidad}</Text>
+              <Text>Precio unitario: ${producto.precio}</Text>
+              <Text>Total: ${producto.total}</Text>
+              <Text>Descripción: {producto.descripcion}</Text>
+              <Text>Fecha: {item.fecha}</Text>
+              <Text>Hora: {producto.hora}</Text>
+              <Text>Usuario: {item.usuario.nombre}</Text>
+            </View>
+          </View>
+        ))}
       </TouchableOpacity>
     </View>
   );
-  
-  
 
   return (
     <View style={styles.container}>
-      <Text style={styles.titulo}>Lista de Pedidos</Text>
-      {pedidos.length === 0 ? (
-        <Text style={styles.noPedidosText}>No hay pedidos para despachar</Text>
-      ) : (
-        <FlatList
-          data={pedidos}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.id}
-        />
-      )}
+      <Text style={styles.header}>Pedidos de PetShop</Text>
+      <FlatList
+        data={pedidos}
+        renderItem={renderItem}
+        keyExtractor={item => item.id}
+      />
+
+      {/* Modal para confirmar el despacho del pedido */}
+      <Modal isVisible={isModalVisible} onBackdropPress={() => setIsModalVisible(false)}>
+        <View style={styles.modalContainer}>
+          <Text style={styles.modalTitle}>Confirmar Despacho</Text>
+          <Text style={styles.modalText}>
+            ¿Estás seguro que deseas despachar el pedido de {selectedPedido?.pedido[0].nombre}?
+          </Text>
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity style={[styles.button, { backgroundColor: '#4CAF50' }]} onPress={despacharPedido}>
+              <Text style={styles.buttonText}>Despachar Pedido</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={[styles.button, { backgroundColor: '#f44336' }]} onPress={() => setIsModalVisible(false)}>
+              <Text style={styles.buttonText}>Cancelar</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -153,79 +130,71 @@ const PedidosPetShopPanel = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
+    padding: 20,
+    backgroundColor: '#f5f5f5',
   },
-  titulo: {
-    fontSize: 20,
+  header: {
+    fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 16,
-    color: '#000', // Color negro
+    marginBottom: 20,
+    textAlign: 'center',
   },
   card: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 8,
-    padding: 16,
-    marginVertical: 8,
-    width: '100%',
+    flexDirection: 'row',
+    marginBottom: 20,
+    padding: 10,
+    backgroundColor: '#fff',
+    borderRadius: 10,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
+    shadowOpacity: 0.8,
     shadowRadius: 2,
-    elevation: 2,
+    elevation: 5,
   },
-  cardTitle: {
+  image: {
+    width: 80,
+    height: 80,
+    borderRadius: 10,
+  },
+  info: {
+    marginLeft: 15,
+    justifyContent: 'center',
+  },
+  title: {
     fontSize: 18,
     fontWeight: 'bold',
-    marginBottom: 8,
-    color: '#000', // Color negro
   },
-  cardText: {
-    fontSize: 16,
-    marginBottom: 4,
-    color: '#000', // Color negro
+  modalContainer: {
+    backgroundColor: '#fff',
+    padding: 20,
+    borderRadius: 10,
   },
-  subTitle: {
-    fontSize: 16,
+  modalTitle: {
+    fontSize: 20,
     fontWeight: 'bold',
-    marginVertical: 8,
-    color: '#000', // Color negro
-  },
-  productoCard: {
-    backgroundColor: '#F0F0F0',
-    borderRadius: 8,
-    padding: 12,
-    marginVertical: 8,
-  },
-  productoText: {
-    fontSize: 14,
-    marginBottom: 4,
-    color: '#000', // Color negro
-  },
-  despachadoButton: {
-    backgroundColor: '#599B85',
-    padding: 12,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginTop: 8,
-  },
-  despachadoButtonText: {
-    color: 'white',
-    fontWeight: 'bold',
-  },
-  noPedidosText: {
-    fontSize: 18,
-    fontWeight: 'bold',
+    marginBottom: 10,
     textAlign: 'center',
-    marginTop: 20,
-    color: '#000', // Color negro
   },
-  usuarioInfoContainer: {
-    marginTop: 8,
-  },
-  usuarioInfoText: {
+  modalText: {
     fontSize: 16,
-    marginBottom: 4,
-    color: '#000', // Color negro
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginTop: 20,
+  },
+  button: {
+    padding: 10,
+    borderRadius: 5,
+    minWidth: 120,
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
 

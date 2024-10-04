@@ -47,14 +47,14 @@ const Paseosadmin = () => {
   const renderPaseoItem = ({ item }) => (
     <View style={styles.card}>
       <View style={styles.cardDetails}>
-        <Text style={styles.cardText}>Fecha: {item.fechas.join(', ')}</Text>
+        <Text style={styles.cardText}>Fecha: {Array.isArray(item.fechas) ? item.fechas.join(', ') : 'No disponible'}</Text>
         <Text style={styles.cardText}>Hora: {item.hora}</Text>
-        <Text style={styles.cardText}>Mascotas: {item.mascotas.join(', ')}</Text>
-        <Text style={styles.cardText}>Observaciones: {item.observaciones}</Text>
-        <Text style={styles.cardText}>Paquete: {item.paquete}</Text>
-        <Text style={styles.cardText}>Nombre: {item.nombre}</Text>
-        <Text style={styles.cardText}>Teléfono: {item.telefono}</Text>
-        <Text style={styles.cardText}>Dirección: {item.direccion}</Text>
+        <Text style={styles.cardText}>Mascotas: {item.mascotas ? item.mascotas.join(', ') : 'No disponible'}</Text>
+        <Text style={styles.cardText}>Observaciones: {item.observaciones || 'No disponible'}</Text>
+        <Text style={styles.cardText}>Paquete: {item.paquete || 'No disponible'}</Text>
+        <Text style={styles.cardText}>Nombre: {item.nombre || 'No disponible'}</Text>
+        <Text style={styles.cardText}>Teléfono: {item.telefono || 'No disponible'}</Text>
+        <Text style={styles.cardText}>Dirección: {item.direccion || 'No disponible'}</Text>
       </View>
       <View style={styles.cardActions}>
         {item.realizado ? (
@@ -71,6 +71,7 @@ const Paseosadmin = () => {
       </View>
     </View>
   );
+  
 
   return (
     <ImageBackground source={backgroundImage} style={styles.backgroundImage}>

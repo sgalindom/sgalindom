@@ -138,7 +138,7 @@ function App() {
         <Stack.Screen name="Premium" component={Premium} />
         <Stack.Screen name="paneladmin" component={PanelAdmin} />
         <Stack.Screen name="pepetshop" component={PedidosPetShopPanel} />
-        <Stack.Screen name="MisProductosPanel" component={MisProductosPanel} />
+        <Stack.Screen name="misproductos" component={MisProductosPanel} />
         <Stack.Screen name="accesorios" component={Accesorios} />
         <Stack.Screen name="comida" component={Comida} />
         <Stack.Screen name="productos" component={Productos} />
