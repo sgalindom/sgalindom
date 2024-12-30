@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, ImageBackground, TextInput, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, ImageBackground } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
@@ -9,7 +9,7 @@ const CalificacionPanel = () => {
   const navigation = useNavigation();
   const user = auth().currentUser;
 
-  const [respuesta, setRespuesta] = useState(3); // Solo una respuesta
+  const [respuesta, setRespuesta] = useState(3);
   const [recomendacion, setRecomendacion] = useState('');
   const [calificacionEnviada, setCalificacionEnviada] = useState(false);
 
@@ -40,17 +40,17 @@ const CalificacionPanel = () => {
     <ImageBackground source={require('../imagenes/fondomain.jpg')} style={styles.backgroundImage}>
       <View style={styles.container}>
         <ScrollView contentContainerStyle={styles.scrollContainer}>
-          <View style={styles.contentContainer}>
+          <View style={styles.card}>
             <Text style={styles.title}>Califica tu experiencia</Text>
             {!calificacionEnviada ? (
               <>
-                <View style={styles.card}>
+                <View style={styles.questionContainer}>
                   <Text style={styles.preguntaText}>¿Cómo calificarías la app?</Text>
                   <View style={styles.radioButtons}>
                     {[1, 2, 3, 4, 5].map(value => (
                       <TouchableOpacity
                         key={value}
-                        style={[styles.radioButton, { backgroundColor: respuesta === value ? '#007BFF' : 'transparent' }]}
+                        style={[styles.radioButton, { backgroundColor: respuesta === value ? '#007BFF' : '#5A9FD1' }]}
                         onPress={() => setRespuesta(value)}
                       >
                         <Text style={styles.radioButtonText}>{value}</Text>
@@ -58,23 +58,21 @@ const CalificacionPanel = () => {
                     ))}
                   </View>
                 </View>
-                <View style={styles.card}>
-                  <TextInput
-                    style={styles.recomendacionInput}
-                    placeholder="Escribe aquí tu recomendación..."
-                    placeholderTextColor="gray" // Color del texto del placeholder
-                    multiline
-                    onChangeText={setRecomendacion}
-                    value={recomendacion}
-                  />
-                </View>
+                <TextInput
+                  style={styles.recomendacionInput}
+                  placeholder="Escribe aquí tu recomendación..."
+                  placeholderTextColor="black"
+                  multiline
+                  onChangeText={setRecomendacion}
+                  value={recomendacion}
+                />
                 <TouchableOpacity style={styles.enviarButton} onPress={enviarCalificacion}>
                   <Text style={styles.enviarButtonText}>Enviar Calificación</Text>
                 </TouchableOpacity>
               </>
             ) : (
               <View style={styles.agradecimientoContainer}>
-                <Icon name="check-circle" size={50} color="#4BB543" />
+                <Icon name="check-circle" size={50} color="#007BFF" />
                 <Text style={styles.agradecimientoText}>¡Gracias por tu calificación!</Text>
                 <TouchableOpacity style={styles.volverButton} onPress={volverAMiPerfil}>
                   <Text style={styles.volverButtonText}>Volver a Mi Perfil</Text>
@@ -90,54 +88,46 @@ const CalificacionPanel = () => {
 
 const styles = StyleSheet.create({
   backgroundImage: {
-    flex: 1, // Hacer que la imagen de fondo ocupe todo el espacio
+    flex: 1,
     justifyContent: 'center',
   },
   container: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    padding: 20,
   },
   scrollContainer: {
     flexGrow: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
   },
-  contentContainer: {
-    backgroundColor: 'rgba(255, 255, 255, 0.9)', // Fondo blanco semitransparente
+  card: {
+    backgroundColor: 'rgba(255, 255, 255, 0.8)', // Fondo blanco semitransparente
     borderRadius: 20,
-    padding: 20,
-    width: '90%',
-    elevation: 5, // Sombra para dar profundidad
-    alignItems: 'center', // Centrar el contenido
+    padding: 30,
+    width: '100%',
+    maxWidth: 400,
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
   },
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    marginBottom: 20,
-    color: '#333', // Título en un gris oscuro
     textAlign: 'center',
-  },
-  card: {
     marginBottom: 20,
-    padding: 15,
-    backgroundColor: '#f9f9f9', // Fondo claro para las tarjetas
-    borderRadius: 10,
-    width: '100%', // Asegura que la tarjeta ocupe el ancho total
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.2,
-    shadowRadius: 1.41,
-    elevation: 2, // Sombra para Android
+    color: '#333',
+  },
+  questionContainer: {
+    marginBottom: 20,
   },
   preguntaText: {
     fontSize: 18,
     marginBottom: 10,
-    color: '#333', // Color del texto de la pregunta
+    color: '#333',
     textAlign: 'center',
   },
   radioButtons: {
@@ -146,33 +136,37 @@ const styles = StyleSheet.create({
   },
   radioButton: {
     borderRadius: 50,
-    borderWidth: 2,
-    borderColor: '#007BFF',
-    padding: 10,
-    marginHorizontal: 5,
+    padding: 12,
+    marginHorizontal: 8,
+    backgroundColor: '#5A9FD1',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   radioButtonText: {
-    color: '#333', // Color del texto de los botones de radio
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
   recomendacionInput: {
-    height: 100,
-    borderColor: 'gray',
-    borderWidth: 1,
+    height: 120,
+    borderColor: '#007BFF',
+    borderWidth: 1.5,
     borderRadius: 10,
-    padding: 10,
-    color: 'black', // Color del texto ingresado
-    textAlignVertical: 'top', // Alinear el texto en la parte superior
+    padding: 12,
+    color: '#333',
+    backgroundColor: '#f2f2f2',
+    textAlignVertical: 'top',
+    marginBottom: 20,
   },
   enviarButton: {
     backgroundColor: '#007BFF',
-    borderRadius: 10,
     padding: 15,
-    width: '100%',
+    borderRadius: 10,
     alignItems: 'center',
-    marginTop: 20,
+    marginTop: 10,
   },
   enviarButtonText: {
-    color: 'white',
+    color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
   },
@@ -189,9 +183,11 @@ const styles = StyleSheet.create({
   },
   volverButton: {
     marginTop: 20,
-    backgroundColor: '#f0f0f0',
+    backgroundColor: '#f2f2f2',
     borderRadius: 10,
     padding: 10,
+    width: '80%',
+    alignItems: 'center',
   },
   volverButtonText: {
     color: '#007BFF',

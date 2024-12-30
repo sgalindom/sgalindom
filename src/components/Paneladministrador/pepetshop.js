@@ -82,20 +82,23 @@ const PedidosPetShopPanel = () => {
           <View key={index}>
             <Image source={{ uri: producto.foto }} style={styles.image} />
             <View style={styles.info}>
-              <Text style={styles.title}>{producto.nombre}</Text>
-              <Text>Cantidad: {producto.cantidad}</Text>
-              <Text>Precio unitario: ${producto.precio}</Text>
-              <Text>Total: ${producto.total}</Text>
-              <Text>Descripción: {producto.descripcion}</Text>
-              <Text>Fecha: {item.fecha}</Text>
-              <Text>Hora: {producto.hora}</Text>
-              <Text>Usuario: {item.usuario.nombre}</Text>
+              <Text style={[styles.title, { color: '#000' }]}>{producto.nombre}</Text>
+              <Text style={styles.text}>Cantidad: {producto.cantidad}</Text>
+              <Text style={styles.text}>Precio unitario: ${producto.precio}</Text>
+              <Text style={styles.text}>Total: ${producto.total}</Text>
+              <Text style={styles.text}>Descripción: {producto.descripcion}</Text>
+              <Text style={styles.text}>Fecha: {item.fecha}</Text>
+              <Text style={styles.text}>Hora: {producto.hora}</Text>
+              <Text style={styles.text}>Usuario: {item.usuario.nombre}</Text>
+              {/* Método de Pago */}
+              <Text style={styles.text}>Método de Pago: {item.metodoPago || 'No especificado'}</Text>
             </View>
           </View>
         ))}
       </TouchableOpacity>
     </View>
   );
+  
 
   return (
     <View style={styles.container}>
@@ -138,6 +141,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 20,
     textAlign: 'center',
+    color: 'black',
   },
   card: {
     flexDirection: 'row',
@@ -163,6 +167,11 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: 'bold',
+    color: '#000', // Color negro para el texto del nombre
+  },
+  text: {
+    fontSize: 16,
+    color: '#000', // Color negro para el resto del texto
   },
   modalContainer: {
     backgroundColor: '#fff',

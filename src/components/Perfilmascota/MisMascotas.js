@@ -46,7 +46,7 @@ const MisMascotas = ({ navigation }) => {
       }}
     >
       <View style={styles.cardContent}>
-        <Icon name="paw" size={40} color="#FF6F61" style={styles.icon} />
+        <Icon name="paw" size={40} color="#007BFF" style={styles.icon} />
         <View style={styles.textContainer}>
           <Text style={styles.mascotaNombre}>{item.nombre}</Text>
           <Text style={styles.mascotaDetalles}>Detalles de la mascota...</Text>
@@ -93,42 +93,47 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     padding: 20,
+    borderRadius: 20,
   },
   title: {
     fontSize: 36,
     fontWeight: 'bold',
     color: '#333',
     marginBottom: 20,
+    textShadowColor: 'rgba(0,0,0,0.5)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 3,
   },
   flatListContainer: {
     paddingBottom: 20,
+    width: '100%',
   },
   mascotaCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginVertical: 10,
+    marginVertical: 15,
     padding: 20,
     backgroundColor: '#FFF',
-    borderRadius: 12,
+    borderRadius: 15,
     width: '100%',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 8,
+    shadowRadius: 10,
+    elevation: 5,
   },
   cardContent: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   icon: {
-    marginRight: 15,
+    marginRight: 20,
   },
   textContainer: {
     flex: 1,
   },
   mascotaNombre: {
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: 'bold',
     color: '#333',
   },
@@ -143,9 +148,9 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   registrarButton: {
-    backgroundColor: '#FF6F61',
+    backgroundColor: '#007BFF',
     paddingVertical: 15,
-    paddingHorizontal: 30,
+    paddingHorizontal: 35,
     borderRadius: 12,
     marginTop: 30,
     shadowColor: '#000',
@@ -158,6 +163,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     color: 'white',
+    textAlign: 'center',
   },
 });
 

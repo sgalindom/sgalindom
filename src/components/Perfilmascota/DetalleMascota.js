@@ -73,7 +73,7 @@ const DetalleMascota = ({ route, navigation }) => {
 
           {/* Botón de eliminar mascota */}
           <TouchableOpacity style={styles.eliminarButton} onPress={handleEliminarPress}>
-            <Text style={styles.eliminarButtonText}>Eliminar Mascota</Text>
+            <Text style={styles.eliminarButtonText}>Eliminar Perfil</Text>
           </TouchableOpacity>
 
           {/* Modal de confirmación */}
@@ -86,7 +86,7 @@ const DetalleMascota = ({ route, navigation }) => {
             <View style={styles.modalContainer}>
               <View style={styles.modalContent}>
                 <Icon name="exclamation-circle" size={60} color="#FF6347" />
-                <Text style={styles.modalText}>¿Estás seguro de que deseas eliminar esta mascota?</Text>
+                <Text style={styles.modalText}>¿Estás seguro de que deseas borrar el perfil?</Text>
                 <View style={styles.modalButtons}>
                   <TouchableOpacity style={styles.confirmButton} onPress={handleConfirmDelete}>
                     <Text style={styles.confirmButtonText}>Sí, eliminar</Text>
@@ -117,37 +117,48 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   detailContainer: {
-    backgroundColor: 'rgba(255, 255, 255, 0.7)', // Fondo semitransparente blanco
-    borderRadius: 10,
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    borderRadius: 15,
     padding: 20,
-    width: '80%',
+    width: '85%',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 10,
   },
   title: {
-    fontSize: 32,
+    fontSize: 28,
     fontWeight: 'bold',
-    color: 'black', // Texto en color negro
+    color: '#333',
     marginBottom: 20,
     textAlign: 'center',
   },
   detailItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: 15,
   },
   detailText: {
-    fontSize: 18,
-    color: 'black', // Texto en color negro
-    marginLeft: 10,
+    fontSize: 16,
+    color: '#555',
+    marginLeft: 15,
   },
   icon: {
     marginRight: 10,
+    color: '#007BFF',
   },
   eliminarButton: {
-    backgroundColor: '#FF6347', // Color rojo
+    backgroundColor: '#007BFF',
     alignItems: 'center',
-    padding: 15,
-    borderRadius: 8,
-    marginTop: 20,
+    paddingVertical: 15,
+    borderRadius: 10,
+    marginTop: 30,
+    shadowColor: '#007BFF',
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.4,
+    shadowRadius: 7,
+    elevation: 5,
   },
   eliminarButtonText: {
     fontSize: 18,
@@ -162,13 +173,19 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     backgroundColor: 'white',
-    padding: 20,
-    borderRadius: 10,
+    padding: 25,
+    borderRadius: 15,
     alignItems: 'center',
-    width: '80%',
+    width: '85%',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.5,
+    shadowRadius: 10,
+    elevation: 15,
   },
   modalText: {
     fontSize: 18,
+    color: '#333',
     textAlign: 'center',
     marginVertical: 20,
   },
@@ -178,12 +195,17 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   confirmButton: {
-    backgroundColor: '#FF6347',
-    padding: 10,
-    borderRadius: 5,
+    backgroundColor: '#007BFF',
+    padding: 12,
+    borderRadius: 8,
     flex: 1,
     marginRight: 10,
     alignItems: 'center',
+    shadowColor: '#007BFF',
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.4,
+    shadowRadius: 7,
+    elevation: 5,
   },
   confirmButtonText: {
     color: 'white',
@@ -191,11 +213,16 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   cancelButton: {
-    backgroundColor: '#888',
-    padding: 10,
-    borderRadius: 5,
+    backgroundColor: '#6c757d',
+    padding: 12,
+    borderRadius: 8,
     flex: 1,
     alignItems: 'center',
+    shadowColor: '#6c757d',
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.4,
+    shadowRadius: 7,
+    elevation: 5,
   },
   cancelButtonText: {
     color: 'white',
@@ -203,5 +230,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 });
+
 
 export default DetalleMascota;

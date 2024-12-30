@@ -13,53 +13,51 @@ function Login({ navigation }) {
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [buttonScale] = useState(new Animated.Value(1));
-  const [hidePassword, setHidePassword] = useState(true);
+  const [hidePassword, setHidePassword] = useState(true);  // Estado para ocultar/mostrar la contraseña
   const [fadeAnim] = useState(new Animated.Value(0));
-  const [modalVisible, setModalVisible] = useState(false); // Estado para controlar el modal
-  const [modalMessage, setModalMessage] = useState(''); // Mensaje a mostrar en el modal
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalMessage, setModalMessage] = useState('');
 
   useEffect(() => {
     const unsubscribe = auth().onAuthStateChanged(async (user) => {
       if (user) {
         try {
-          setIsLoading(true);  // Mostrar el indicador de carga mientras se verifica
+          setIsLoading(true);
           const isAdmin = await checkAdminStatus(user.email);
-          
+
           if (isAdmin) {
             console.log('Inicio de sesión exitoso - Administrador');
             navigation.reset({
               index: 0,
-              routes: [{ name: 'paneladmin' }],  // Asegúrate de que el stack se limpie y navegue directamente a admin
+              routes: [{ name: 'paneladmin' }],
             });
           } else {
             console.log('Inicio de sesión exitoso - Usuario normal');
             navigation.reset({
               index: 0,
-              routes: [{ name: 'MainPanel' }],  // Limpia el stack y navega al MainPanel
+              routes: [{ name: 'MainPanel' }],
             });
           }
         } catch (error) {
           console.error('Error al verificar el estado del usuario', error);
           showErrorModal('Inicio de sesión fallido. Inténtalo de nuevo.');
         } finally {
-          setIsLoading(false);  // Ocultar el indicador de carga
+          setIsLoading(false);
         }
       } else {
         console.log('Usuario no autenticado, redirigiendo al Login');
-        navigation.navigate('Login');  // Redirigir al Login si no hay usuario autenticado
+        navigation.navigate('Login');
       }
-      
+
       Animated.timing(fadeAnim, {
         toValue: 1,
         duration: 500,
         useNativeDriver: true,
       }).start();
     });
-  
+
     return unsubscribe;
   }, [navigation, fadeAnim]);
-  
-  
 
   const checkAdminStatus = async (userEmail) => {
     try {
@@ -119,6 +117,10 @@ function Login({ navigation }) {
     navigation.navigate('RecuperarContraseña');
   };
 
+  const handleRegistrarse = () => {
+    navigation.navigate('Registro');
+  };
+
   const animateButton = () => {
     Animated.sequence([
       Animated.timing(buttonScale, {
@@ -152,23 +154,37 @@ function Login({ navigation }) {
           <Text style={styles.welcomeText}>Inicia Sesión</Text>
           <View style={styles.inputContainer}>
             <Icon name="envelope" size={20} color="gray" style={styles.icon} />
+            
             <TextInput
               placeholder="Correo electrónico"
               onChangeText={(text) => setEmail(text)}
               value={email}
               style={styles.input}
               keyboardType="email-address"
+              placeholderTextColor="#000000"  // Establece el color del texto del placeholder a negro
             />
+
           </View>
           <View style={styles.inputContainer}>
             <Icon name="lock" size={20} color="gray" style={styles.icon} />
             <TextInput
               placeholder="Contraseña"
-              secureTextEntry={hidePassword}
+              secureTextEntry={hidePassword}  // Muestra u oculta la contraseña
               onChangeText={(text) => setPassword(text)}
               value={password}
               style={styles.input}
+              placeholderTextColor="#000000"
             />
+            <TouchableOpacity
+              style={styles.eyeIconContainer}
+              onPress={() => setHidePassword(!hidePassword)}
+            >
+              <Icon
+                name={hidePassword ? 'eye-slash' : 'eye'}
+                size={27}
+                color="black"
+              />
+            </TouchableOpacity>
           </View>
 
           {/* Modal para errores */}
@@ -201,6 +217,11 @@ function Login({ navigation }) {
           <TouchableOpacity onPress={handleRecuperarContraseña}>
             <Text style={styles.recuperarText}>¿Olvidaste tu contraseña?</Text>
           </TouchableOpacity>
+
+          <TouchableOpacity onPress={handleRegistrarse}>
+            <Text style={styles.recuperarText}>Registrate aqui</Text>
+          </TouchableOpacity>
+
         </Animated.View>
       </View>
     </ImageBackground>
@@ -211,6 +232,12 @@ const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 
 const styles = StyleSheet.create({
+
+  eyeIconContainer: {
+    position: 'absolute',
+    right: 10,  
+  },
+
   backgroundImage: {
     flex: 1,
     width: windowWidth,
@@ -277,7 +304,7 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
-    height: 40,
+    height: 50,
     paddingLeft: 10,
     color: '#333',
   },
@@ -306,8 +333,10 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   eyeIconContainer: {
-    position: 'absolute',
-    right: 10,
+    width: 48,   // Aumenta la anchura a 48dp
+    height: 48,  // Aumenta la altura a 48dp
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   enlaceRecuperarContraseña: {
     marginVertical: 10,
@@ -317,11 +346,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   registerButton: {
-    marginTop: 20,
+    marginTop: 46,
   },
   registerButtonText: {
     color: 'black',
-    fontSize: 16,
+    fontSize: 30,
   },
   bottomRightTextContainer: {
     position: 'absolute',
@@ -349,17 +378,29 @@ const styles = StyleSheet.create({
     fontSize: 18,
     textAlign: 'center',
     marginVertical: 20,
+    color: 'black',
   },
   modalButton: {
     backgroundColor: '#2F9FFA',
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 5,
+    height: 48,
   },
   modalButtonText: {
     color: 'white',
     fontSize: 16,
   },
+  recuperarText: {
+    fontSize: 20,
+    color: 'black',
+    marginVertical: 2, // Espaciado adecuado para accesibilidad
+    height: 48,  // Aseguramos que el texto también tenga una altura mínima de 48dp en la zona clicable
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  
+
 });
 
 export default Login;

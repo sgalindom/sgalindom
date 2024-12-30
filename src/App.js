@@ -14,6 +14,7 @@ import Login from './components/Registro-loguin-contraseña/Login';
 import Registro from './components/Registro-loguin-contraseña/Registro';
 import RecuperarContraseña from './components/Registro-loguin-contraseña/RecuperarContraseña';
 
+
 // Importaciones relacionadas con el Panel Principal
 import MainPanel from './components/MainPanel';
 import Contactonos from './components/Contactanos'; // Importación añadida
@@ -74,6 +75,9 @@ import VerVeterinarias from './components/veterinarias/verveterinarias';
 import GatoScreen from './components/Petshop/Gato/gato';
 import Opciones from './components/Petshop/Gato/opciones';
 import VerProductos from './components/Petshop/Gato/verproductos';
+import VerProductosp from './components/Petshop/Perro/verproductosp';
+import PerroScreen from './components/Petshop/Perro/perro';
+import Opcionesp from './components/Petshop/Perro/opcionesp';
 import Detalle from './components/Petshop/detalles';
 
 import Paseosadmin from './components/Paneladministrador/paseosadmin';
@@ -106,7 +110,8 @@ function App() {
 
   return (
     <NavigationContainer>
-      <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName="inicio">
+      <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName="Inicio">
+        <Stack.Screen name="Inicio" component={Inicio} />
         <Stack.Screen name="PreLogin" component={PreLogin} />
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="Registro" component={Registro} />
@@ -149,8 +154,11 @@ function App() {
         <Stack.Screen name="inicio" component={Inicio} />
         <Stack.Screen name="verveterinarias" component={VerVeterinarias} />
         <Stack.Screen name="gato" component={GatoScreen} />
+        <Stack.Screen name= "perro" component={PerroScreen} />
         <Stack.Screen name="opciones" component={Opciones} />
         <Stack.Screen name="verproductos" component={VerProductos} />
+        <Stack.Screen name="verproductosp" component={VerProductosp} />
+        <Stack.Screen name="opcionesp" component={Opcionesp} />
         <Stack.Screen name="detalles" component={Detalle} />
         <Stack.Screen name="Adieguar1" component={AdieguarScreen} />
         <Stack.Screen name="Paseosadmin" component={Paseosadmin} />

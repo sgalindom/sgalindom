@@ -5,7 +5,6 @@ import {
   TextInput,
   TouchableOpacity,
   Image,
-  ImageBackground,
   StyleSheet,
   Dimensions,
   ScrollView,
@@ -16,21 +15,18 @@ import firestore from '@react-native-firebase/firestore';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import LinearGradient from 'react-native-linear-gradient';
 import Modal from 'react-native-modal';
-import DatePicker from 'react-native-date-picker';
 
 const logoImage = require('../imagenes/fondoperfil.jpg');
-const backgroundImage = require('../imagenes/fondomain.jpg');
 
 const Registro = ({ navigation }) => {
-  // Definir estados iniciales
   const initialFormState = {
     email: '',
     password: '',
     confirmPassword: '',
     nombreCompleto: '',
-    telefono: '',
+    mascota: [], // Ajustado para permitir múltiples selecciones
     direccion: '',
-    dateOfBirth: new Date(),
+    telefono: '',
   };
 
   const [form, setForm] = useState(initialFormState);
@@ -38,107 +34,80 @@ const Registro = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
   const [isModalVisible, setModalVisible] = useState(false);
   const [modalMessage, setModalMessage] = useState('');
-  const [modalSuccess, setModalSuccess] = useState(false); // Estado para diferenciar entre éxito o error
-  const [openDatePicker, setOpenDatePicker] = useState(false); // Estado para controlar el modal del DatePicker
+  const [modalSuccess, setModalSuccess] = useState(false);
+  const [passwordStrength, setPasswordStrength] = useState('Débil');
+  const [passwordColor, setPasswordColor] = useState('red');
 
-  // Restablecer el formulario cada vez que se monta el componente
   useEffect(() => {
-    // Reiniciar los valores del formulario cuando el componente se monta
     setForm(initialFormState);
   }, []);
 
-  // Función para manejar la entrada del nombre, permitiendo solo letras y espacios
   const handleNombreInput = (value) => {
-    const formattedValue = value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, ''); // Solo permite letras y espacios
+    const formattedValue = value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '');
     setForm({ ...form, nombreCompleto: formattedValue });
   };
 
-  // Función para manejar la entrada del teléfono, permitiendo solo números y el símbolo "+"
-  const handleTelefonoInput = (value) => {
-    const formattedValue = value.replace(/[^0-9+]/g, ''); // Solo permite números y el símbolo "+"
-    setForm({ ...form, telefono: formattedValue });
-  };
-
-  // Función para manejar la validación de la contraseña, eliminando espacios
   const handlePasswordInput = (value) => {
-    const formattedValue = value.replace(/\s/g, ''); // Elimina todos los espacios
+    const formattedValue = value.replace(/\s/g, '');
     setForm({ ...form, password: formattedValue });
-  };
 
-  const handleConfirmPasswordInput = (value) => {
-    setForm({ ...form, confirmPassword: value });
-  };
-
-  const handleEmailInput = (value) => {
-    setForm({ ...form, email: value });
-  };
-
-  const handleDireccionInput = (value) => {
-    setForm({ ...form, direccion: value });
-  };
-
-  const handlePasswordValidation = () => {
-    const passwordPattern = /^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{6,})/;
-    if (!passwordPattern.test(form.password)) {
-      setModalMessage('La contraseña debe tener al menos 6 caracteres, una mayúscula, un número y un carácter especial.');
-      setModalSuccess(false);
-      setModalVisible(true);
-      return false;
+    if (value.length < 6) {
+      setPasswordStrength('Débil');
+      setPasswordColor('red');
+    } else if (value.length >= 6 && !value.match(/^(?=.*[A-Z])(?=.*[0-9])(?=.{6,})/)) {
+      setPasswordStrength('Media');
+      setPasswordColor('yellow');
+    } else if (value.match(/^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{8,})/)) {
+      setPasswordStrength('Segura');
+      setPasswordColor('green');
     }
-    return true;
+  };
+
+  const toggleMascota = (tipo) => {
+    const nuevoEstado = form.mascota.includes(tipo)
+      ? form.mascota.filter((mascota) => mascota !== tipo)
+      : [...form.mascota, tipo];
+    setForm({ ...form, mascota: nuevoEstado });
   };
 
   const handleRegistro = async () => {
     setLoading(true);
-  
+
     try {
-      if (!form.email || !form.password || !form.confirmPassword || !form.nombreCompleto || !form.telefono || !form.direccion || !form.dateOfBirth) {
-        setModalMessage('Por favor completa todos los campos.');
+      if (!form.email || !form.password || !form.nombreCompleto || form.mascota.length === 0 || !form.direccion || !form.telefono) {
+        setModalMessage('Por favor completa todos los campos obligatorios.');
         setModalSuccess(false);
         setModalVisible(true);
         setLoading(false);
         return;
       }
-  
-      if (!handlePasswordValidation()) {
-        setLoading(false);
-        return;
-      }
-  
-      if (form.password !== form.confirmPassword) {
+
+      if (form.password !== form.confirmPassword && form.confirmPassword) {
         setModalMessage('Las contraseñas no coinciden.');
         setModalSuccess(false);
         setModalVisible(true);
         setLoading(false);
         return;
       }
-  
-      // Cálculo de la edad a partir de la fecha de nacimiento
-      const today = new Date();
-      const birthDate = new Date(form.dateOfBirth);
-      let age = today.getFullYear() - birthDate.getFullYear();
-      const monthDifference = today.getMonth() - birthDate.getMonth();
-  
-      if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
-        age--; // Ajuste para el caso en que el cumpleaños aún no ha pasado este año
-      }
-  
+
       await auth().createUserWithEmailAndPassword(form.email, form.password);
-  
+
       const user = auth().currentUser;
-  
+
       if (user) {
         const userData = {
           nombreCompleto: form.nombreCompleto,
-          telefono: form.telefono,
+          mascota: form.mascota,
           direccion: form.direccion,
-          fechaNacimiento: form.dateOfBirth, // Fecha de nacimiento completa
-          edad: age, // Edad calculada
+          telefono: form.telefono,
         };
-  
-        await firestore().collection('usuarios').doc(user.email).collection('datos').add(userData);
-  
-        // Mostrar modal de éxito, pero NO navegar aún al MainPanel
+
+        await firestore()
+          .collection('usuarios')
+          .doc(user.email)
+          .collection('datos')
+          .add(userData);
+
         setModalMessage('Usuario registrado exitosamente');
         setModalSuccess(true);
         setModalVisible(true);
@@ -151,194 +120,157 @@ const Registro = ({ navigation }) => {
       setLoading(false);
     }
   };
-  
 
   const handleCloseModal = () => {
     setModalVisible(false);
-
-    // Navegar al MainPanel solo si el registro fue exitoso
     if (modalSuccess) {
       navigation.navigate('MainPanel');
     }
   };
 
   return (
-    <ImageBackground source={backgroundImage} style={styles.backgroundImage}>
-      <ScrollView contentContainerStyle={styles.container}>
-        <View style={styles.logoContainer}>
-          <Image source={logoImage} style={styles.logo} />
-        </View>
-        <Text style={styles.title}>¡Únete a nosotros!</Text>
-        <View style={styles.formContainer}>
-          <View style={styles.inputContainer}>
-            <Icon name="user" size={20} color="#555" style={styles.icon} />
-            <TextInput
-              placeholder="Nombre completo"
-              onChangeText={handleNombreInput}
-              value={form.nombreCompleto}
-              style={styles.input}
-              placeholderTextColor="#888"
-            />
-          </View>
-
-          <View style={styles.inputContainer}>
-            <Icon name="phone" size={20} color="#555" style={styles.icon} />
-            <TextInput
-              placeholder="Teléfono"
-              onChangeText={handleTelefonoInput}
-              value={form.telefono}
-              style={styles.input}
-              placeholderTextColor="#888"
-              keyboardType="phone-pad"
-            />
-          </View>
-
-          <View style={styles.inputContainer}>
-            <Icon name="home" size={20} color="#555" style={styles.icon} />
-            <TextInput
-              placeholder="Dirección"
-              onChangeText={handleDireccionInput}
-              value={form.direccion}
-              style={styles.input}
-              placeholderTextColor="#888"
-            />
-          </View>
-
-          {/* Botón para abrir el DatePicker */}
-          <View style={styles.inputContainer}>
-            <Icon name="calendar" size={20} color="#555" style={styles.icon} />
-            <TouchableOpacity onPress={() => setOpenDatePicker(true)}>
-              <Text style={styles.input}>{form.dateOfBirth ? form.dateOfBirth.toDateString() : 'Seleccionar fecha de nacimiento'}</Text>
-            </TouchableOpacity>
-          </View>
-
-          {/* Modal del DatePicker */}
-          <DatePicker
-            modal
-            open={openDatePicker}
-            date={form.dateOfBirth}
-            mode="date"
-            minimumDate={new Date(1900, 0, 1)}
-            maximumDate={new Date()}
-            onConfirm={(date) => {
-              setOpenDatePicker(false);
-              setForm({ ...form, dateOfBirth: date });
-            }}
-            onCancel={() => {
-              setOpenDatePicker(false);
-            }}
+    <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
+      <View style={styles.logoContainer}>
+        <Image source={logoImage} style={styles.logo} />
+      </View>
+      <Text style={styles.title}>¡Registra a tu mascota en el mejor cuidado profesional!</Text>
+      <View style={styles.formContainer}>
+        <View style={styles.inputContainer}>
+          <Icon name="user" size={20} color="black" style={styles.icon} />
+          <TextInput
+            placeholder="Nombre completo"
+            onChangeText={handleNombreInput}
+            value={form.nombreCompleto}
+            style={styles.input}
+            placeholderTextColor="black"
           />
-
-          <View style={styles.inputContainer}>
-            <Icon name="envelope" size={20} color="#555" style={styles.icon} />
-            <TextInput
-              placeholder="Correo electrónico"
-              onChangeText={handleEmailInput}
-              value={form.email}
-              style={styles.input}
-              placeholderTextColor="#888"
-              keyboardType="email-address"
-            />
-          </View>
-
-          <View style={styles.inputContainer}>
-            <Icon name="lock" size={20} color="#555" style={styles.icon} />
-            <TextInput
-              placeholder="Contraseña"
-              secureTextEntry={hidePassword}
-              onChangeText={handlePasswordInput}
-              value={form.password}
-              style={styles.input}
-              placeholderTextColor="#888"
-            />
-            <TouchableOpacity onPress={() => setHidePassword(!hidePassword)} style={styles.largerTouchArea}>
-              <Icon name={hidePassword ? 'eye-slash' : 'eye'} size={20} color="#555" />
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.inputContainer}>
-            <Icon name="lock" size={20} color="#555" style={styles.icon} />
-            <TextInput
-              placeholder="Confirmar contraseña"
-              secureTextEntry={hidePassword}
-              onChangeText={handleConfirmPasswordInput}
-              value={form.confirmPassword}
-              style={styles.input}
-              placeholderTextColor="#888"
-            />
-            <TouchableOpacity onPress={() => setHidePassword(!hidePassword)} style={styles.largerTouchArea}>
-              <Icon name={hidePassword ? 'eye-slash' : 'eye'} size={20} color="#555" />
-            </TouchableOpacity>
-          </View>
-
-          {loading ? (
-            <ActivityIndicator size="large" color="#2F9FFA" />
-          ) : (
-            <TouchableOpacity onPress={handleRegistro} style={styles.gradientButton}>
-              <LinearGradient colors={['#6DD5FA', '#2980B9']} style={styles.gradientButton}>
-                <Text style={styles.buttonText}>¡Regístrate ahora!</Text>
-              </LinearGradient>
-            </TouchableOpacity>
-          )}
-
-          {/* Modal personalizado para mostrar alertas bonitas */}
-          <Modal isVisible={isModalVisible}>
-            <View style={styles.modalContent}>
-              <Icon
-                name={modalSuccess ? 'check-circle' : 'times-circle'}
-                size={60}
-                color={modalSuccess ? 'green' : 'red'}
-              />
-              <Text style={styles.modalMessage}>{modalMessage}</Text>
-              <TouchableOpacity onPress={handleCloseModal} style={styles.modalButton}>
-                <Text style={styles.modalButtonText}>Cerrar</Text>
-              </TouchableOpacity>
-            </View>
-          </Modal>
         </View>
-      </ScrollView>
-    </ImageBackground>
+
+        <View style={styles.inputContainer}>
+          <Icon name="envelope" size={20} color="black" style={styles.icon} />
+          <TextInput
+            placeholder="Correo electrónico"
+            onChangeText={(value) => setForm({ ...form, email: value })}
+            value={form.email}
+            style={styles.input}
+            placeholderTextColor="black"
+            keyboardType="email-address"
+          />
+        </View>
+
+        <View style={styles.inputContainer}>
+          <Icon name="phone" size={20} color="black" style={styles.icon} />
+          <TextInput
+            placeholder="Teléfono"
+            onChangeText={(value) => setForm({ ...form, telefono: value })}
+            value={form.telefono}
+            style={styles.input}
+            placeholderTextColor="black"
+            keyboardType="phone-pad"
+          />
+        </View>
+
+        <View style={styles.inputContainer}>
+          <Icon name="address-card" size={20} color="black" style={styles.icon} />
+          <TextInput
+            placeholder="Dirección"
+            onChangeText={(value) => setForm({ ...form, direccion: value })}
+            value={form.direccion}
+            style={styles.input}
+            placeholderTextColor="black"
+          />
+        </View>
+
+        <View style={styles.inputContainer}>
+          <Icon name="lock" size={20} color="black" style={styles.icon} />
+          <TextInput
+            placeholder="Contraseña"
+            secureTextEntry={hidePassword}
+            onChangeText={handlePasswordInput}
+            value={form.password}
+            style={styles.input}
+            placeholderTextColor="black"
+          />
+          <TouchableOpacity onPress={() => setHidePassword(!hidePassword)} style={styles.largerTouchArea}>
+            <Icon name={hidePassword ? 'eye-slash' : 'eye'} size={30} color="black" />
+          </TouchableOpacity>
+        </View>
+
+        <Text style={[styles.passwordStrength, { color: passwordColor }]}>Fortaleza: {passwordStrength}</Text>
+
+        <Text style={styles.mascotaLabel}>¿Qué mascota tienes?</Text>
+        <View style={styles.checkboxWrapper}>
+          <TouchableOpacity
+            style={[styles.checkbox, form.mascota.includes('Perro') && styles.checkboxSelected]}
+            onPress={() => toggleMascota('Perro')}
+          >
+            <Text style={styles.checkboxText}>Perro</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.checkbox, form.mascota.includes('Gato') && styles.checkboxSelected]}
+            onPress={() => toggleMascota('Gato')}
+          >
+            <Text style={styles.checkboxText}>Gato</Text>
+          </TouchableOpacity>
+        </View>
+
+        {loading ? (
+          <ActivityIndicator size="large" color="#2F9FFA" />
+        ) : (
+          <TouchableOpacity onPress={handleRegistro} style={styles.gradientButton}>
+            <LinearGradient colors={["#6DD5FA", "#2980B9"]} style={styles.gradientButton}>
+              <Text style={styles.buttonText}>Crear cuenta</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+        )}
+
+        <Modal isVisible={isModalVisible}>
+          <View style={styles.modalContent}>
+            <Icon name={modalSuccess ? 'check-circle' : 'times-circle'} size={60} color={modalSuccess ? 'green' : 'red'} />
+            <Text style={styles.modalMessage}>{modalMessage}</Text>
+            <TouchableOpacity onPress={handleCloseModal} style={styles.modalButton}>
+              <Text style={styles.modalButtonText}>Cerrar</Text>
+            </TouchableOpacity>
+          </View>
+        </Modal>
+      </View>
+    </ScrollView>
   );
 };
 
 const windowWidth = Dimensions.get('window').width;
-const windowHeight = Dimensions.get('window').height;
 
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
     alignItems: 'center',
-    justifyContent: 'center',
-  },
-  backgroundImage: {
-    flex: 1,
-    resizeMode: 'cover',
-    width: windowWidth,
-    height: windowHeight,
+    justifyContent: 'flex-start',
+    backgroundColor: '#F5F5F5',
+    paddingTop: 20,
   },
   logoContainer: {
-    marginBottom: 20,
+    marginBottom: 10,
     width: '100%',
-    height: 150,
     alignItems: 'center',
-    justifyContent: 'center',
   },
   logo: {
-    width: '120%',
-    height: '120%',
+    width: '100%',
+    height: undefined,
+    aspectRatio: 16 / 9,
     resizeMode: 'contain',
   },
   title: {
-    fontSize: 28,
+    fontSize: 20,
     fontWeight: 'bold',
-    color: '#000000',
+    color: 'black',
     marginBottom: 20,
+    textAlign: 'center',
   },
   formContainer: {
     width: '85%',
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    backgroundColor: '#FFFFFF',
     borderRadius: 20,
-    padding: 20,
+    padding: 15,
     elevation: 8,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
@@ -348,15 +280,15 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 15,
+    marginBottom: 18,
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
   },
   input: {
     flex: 1,
-    fontSize: 16,
+    fontSize: 14,
     padding: 10,
-    color: '#333',
+    color: 'black',
   },
   icon: {
     marginRight: 10,
@@ -367,7 +299,7 @@ const styles = StyleSheet.create({
     right: 0,
   },
   gradientButton: {
-    marginTop: 20,
+    marginTop: 15,
     padding: 15,
     borderRadius: 10,
     alignItems: 'center',
@@ -375,7 +307,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: '#FFF',
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: 'bold',
   },
   modalContent: {
@@ -388,6 +320,8 @@ const styles = StyleSheet.create({
   modalMessage: {
     fontSize: 16,
     marginVertical: 10,
+    color: 'black',
+    textAlign: 'center',
   },
   modalButton: {
     marginTop: 10,
@@ -396,8 +330,46 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   modalButtonText: {
-    color: 'black',
+    color: '#fff',
     fontSize: 16,
+  },
+  checkboxWrapper: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: 10,
+  },
+  checkbox: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    padding: 10,
+    marginHorizontal: 10,
+    alignItems: 'center',
+  },
+  checkboxSelected: {
+    backgroundColor: '#6DD5FA',
+    borderColor: '#2980B9',
+  },
+  checkboxText: {
+    fontSize: 14,
+    color: 'black',
+  },
+  mascotaLabel: {
+    fontSize: 16,
+    color: 'black',
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 10,
+  },
+  passwordStrength: {
+    fontSize: 12,
+    marginTop: -10,
+    marginBottom: 10,
+  },
+  passwordHint: {
+    fontSize: 10,
+    color: 'black',
+    marginBottom: 15,
   },
 });
 

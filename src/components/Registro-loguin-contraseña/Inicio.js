@@ -1,36 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, Alert, TouchableOpacity, ActivityIndicator } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
-import storage from '@react-native-firebase/storage';
-import auth from '@react-native-firebase/auth';
 import FastImage from 'react-native-fast-image';
+import auth from '@react-native-firebase/auth';
 
 const Inicio = () => {
   const navigation = useNavigation();
-  const [backgroundUrl, setBackgroundUrl] = useState(null);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchImages = async () => {
-      try {
-        const backgroundRef = storage().ref('imagenes/MiPerfil.jpg');
-        await backgroundRef.getMetadata();
-        const backgroundUrl = await backgroundRef.getDownloadURL();
-        setBackgroundUrl(backgroundUrl);
-      } catch (error) {
-        if (error.code === 'storage/object-not-found') {
-          console.error('El archivo no existe en Firebase Storage', error);
-          Alert.alert('Error', 'El archivo no existe en Firebase Storage. Verifica que la ruta y el nombre sean correctos.');
-        } else {
-          console.error('Error fetching images from Firebase Storage', error);
-          Alert.alert('Error', 'Error al obtener imágenes de Firebase Storage. Verifica los permisos y la configuración.');
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-
     const checkAuthStatus = () => {
       const unsubscribe = auth().onAuthStateChanged(user => {
         if (user) {
@@ -42,7 +20,6 @@ const Inicio = () => {
       return () => unsubscribe();
     };
 
-    fetchImages();
     checkAuthStatus();
   }, [navigation]);
 
@@ -55,26 +32,14 @@ const Inicio = () => {
   };
 
   const navigateToHola = () => {
-    // Navegar a la pantalla 'Hola'
     navigation.navigate('proximamente');
   };
-
-  if (loading) {
-    return (
-      <View style={styles.container}>
-        <ActivityIndicator size="large" color="#0000ff" />
-      </View>
-    );
-  }
 
   return (
     <View style={styles.container}>
       <FastImage
         style={styles.background}
-        source={{
-          uri: backgroundUrl,
-          priority: FastImage.priority.high,
-        }}
+        source={require('../imagenes/MiPerfil.jpg')} // Cambia esta ruta al lugar donde está la imagen en tu proyecto
         resizeMode={FastImage.resizeMode.cover}
       >
         <View style={styles.buttonsContainer}>

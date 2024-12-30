@@ -74,7 +74,6 @@ const VerProductos = ({ route }) => {
         }
 
         const productosArray = [];
-
         productosSnapshot.forEach((doc) => {
           productosArray.push(doc.data());
         });
@@ -101,28 +100,31 @@ const VerProductos = ({ route }) => {
       />
       <Text style={styles.title}>Productos de {tipoAlimento}</Text>
       <View style={styles.productosContainer}>
-        {productos.map((producto, index) => (
-          <TouchableOpacity
-            key={index}
-            style={styles.productoCard}
-            onPress={() => verDetalle(producto)}
-          >
-            <Image
-              source={{ uri: producto.Foto }}
-              style={styles.productoImagen}
-              resizeMode="cover"
-            />
-            <View style={styles.productoInfo}>
-              <Text style={styles.productoNombre}>{producto.Nombre}</Text>
-              <Text style={styles.productoDescripcion}>{producto.Descripcion}</Text>
-              <Text style={styles.precio}>Precio: {producto.Precio}</Text>
-            </View>
-          </TouchableOpacity>
-        ))}
+        {productos.length === 0 ? (
+          <Text style={styles.noProductosText}>No hay productos disponibles </Text>
+        ) : (
+          productos.map((producto, index) => (
+            <TouchableOpacity
+              key={index}
+              style={styles.productoCard}
+              onPress={() => verDetalle(producto)}
+            >
+              <Image
+                source={{ uri: producto.Foto }}
+                style={styles.productoImagen}
+                resizeMode="cover"
+              />
+              <View style={styles.productoInfo}>
+                <Text style={styles.productoNombre}>{producto.Nombre}</Text>
+                <Text style={styles.productoDescripcion}>{producto.Descripcion}</Text>
+                <Text style={styles.productoPrecio}>Precio: {producto.Precio}</Text>
+              </View>
+            </TouchableOpacity>
+          ))
+        )}
       </View>
     </View>
   );
-  
 };
 
 const styles = StyleSheet.create({
@@ -168,23 +170,27 @@ const styles = StyleSheet.create({
   productoInfo: {
     flex: 1,
     padding: 10,
-    color: '#000',
-    
   },
   productoNombre: {
     fontSize: 18,
     fontWeight: 'bold',
     color: '#000',
   },
+  productoDescripcion: {
+    fontSize: 14,
+    color: '#666',
+  },
   productoPrecio: {
     fontSize: 16,
     marginTop: 5,
     color: '#000',
   },
-  precioKg: {
-    fontSize: 14,
-    color: '#666',
-    
+  noProductosText: {
+    fontSize: 18,
+    textAlign: 'center',
+    color: '#000',
+    fontWeight: 'bold',
+    marginTop: 20,
   },
 });
 

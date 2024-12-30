@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ImageBackground, Image, TouchableOpacity, Linking, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ImageBackground, Image, TouchableOpacity, Linking, ScrollView, Animated } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import firestore from '@react-native-firebase/firestore';
 import moment from 'moment-timezone';
@@ -7,6 +7,7 @@ import moment from 'moment-timezone';
 const AdieguarScreen = ({ route }) => {
   const { adieguarId } = route.params;
   const [guarderia, setGuarderia] = useState(null);
+  const [fadeAnim] = useState(new Animated.Value(0)); // Animación de desvanecimiento
 
   useEffect(() => {
     const obtenerDatosGuarderia = async () => {
@@ -15,6 +16,11 @@ const AdieguarScreen = ({ route }) => {
 
         if (snapshot.exists) {
           setGuarderia(snapshot.data());
+          Animated.timing(fadeAnim, {
+            toValue: 1,
+            duration: 800,
+            useNativeDriver: true,
+          }).start(); // Animar desvanecimiento
         } else {
           console.log('No se encontró la guardería o adiestramiento con el ID proporcionado.');
         }
@@ -56,50 +62,63 @@ const AdieguarScreen = ({ route }) => {
 
   if (!guarderia) {
     return (
-      <View style={styles.container}>
-        <Text>Cargando...</Text>
+      <View style={styles.loadingContainer}>
+        <Text style={styles.loadingText}>Cargando...</Text>
       </View>
     );
   }
 
   return (
     <ImageBackground source={require('../imagenes/fondomain.jpg')} style={styles.background}>
-      <ScrollView style={styles.scrollView}>
-        <View style={styles.container}>
-          <Image source={{ uri: guarderia.Foto }} style={styles.image} />
-          <Text style={styles.title}>{guarderia.Nombre}</Text>
-          <View style={styles.descriptionCard}>
-            <Text style={styles.description}>{guarderia.Descripcion}</Text>
-          </View>
-          <View style={styles.infoContainer}>
-            <View style={styles.infoRow}>
-              <Icon name="location" size={20} color="black" style={styles.icon} />
-              <Text style={styles.infoText}>{guarderia.Barrio}</Text>
+      <ScrollView contentContainerStyle={styles.scrollView}>
+        <Animated.View style={[styles.container, { opacity: fadeAnim }]}>
+          <View style={styles.cardContainer}>
+            {/* Contenedor para la imagen de la guardería */}
+            <View style={styles.imageWrapper}>
+              <Image source={{ uri: guarderia.Foto }} style={styles.image} />
             </View>
-            <View style={styles.infoRow}>
-              <Icon name="location-sharp" size={20} color="black" style={styles.icon} />
-              <Text style={styles.infoText}>{guarderia.Direccion}</Text>
+            <Text style={styles.title}>{guarderia.Nombre}</Text>
+
+            {/* Descripción de la Guardería */}
+            <View style={styles.descriptionCard}>
+              <Text style={styles.description}>{guarderia.Descripcion}</Text>
             </View>
+
+            {/* Información de la guardería */}
+            <View style={styles.infoContainer}>
+              <View style={styles.infoRow}>
+                <Icon name="location" size={22} color="#2AC9FA" style={styles.icon} />
+                <Text style={styles.infoText}>{guarderia.Barrio}</Text>
+              </View>
+              <View style={styles.infoRow}>
+                <Icon name="location-sharp" size={22} color="#2AC9FA" style={styles.icon} />
+                <Text style={styles.infoText}>{guarderia.Direccion}</Text>
+              </View>
+            </View>
+
+            {/* Servicios ofrecidos */}
             <View style={styles.card}>
               <Text style={styles.cardTitle}>Servicios</Text>
               {guarderia.Servicios && guarderia.Servicios.split('-').map((servicio, index) => (
                 <Text key={index} style={styles.service}>{servicio.trim()}</Text>
               ))}
             </View>
+
+            {/* Botones de acción */}
             <TouchableOpacity style={styles.button} onPress={llamarTelefono}>
               <Icon name="call" size={20} color="white" style={styles.icon} />
               <Text style={styles.buttonText}>Llamar</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.button} onPress={abrirMapa}>
-              <Icon name="map" size={20} color="white" style={styles.icon} />
-              <Text style={styles.buttonText}>Abrir Mapa</Text>
+            <TouchableOpacity style={styles.buttonOutline} onPress={abrirMapa}>
+              <Icon name="map" size={20} color="#2AC9FA" style={styles.icon} />
+              <Text style={styles.buttonOutlineText}>Abrir Mapa</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.button} onPress={abrirPagina}>
-              <Icon name="globe" size={20} color="white" style={styles.icon} />
-              <Text style={styles.buttonText}>Abrir Página Web</Text>
+            <TouchableOpacity style={styles.buttonOutline} onPress={abrirPagina}>
+              <Icon name="globe" size={20} color="#2AC9FA" style={styles.icon} />
+              <Text style={styles.buttonOutlineText}>Abrir Página Web</Text>
             </TouchableOpacity>
           </View>
-        </View>
+        </Animated.View>
       </ScrollView>
     </ImageBackground>
   );
@@ -111,43 +130,66 @@ const styles = StyleSheet.create({
     resizeMode: 'cover',
   },
   scrollView: {
-    flex: 1,
+    flexGrow: 1,
+    paddingHorizontal: 20,
+    paddingVertical: 40,
   },
   container: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 40,
   },
-  image: {
-    width: 200,
-    height: 200,
-    borderRadius: 100,
+  cardContainer: {
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    padding: 15,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.25,
+    shadowRadius: 10,
+    elevation: 8,
+    width: '100%',
+  },
+  imageWrapper: {
+    justifyContent: 'center', // Centra verticalmente
+    alignItems: 'center', // Centra horizontalmente
     marginBottom: 20,
   },
+  image: {
+    width: '80%',
+    height: 200,
+    borderRadius: 20,
+    shadowColor: '#2AC9FA', // Sombra color neón
+    shadowOpacity: 0.6,
+    shadowOffset: { width: 5, height: 8 },
+    shadowRadius: 16,
+  },
   title: {
-    fontSize: 24,
+    fontSize: 30,
     fontWeight: 'bold',
-    marginBottom: 10,
-    color: 'black',
+    color: '#2AC9FA', // Verde neón
+    marginBottom: 15,
     textAlign: 'center',
   },
   descriptionCard: {
-    backgroundColor: 'white',
-    padding: 20,
-    borderRadius: 10,
+    backgroundColor: '#fff',
+    padding: 15,
+    borderRadius: 15,
     marginBottom: 20,
     width: '100%',
-    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.15,
+    shadowRadius: 10,
+    elevation: 8,
   },
   description: {
-    fontSize: 18,
-    color: 'black',
+    fontSize: 16,
+    color: '#333',
     textAlign: 'justify',
   },
   infoContainer: {
-    alignItems: 'center',
+    width: '100%',
   },
   infoRow: {
     flexDirection: 'row',
@@ -159,41 +201,77 @@ const styles = StyleSheet.create({
   },
   infoText: {
     fontSize: 16,
-    color: 'black',
+    color: '#333',
   },
   card: {
-    backgroundColor: 'white',
-    padding: 20,
-    borderRadius: 10,
-    marginBottom: 20,
+    backgroundColor: '#fff',
+    padding: 15,
+    borderRadius: 15,
+    marginBottom: 30,
     width: '100%',
-    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.15,
+    shadowRadius: 10,
+    elevation: 8,
   },
   cardTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: 'black',
+    color: '#333',
     marginBottom: 10,
   },
   service: {
     fontSize: 16,
-    color: 'black',
-    marginBottom: 5,
+    color: '#555',
+    marginBottom: 8,
   },
   button: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#2AC9FA',
+    backgroundColor: '#2AC9FA', // Botón de color llamativo
     paddingVertical: 15,
-    paddingHorizontal: 30,
+    paddingHorizontal: 35,
     borderRadius: 30,
-    marginVertical: 10,
+    marginVertical: 12,
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
   },
   buttonText: {
     color: 'white',
-    marginLeft: 5,
+    marginLeft: 10,
     fontWeight: 'bold',
+    fontSize: 16,
+  },
+  buttonOutline: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 15,
+    paddingHorizontal: 35,
+    borderRadius: 30,
+    borderColor: '#2AC9FA',
+    borderWidth: 2,
+    marginVertical: 12,
+  },
+  buttonOutlineText: {
+    color: '#2AC9FA',
+    marginLeft: 10,
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    fontSize: 20,
+    color: '#333',
   },
 });
 

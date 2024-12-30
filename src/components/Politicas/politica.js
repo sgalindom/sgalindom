@@ -99,11 +99,13 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 16,
     textAlign: 'center',
+    color: 'black', // Texto negro
   },
   paragraph: {
     fontSize: 16,
     marginBottom: 16,
     textAlign: 'justify',
+    color: 'black', // Texto negro
   },
   card: {
     backgroundColor: 'rgba(255, 255, 255, 0.8)',
@@ -123,10 +125,12 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 8,
+    color: 'black', // Texto negro
   },
   cardText: {
     fontSize: 16,
     textAlign: 'justify',
+    color: 'black', // Texto negro
   },
   button: {
     backgroundColor: '#2F9FFA', // Color del botón

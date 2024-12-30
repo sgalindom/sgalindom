@@ -9,7 +9,27 @@ const Pago = ({ navigation }) => {
   const [totalPagar, setTotalPagar] = useState('0');
   const [elevationAnim] = useState(new Animated.Value(0)); // Animación de elevación
   const [modalVisible, setModalVisible] = useState(false); // Estado para el modal
+  const [modalDatosBancariosVisible, setModalDatosBancariosVisible] = useState(false); // Modal para datos bancarios
   const [datosUsuario, setDatosUsuario] = useState(null); // Información del usuario
+  const [metodoPago, setMetodoPago] = useState('');
+
+  const metodosDePago = [
+    { id: 'transferencia', label: 'Transferencia' },
+    { id: 'nequi', label: 'Nequi' },
+    { id: 'efectivo', label: 'Efectivo' },
+    { id: 'contraentrega', label: 'Contraentrega' },
+  ];
+
+  const renderMetodoPago = (metodo) => (
+    <TouchableOpacity
+      key={metodo.id}
+      style={styles.metodoPagoItem}
+      onPress={() => setMetodoPago(metodo.id)}
+    >
+      <View style={[styles.circle, metodoPago === metodo.id && styles.circleSelected]} />
+      <Text style={styles.metodoPagoText}>{metodo.label}</Text>
+    </TouchableOpacity>
+  );
 
   useEffect(() => {
     const obtenerDatosUsuario = async () => {
@@ -24,6 +44,7 @@ const Pago = ({ navigation }) => {
               nombreCompleto: datos.nombreCompleto || 'Usuario',
               correo: usuarioAutenticado.email,
               telefono: datos.telefono || 'Teléfono no disponible',
+              direccion: datos.direccion || 'Dirección no disponible',
             });
           }
         }
@@ -82,56 +103,53 @@ const Pago = ({ navigation }) => {
       {
         text: 'Confirmar', onPress: async () => {
           try {
-            // Mostrar modal
-            setModalVisible(true);
-  
-            // Obtener el usuario actual
+            if (metodoPago === 'nequi' || metodoPago === 'transferencia') {
+              setModalDatosBancariosVisible(true);
+            } else {
+              setModalVisible(true);
+            }
+
             const usuarioAutenticado = auth().currentUser;
-  
+
             if (usuarioAutenticado && datosUsuario) {
-              // Crear un nuevo pedido en la colección global `mispedidos`
               const misPedidosRef = firestore().collection('mispedidos');
-  
-              // Crear un documento con un ID único generado automáticamente
               const nuevoPedidoRef = await misPedidosRef.add({
                 usuario: {
                   email: datosUsuario.correo,
                   nombre: datosUsuario.nombreCompleto,
                   telefono: datosUsuario.telefono,
+                  direccion: datosUsuario.direccion,
                 },
-                pedido: pedidos, // Información de los productos
+                pedido: pedidos,
                 total: totalPagar,
+                metodoPago,
                 fecha: new Date().toLocaleString(),
               });
-  
-              // Obtener el ID del nuevo documento generado
+
               const nuevoPedidoId = nuevoPedidoRef.id;
-  
-              // Crear un nuevo pedido en la colección `usuarios/{email}/mispedidos`
+
               const usuarioMisPedidosRef = firestore()
                 .collection('usuarios')
                 .doc(usuarioAutenticado.email)
                 .collection('mispedidos');
-  
+
               await usuarioMisPedidosRef.doc(nuevoPedidoId).set({
                 pedido: pedidos,
                 total: totalPagar,
+                metodoPago,
                 fecha: new Date().toLocaleString(),
               });
-  
-              // Limpiar el carrito en `usuarios/{email}/pedidos`
+
               const pedidosRef = firestore()
                 .collection('usuarios')
                 .doc(usuarioAutenticado.email)
                 .collection('pedidos');
               const pedidosDocs = await pedidosRef.get();
-  
-              // Eliminar cada documento en la colección de pedidos
+
               pedidosDocs.forEach(async (doc) => {
                 await doc.ref.delete();
               });
-  
-              // Vaciar el estado de pedidos después de eliminarlos
+
               setPedidos([]);
             }
           } catch (error) {
@@ -139,12 +157,10 @@ const Pago = ({ navigation }) => {
             Alert.alert('Error', 'Hubo un problema al procesar el pedido. Por favor, inténtelo de nuevo más tarde.');
             setModalVisible(false);
           }
-        }
-      }
+        },
+      },
     ]);
   };
-  
-  
 
   const handleEliminarPedido = async (id) => {
     Alert.alert('Confirmación', '¿Deseas eliminar este producto del carrito?', [
@@ -178,7 +194,7 @@ const Pago = ({ navigation }) => {
   };
 
   const renderItem = ({ item }) => (
-    <Animated.View style={[styles.itemContainer, { transform: [{ scale: elevationAnim }] }]}>
+    <Animated.View style={[styles.itemContainer, { transform: [{ scale: elevationAnim }] }]} >
       <View style={styles.cardContent}>
         <Image source={{ uri: item.foto }} style={styles.productImage} />
         <View style={styles.productDetails}>
@@ -196,6 +212,7 @@ const Pago = ({ navigation }) => {
       </View>
     </Animated.View>
   );
+  
 
   return (
     <View style={styles.container}>
@@ -222,6 +239,10 @@ const Pago = ({ navigation }) => {
           )}
           ListFooterComponent={() => (
             <View style={styles.footer}>
+              <View style={styles.metodosPagoContainer}>
+                <Text style={styles.metodoPagoTitulo}>Selecciona un método de pago:</Text>
+                {metodosDePago.map(renderMetodoPago)}
+              </View>
               <View style={styles.subtotalContainer}>
                 <Text style={styles.subtotalText}>Subtotal</Text>
                 <Text style={styles.subtotalAmount}>${totalPagar}</Text>
@@ -229,7 +250,7 @@ const Pago = ({ navigation }) => {
               <TouchableOpacity
                 onPress={pedidos.length > 0 ? handleHacerPedido : null}
                 style={[styles.botonHacerPedido, pedidos.length === 0 && styles.botonDeshabilitado]}
-                disabled={pedidos.length === 0}
+                disabled={pedidos.length === 0 || !metodoPago}
               >
                 <Text style={styles.textoBoton}>Iniciar compra</Text>
               </TouchableOpacity>
@@ -237,6 +258,34 @@ const Pago = ({ navigation }) => {
           )}
         />
       )}
+      {/* Modal para datos bancarios */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalDatosBancariosVisible}
+        onRequestClose={() => setModalDatosBancariosVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalText}>Por favor enviar comprobante</Text>
+            <Text style={styles.modalText}>Datos Bancarios:</Text>
+            <Text style={styles.modalText}>Banco: XYZ</Text>
+            <Text style={styles.modalText}>Cuenta: 123456789</Text>
+            <Text style={styles.modalText}>Nequi: 987654321</Text>
+            <TouchableOpacity
+              style={styles.modalButton}
+              onPress={() => {
+                setModalDatosBancariosVisible(false);
+                navigation.navigate('MainPanel'); // Navegar a MainPanel
+              }}
+            >
+              <Text style={styles.modalButtonText}>Finalizar</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+    
+ 
 
       {/* Modal de confirmación de pedido */}
       <Modal
@@ -279,7 +328,7 @@ const styles = StyleSheet.create({
   emptyText: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#D3D3D3',
+    color: '#333', // Cambiado a negro
     marginVertical: 20,
   },
   goBackButton: {
@@ -289,37 +338,35 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   goBackButtonText: {
-    color: '#fff',
-    fontSize: 18,
+    color: 'white', // Cambiado a negro
+    fontSize: 16,
     fontWeight: 'bold',
+    textAlign: 'center',
   },
   header: {
     marginBottom: 20,
     alignItems: 'center',
   },
   headerTitle: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#000', // Cambiado a negro
   },
   itemContainer: {
-    marginBottom: 20,
-    padding: 10,
-    backgroundColor: '#fff',
+    marginBottom: 15,
+    backgroundColor: '#FFF',
     borderRadius: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
+    overflow: 'hidden',
     elevation: 3,
   },
   cardContent: {
     flexDirection: 'row',
     alignItems: 'center',
+    padding: 15,
   },
   productImage: {
-    width: 100,
-    height: 100,
+    width: 70,
+    height: 70,
     borderRadius: 10,
     marginRight: 15,
   },
@@ -327,73 +374,96 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   productTitle: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: 'bold',
+    color: '#000', // Cambiado a negro
     marginBottom: 5,
   },
   productPrice: {
-    fontSize: 16,
-    color: '#333',
-    marginBottom: 5,
+    fontSize: 14,
+    color: '#000', // Cambiado a negro
   },
   productQuantity: {
-    fontSize: 16,
-    color: '#333',
-    marginBottom: 10,
+    fontSize: 14,
+    color: '#000', // Cambiado a negro
   },
   botonEliminar: {
-    backgroundColor: '#FF4757',
-    paddingVertical: 5,
-    paddingHorizontal: 15,
-    borderRadius: 20,
     flexDirection: 'row',
     alignItems: 'center',
+    backgroundColor: '#D9534F',
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    borderRadius: 5,
+    marginTop: 10,
   },
   textoBotonEliminar: {
-    color: 'white',
-    fontWeight: 'bold',
+    color: '#FFF',
     marginLeft: 5,
   },
   footer: {
-    padding: 20,
-    backgroundColor: '#fff',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: -2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 3,
+    marginTop: 20,
+    paddingTop: 10,
+    borderTopWidth: 1,
+    borderTopColor: '#E0E0E0',
+  },
+  metodosPagoContainer: {
+    marginBottom: 20,
+  },
+  metodoPagoTitulo: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#000', // Cambiado a negro
+    marginBottom: 10,
+  },
+  metodoPagoItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  circle: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#000', // Cambiado a negro
+    marginRight: 10,
+  },
+  circleSelected: {
+    backgroundColor: '#3498db',
+  },
+  metodoPagoText: {
+    fontSize: 16,
+    color: '#000', // Cambiado a negro
   },
   subtotalContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 16,
+    alignItems: 'center',
+    marginVertical: 15,
   },
   subtotalText: {
     fontSize: 18,
-    color: '#333',
     fontWeight: 'bold',
+    color: '#000', // Cambiado a negro
   },
   subtotalAmount: {
-    fontSize: 22,
+    fontSize: 18,
     fontWeight: 'bold',
-    color: '#000',
+    color: '#000', // Cambiado a negro
   },
   botonHacerPedido: {
     backgroundColor: '#6A0DAD',
     paddingVertical: 15,
-    borderRadius: 20,
+    borderRadius: 10,
     alignItems: 'center',
-    justifyContent: 'center',
   },
   botonDeshabilitado: {
     backgroundColor: '#D3D3D3',
   },
   textoBoton: {
-    color: '#fff',
     fontSize: 18,
     fontWeight: 'bold',
+    color: '#FFF',
   },
   modalContainer: {
     flex: 1,
@@ -402,27 +472,28 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalContent: {
-    backgroundColor: '#fff',
-    borderRadius: 10,
+    backgroundColor: '#FFF',
     padding: 30,
+    borderRadius: 10,
     alignItems: 'center',
+    justifyContent: 'center',
+    width: '80%',
   },
   modalText: {
     fontSize: 20,
-    marginTop: 20,
     fontWeight: 'bold',
-    color: '#333',
+    color: 'black',
+    marginVertical: 20,
   },
   modalButton: {
-    marginTop: 20,
     backgroundColor: '#6A0DAD',
-    padding: 15,
-    borderRadius: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
   },
   modalButtonText: {
-    color: '#fff',
     fontSize: 18,
-    fontWeight: 'bold',
+    color: '#FFF',
   },
 });
 

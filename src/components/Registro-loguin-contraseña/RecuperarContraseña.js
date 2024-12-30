@@ -31,7 +31,6 @@ const RecuperarContraseña = ({ navigation }) => {
       await auth().sendPasswordResetEmail(email);
       console.log('Correo de restablecimiento de contraseña enviado con éxito.');
 
-      // Mostrar alerta de éxito
       Alert.alert(
         'Correo Enviado',
         'Se ha enviado un correo con instrucciones para restablecer tu contraseña.',
@@ -55,11 +54,16 @@ const RecuperarContraseña = ({ navigation }) => {
             onChangeText={(text) => setEmail(text)}
             style={styles.input}
             placeholderTextColor="black"
+            accessibilityLabel="Campo de correo electrónico"
           />
         </View>
         {error && <Text style={styles.errorText}>{error}</Text>}
-        <TouchableOpacity onPress={handleRecuperarContraseña} style={styles.button}>
-          <Text style={styles.buttonText}>Recuperar Contraseña</Text>
+        <TouchableOpacity
+          onPress={handleRecuperarContraseña}
+          style={styles.button}
+          accessibilityLabel="Botón para recuperar la contraseña con un enlace a tu correo electrónico"
+        >
+          <Text style={styles.buttonText}>Enviar</Text>
         </TouchableOpacity>
       </View>
     </ImageBackground>
@@ -85,7 +89,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 30,
     fontWeight: 'bold',
-    color: '#FFFFFF',
+    color: 'black',
     marginBottom: 30,
   },
   inputContainer: {

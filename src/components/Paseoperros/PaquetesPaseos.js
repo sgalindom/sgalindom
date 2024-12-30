@@ -4,7 +4,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 
 const PaquetesPaseos = ({ navigation }) => {
   const fondoPaquetesImage = require('../imagenes/fondomain.jpg');
-  const paseoImage = require('../imagenes/fondomain.jpg'); // Imagen representativa de paseos
+  const paseoImage = { uri: 'https://www.fanaticosdelasmascotas.cl/wp-content/uploads/2021/03/portada-1.png' }; // Imagen representativa de paseos
 
   const animatedScale = new Animated.Value(1);
 
@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
     marginBottom: 30,
     textAlign: 'center',
     letterSpacing: 2,
-    textShadowColor: '#FF6F61',
+    textShadowColor: 'black',
     textShadowOffset: { width: 0, height: 3 },
     textShadowRadius: 8,
   },
@@ -116,7 +116,7 @@ const styles = StyleSheet.create({
   },
   agendarButton: {
     flexDirection: 'row',
-    backgroundColor: '#FF6F61',
+    backgroundColor: '#007BFF',
     paddingVertical: 15,
     paddingHorizontal: 20,
     borderRadius: 50,

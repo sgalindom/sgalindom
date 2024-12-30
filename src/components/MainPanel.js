@@ -37,21 +37,19 @@ const MainPanel = ({ navigation }) => {
     { id: 10, text: 'Enseña a tu mascota comandos básicos para su seguridad.' },
   ];
 
-  // Rotación de servicios cada 3 segundos
+  // Rotación de servicios
   useEffect(() => {
     const intervalId = setInterval(() => {
-      const nextIndex = (currentServiceIndex + 1) % services.length;
-      scrollViewRef.current.scrollTo({ x: nextIndex * width * 0.8, animated: true });
-      setCurrentServiceIndex(nextIndex);
-    }, 3000);
+      setCurrentServiceIndex((prevIndex) => (prevIndex + 1) % services.length);
+    }, 6000); // Cambia la imagen cada 6 segundos
 
     return () => clearInterval(intervalId);
-  }, [currentServiceIndex]);
+  }, [services.length]);
 
   // Rotación de consejos cada 3 segundos
   useEffect(() => {
     const tipIntervalId = setInterval(() => {
-      setCurrentTipIndex(prevIndex => (prevIndex + 1) % tips.length);
+      setCurrentTipIndex((prevIndex) => (prevIndex + 1) % tips.length);
     }, 3000);
 
     return () => clearInterval(tipIntervalId);
@@ -68,7 +66,7 @@ const MainPanel = ({ navigation }) => {
               .collection(category);
 
             const snapshot = await vetProductsRef.get();
-            return snapshot.docs.map(doc => ({
+            return snapshot.docs.map((doc) => ({
               id: doc.id,
               vetId: vetId,
               ...doc.data(),
@@ -85,10 +83,12 @@ const MainPanel = ({ navigation }) => {
 
         const veterinariasRef = firestore().collection('Veterinarias');
         const veterinariasSnapshot = await veterinariasRef.get();
-        setVeterinarias(veterinariasSnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data(),
-        })));
+        setVeterinarias(
+          veterinariasSnapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }))
+        );
       } catch (error) {
         console.error('Error fetching products', error);
       }
@@ -113,8 +113,10 @@ const MainPanel = ({ navigation }) => {
     }
   };
 
+ 
+
   return (
-    <ImageBackground source={require('./imagenes/fondomain.jpg')} style={styles.backgroundImage}>
+    <View style={styles.backgroundContainer}>
       <ScrollView contentContainerStyle={styles.container}>
         {/* Logo */}
         <View style={styles.logoContainer}>
@@ -124,7 +126,6 @@ const MainPanel = ({ navigation }) => {
         <View style={styles.welcomeTextContainer}>
           <Text style={styles.welcomeText}>¡Encuentra todo lo que tu mejor amigo necesita!</Text>
         </View>
-
 
         {/* Carrusel de Servicios con animación */}
         <Animated.ScrollView
@@ -147,6 +148,19 @@ const MainPanel = ({ navigation }) => {
           ))}
         </Animated.ScrollView>
 
+        {/* Indicadores del carrusel */}
+        <View style={styles.indicatorContainer}>
+          {services.map((_, index) => (
+            <View
+              key={index}
+              style={[
+                styles.indicator,
+                { backgroundColor: currentServiceIndex === index ? '#E4784A' : '#ccc' },
+              ]}
+            />
+          ))}
+        </View>
+
         {/* Consejos */}
         <View style={styles.tipContainer}>
           <View style={styles.tipCard}>
@@ -162,7 +176,7 @@ const MainPanel = ({ navigation }) => {
               <Image source={require('./imagenes/gato.jpg')} style={styles.tarjetaImage} />
               <Text style={styles.tarjetaText}>Gato</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => navigation.navigate('proximamente')} style={styles.tarjeta}>
+            <TouchableOpacity onPress={() => navigation.navigate('perro')} style={styles.tarjeta}>
               <Image source={require('./imagenes/perro.jpg')} style={styles.tarjetaImage} />
               <Text style={styles.tarjetaText}>Perro</Text>
             </TouchableOpacity>
@@ -173,7 +187,7 @@ const MainPanel = ({ navigation }) => {
         <View style={styles.veterinariasContainer}>
           <View style={styles.veterinariasTitleContainer}>
             <Icon name="storefront-sharp" size={24} color="#E4784A" style={styles.iconMargin} />
-            <Text style={styles.veterinariasTitle}>Veterinarias</Text>
+            <Text style={styles.veterinariasTitle}>Veterinarias y mas...</Text>
           </View>
           <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
             {veterinarias.map(vet => (
@@ -189,73 +203,83 @@ const MainPanel = ({ navigation }) => {
             ))}
           </ScrollView>
         </View>
+
+        
+
+        
       </ScrollView>
+      
 
       {/* Barra de perfil */}
       <View style={styles.profileBar}>
         <TouchableOpacity onPress={() => navigation.navigate('MiPerfil')} style={styles.profileButton}>
-          <Icon name="person" size={30} color="#000" />
+          <Icon name="person" size={30} color="black" />
           <Text style={styles.profileButtonText}>Perfil</Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => navigation.navigate('pago')} style={styles.profileButton}>
-          <Icon name="cart" size={30} color="#000" />
-          <Text style={styles.profileButtonText}>Pedidos</Text>
+          <Icon name="cart" size={30} color="black" />
+          <Text style={styles.profileButtonText}>Carrito</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate('Contactanos')} style={styles.profileButton}>
-          <Icon name="logo-whatsapp" size={30} color="#000" />
-          <Text style={styles.profileButtonText}>Contáctanos</Text>
+        <TouchableOpacity onPress={() => navigation.navigate('vercupones')} style={styles.profileButton}>
+          <Icon name="ticket" size={30} color="black" />
+          <Text style={styles.profileButtonText}>Cupones</Text>
         </TouchableOpacity>
       </View>
-    </ImageBackground>
+    </View>
   );
 };
-
 const styles = StyleSheet.create({
-  backgroundImage: {
+  backgroundContainer: {
     flex: 1,
-    resizeMode: 'cover',
+    backgroundColor: '#f4f6fc', // Color de fondo suave
   },
+  
   container: {
     flexGrow: 1,
-    padding: 15,
+    padding: 20,
   },
+
   logoContainer: {
     width: '100%',
-    height: 140, // La altura puede variar si lo deseas
-    justifyContent: 'flex-start', // Para que esté pegado arriba
+    height: 180,
+    justifyContent: 'flex-start',
     alignItems: 'center',
-    paddingTop: 0, // Sin padding superior
-    marginTop: 0, // Sin margen superior
   },
   logoImage: {
-    width: '110%', // Ocupar todo el ancho del dispositivo
-    height: '100%', // Ocupar toda la altura disponible en el contenedor
-    resizeMode: 'cover', // Ajustar la imagen sin distorsionar
+    resizeMode: 'cover',
+    width: '110%',
+    height: 180,
+    borderRadius: 15, // Bordes suaves
   },
+
   welcomeText: {
-    fontSize: 32,
+    fontSize: 28,
     fontWeight: 'bold',
-    color: '#fff', // Texto blanco
+    color: '#333',
     textAlign: 'center',
-    marginBottom: 20,
-    textShadowColor: 'rgba(0, 0, 0, 0.8)', // Color de la sombra, negro con opacidad
-    textShadowOffset: { width: 2, height: 2 }, // Desplazamiento de la sombra
-    textShadowRadius: 3, // Difusión de la sombra
+    marginBottom: 25,
+    textShadowColor: '#ddd',
+    textShadowOffset: { width: 2, height: 2 },
+    textShadowRadius: 5,
   },
 
   carouselContainer: {
     justifyContent: 'center',
     alignItems: 'center',
   },
+  
   serviceCard: {
-    width: width * 0.8, // 80% del ancho de la pantalla
-    height: 200, // Altura de las tarjetas
-    marginHorizontal: 10,
-    borderRadius: 10,
+    width: width * 0.8,
+    height: 220,
+    marginHorizontal: 12,
+    borderRadius: 15,
     overflow: 'hidden',
     backgroundColor: '#fff',
-    elevation: 3,
+    elevation: 6,
+    borderColor: '#ddd',
+    borderWidth: 1,
   },
+
   serviceImage: {
     width: '100%',
     height: '100%',
@@ -263,118 +287,159 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   serviceTitle: {
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
     color: '#fff',
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: 'bold',
     textAlign: 'center',
-    paddingVertical: 5,
+    paddingVertical: 10,
     width: '100%',
   },
+
+  indicatorContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: 10,
+  },
+  indicator: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    margin: 5,
+    backgroundColor: '#ccc',
+  },
+
   tipContainer: {
     marginBottom: 20,
   },
+  
   tipCard: {
-    padding: 15,
+    padding: 20,
     backgroundColor: '#fff',
-    borderRadius: 10,
-    elevation: 3,
-    marginVertical: 10,
+    borderRadius: 15,
+    elevation: 4,
+    marginVertical: 12,
     alignItems: 'center',
+    borderColor: '#ddd',
+    borderWidth: 1,
   },
+
   tipText: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: 'bold',
-    color: '#000',
+    color: '#333',
+    textAlign: 'center',
   },
+
   compraParaContainer: {
     marginBottom: 20,
   },
   compraParaText: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
-    color: '#000',
+    color: '#333',
     textAlign: 'center',
-    marginBottom: 10,
+    marginBottom: 12,
   },
+
   tarjetaContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
+    justifyContent: 'space-between',
   },
+
   tarjeta: {
     alignItems: 'center',
-    width: '40%',
+    width: '45%',
     backgroundColor: '#fff',
-    borderRadius: 10,
+    borderRadius: 15,
     overflow: 'hidden',
-    elevation: 3,
+    elevation: 6,
     marginHorizontal: 5,
-    padding: 10,
+    padding: 15,
+    borderColor: '#ddd',
+    borderWidth: 1,
   },
+  
   tarjetaImage: {
     width: '100%',
-    height: 130,
+    height: 140,
+    borderRadius: 10,
   },
   tarjetaText: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: 'bold',
     marginVertical: 10,
-    color: '#000',
+    color: '#333',
   },
+
   veterinariasContainer: {
     marginBottom: 20,
   },
+
   veterinariasTitleContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: 15,
   },
+
   iconMargin: {
     marginRight: 10,
   },
+
   veterinariasTitle: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: 'bold',
-    color: '#000',
+    color: '#333',
+    alignItems: 'center',
   },
+
   veterinariaCard: {
     marginRight: 15,
-    marginHorizontal: 5,
     backgroundColor: '#fff',
-    borderRadius: 10,
+    borderRadius: 15,
     overflow: 'hidden',
-    elevation: 3,
+    elevation: 4,
+    borderColor: '#ddd',
+    borderWidth: 1,
+    marginHorizontal: 5,
   },
+
   veterinariaButton: {
     alignItems: 'center',
     padding: 10,
   },
+  
   veterinariaImage: {
     width: 160,
     height: 120,
-    borderRadius: 10,
+    borderRadius: 12,
   },
+
   veterinariaName: {
-    marginTop: 10,
+    marginTop: 12,
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#000',
+    color: '#333',
   },
+
   profileBar: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    padding: 10,
-    backgroundColor: '#f5f5f5',
+    paddingVertical: 12,
+    backgroundColor: '#fff',
     borderTopWidth: 1,
     borderTopColor: '#ddd',
   },
+
   profileButton: {
     alignItems: 'center',
   },
+
   profileButtonText: {
     marginTop: 5,
-    fontSize: 12,
+    fontSize: 14,
     fontWeight: 'bold',
+    color: '#333',
   },
 });
 

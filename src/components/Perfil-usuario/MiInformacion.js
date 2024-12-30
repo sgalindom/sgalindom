@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ImageBackground, ScrollView, TouchableOpacity, Image, Modal } from 'react-native';
+import { View, Text, StyleSheet, ImageBackground, ScrollView, TouchableOpacity, Image, Modal, TextInput } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
@@ -11,6 +11,13 @@ const MiInformacion = () => {
   const [profileImage, setProfileImage] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [userEmail, setUserEmail] = useState('');
+  const [editableData, setEditableData] = useState({
+    direccion: '',
+    telefono: '',
+  });
+  const [editingField, setEditingField] = useState(null);
+  const [editAddressModalVisible, setEditAddressModalVisible] = useState(false);
+  const [newDireccion, setNewDireccion] = useState('');
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -140,6 +147,68 @@ const MiInformacion = () => {
     }
   };
 
+  const handleEdit = (field) => {
+    setEditingField(field);
+    setEditableData({
+      direccion: userData.direccion,
+      telefono: userData.telefono,
+    });
+  };
+
+  const handleSave = async () => {
+    const user = auth().currentUser;
+    const userEmail = user.email;
+    try {
+      const userDocs = await firestore()
+        .collection('usuarios')
+        .doc(userEmail)
+        .collection('datos')
+        .get();
+
+      if (!userDocs.empty) {
+        const docId = userDocs.docs[0].id;
+        await firestore()
+          .collection('usuarios')
+          .doc(userEmail)
+          .collection('datos')
+          .doc(docId)
+          .set({
+            direccion: editableData.direccion,
+          }, { merge: true });
+        setUserData({ ...userData, direccion: editableData.direccion });
+        setEditingField(null);
+      }
+    } catch (error) {
+      console.error('Error al guardar los cambios: ', error);
+    }
+  };
+
+  const handleSaveAddress = async () => {
+    const user = auth().currentUser;
+    const userEmail = user.email;
+    try {
+      const userDocs = await firestore()
+        .collection('usuarios')
+        .doc(userEmail)
+        .collection('datos')
+        .get();
+
+      if (!userDocs.empty) {
+        const docId = userDocs.docs[0].id;
+        await firestore()
+          .collection('usuarios')
+          .doc(userEmail)
+          .collection('datos')
+          .doc(docId)
+          .set({ direccion: newDireccion }, { merge: true });
+        setUserData({ ...userData, direccion: newDireccion });
+        setEditAddressModalVisible(false);
+      }
+    } catch (error) {
+      console.error('Error al actualizar la dirección: ', error);
+    }
+  };
+
   return (
     <ImageBackground source={require('../imagenes/fondomain.jpg')} style={styles.backgroundImage}>
       <View style={styles.centeredContainer}>
@@ -171,20 +240,41 @@ const MiInformacion = () => {
                 </View>
                 <View style={styles.card}>
                   <Icon name="birthday-cake" size={24} color="#3498db" style={styles.cardIcon} />
-                  <Text style={styles.cardText}>Fecha de Nacimiento: {new Date(userData.fechaNacimiento.seconds * 1000).toLocaleDateString()}</Text>
-                </View>
-                <View style={styles.card}>
-                  <Icon name="birthday-cake" size={24} color="#3498db" style={styles.cardIcon} />
-                  <Text style={styles.cardText}>Edad: {userData.edad} años</Text>
+                  <Text style={styles.cardText}>
+                    Fecha de Nacimiento: 
+                    {userData.fechaNacimiento && userData.fechaNacimiento.seconds 
+                      ? new Date(userData.fechaNacimiento.seconds * 1000).toLocaleDateString()
+                      : 'No disponible'}
+                  </Text>
                 </View>
                 <View style={styles.card}>
                   <Icon name="home" size={24} color="#3498db" style={styles.cardIcon} />
-                  <Text style={styles.cardText}>Dirección: {userData.direccion}</Text>
+                  <Text style={styles.cardText}>
+                    Dirección: 
+                    {editingField === 'direccion' ? 
+                      <TextInput
+                        style={styles.inputField}
+                        value={editableData.direccion}
+                        onChangeText={(text) => setEditableData({ ...editableData, direccion: text })}
+                      /> 
+                      : userData.direccion
+                    }
+                  </Text>
+                  {editingField !== 'direccion' && (
+                    <TouchableOpacity onPress={() => setEditAddressModalVisible(true)}>
+                      <Icon name="edit" size={18} color="#3498db" style={styles.editIcon} />
+                    </TouchableOpacity>
+                  )}
                 </View>
                 <View style={styles.card}>
                   <Icon name="phone" size={24} color="#3498db" style={styles.cardIcon} />
                   <Text style={styles.cardText}>Teléfono: {userData.telefono}</Text>
                 </View>
+                {editingField && (
+                  <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
+                    <Text style={styles.saveButtonText}>Guardar Cambios</Text>
+                  </TouchableOpacity>
+                )}
               </>
             ) : (
               <Text style={styles.infoText}>Cargando...</Text>
@@ -192,11 +282,35 @@ const MiInformacion = () => {
           </View>
         </View>
 
+        {/* Modal para editar la dirección */}
+        <Modal
+          animationType="fade"
+          transparent={true}
+          visible={editAddressModalVisible}
+          onRequestClose={() => setEditAddressModalVisible(false)}
+        >
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <TextInput
+                style={styles.inputField}
+                value={newDireccion}
+                onChangeText={setNewDireccion}
+                placeholder="Ingrese nueva dirección"
+              />
+              <TouchableOpacity style={styles.saveButton} onPress={handleSaveAddress}>
+                <Text style={styles.saveButtonText}>Guardar Dirección</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.modalCancelButton} onPress={() => setEditAddressModalVisible(false)}>
+                <Text style={styles.saveButtonText}>Cancelar</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+
         {/* Modal con iconos */}
         <Modal animationType="fade" transparent={true} visible={modalVisible} onRequestClose={() => setModalVisible(false)}>
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
-              
               {/* Tomar Foto */}
               <TouchableOpacity style={styles.modalItem} onPress={takePhoto}>
                 <Icon name="camera" size={24} color="#3498db" style={styles.modalIcon} />
@@ -212,15 +326,13 @@ const MiInformacion = () => {
               {/* Quitar Foto */}
               <TouchableOpacity style={[styles.modalItem, styles.modalRemove]} onPress={removePhoto}>
                 <Icon name="trash-alt" size={24} color="#e74c3c" style={styles.modalIcon} />
-                <Text style={[styles.modalItemText, { color: '#e74c3c' }]}>Quitar Foto</Text>
+                <Text style={[styles.modalItemText, { color: '#e74c3c' }]}>Eliminar Foto</Text>
               </TouchableOpacity>
 
               {/* Cancelar */}
-              <TouchableOpacity style={[styles.modalItem, styles.modalCancel]} onPress={() => setModalVisible(false)}>
-                <Icon name="times-circle" size={24} color="#3498db" style={styles.modalIcon} />
-                <Text style={styles.modalItemText}>Cancelar</Text>
+              <TouchableOpacity style={styles.modalCancelButton} onPress={() => setModalVisible(false)}>
+                <Text style={styles.saveButtonText}>Cancelar</Text>
               </TouchableOpacity>
-
             </View>
           </View>
         </Modal>
@@ -240,84 +352,81 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   cardWrapper: {
-    backgroundColor: '#fff',
-    borderRadius: 15,
-    padding: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 5 },
-    shadowOpacity: 0.15,
-    shadowRadius: 10,
-    elevation: 8,
     width: '90%',
-    marginBottom: 30,
+    padding: 20,
+    backgroundColor: 'white',
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
   },
   profileSection: {
     alignItems: 'center',
-    marginBottom: 30,
+    marginBottom: 20,
   },
   imageContainer: {
-    position: 'relative', // Necessary for absolute positioning of the camera icon
+    position: 'relative',
   },
   profileImageContainer: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    overflow: 'hidden',
     marginBottom: 10,
-    borderWidth: 1,
-    borderColor: '#888',
-    borderRadius: 100,
-    padding: 5,
+    backgroundColor: '#eee',
   },
   profileImage: {
-    width: 150,
-    height: 150,
-    borderRadius: 75,
+    width: '100%',
+    height: '100%',
   },
   profileImagePlaceholder: {
-    width: 150,
-    height: 150,
-    borderRadius: 75,
-    backgroundColor: '#f0f0f0',
+    width: '100%',
+    height: '100%',
     justifyContent: 'center',
     alignItems: 'center',
   },
   cameraIconContainer: {
     position: 'absolute',
-    bottom: 10,
-    right: 10,
+    bottom: 5,
+    right: 5,
     backgroundColor: '#3498db',
-    borderRadius: 15,
     padding: 5,
-    elevation: 5,
+    borderRadius: 20,
   },
   emailText: {
-    fontSize: 18,
-    color: '#3498db',
-    fontWeight: 'bold',
+    fontSize: 16,
+    color: 'black',
   },
   cardSection: {
-    width: '100%',
-    alignItems: 'center',
+    marginTop: 20,
   },
   card: {
-    width: '90%',
-    padding: 15,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: '#ddd',
-    marginVertical: 10,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#f8f8f8',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
-    elevation: 4,
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ddd',
   },
   cardIcon: {
-    marginRight: 20,
+    marginRight: 10,
   },
   cardText: {
     fontSize: 16,
-    color: '#333',
+    color: 'black',
+  },
+  saveButton: {
+    backgroundColor: '#3498db',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 10,
+    marginTop: 20,
+    alignItems: 'center',
+  },
+  saveButtonText: {
+    color: '#fff',
+    fontSize: 16,
   },
   modalContainer: {
     flex: 1,
@@ -326,38 +435,48 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalContent: {
-    backgroundColor: 'white',
+    backgroundColor: '#fff',
+    padding: 20,
     borderRadius: 10,
-    paddingVertical: 20,
-    paddingHorizontal: 30,
     width: '80%',
-    alignItems: 'center',
   },
   modalItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
-    width: '100%',
-  },
-  modalItemText: {
-    fontSize: 18,
-    marginLeft: 10,
-    color: '#3498db',
+    paddingVertical: 10,
   },
   modalIcon: {
     marginRight: 10,
   },
-  modalRemove: {
-    borderBottomWidth: 0, // Último ítem sin borde
+  modalItemText: {
+    fontSize: 16,
   },
-  modalCancel: {
-    marginTop: 20,
+  modalRemove: {
     borderTopWidth: 1,
-    borderTopColor: '#eee',
-    paddingTop: 15,
-    paddingBottom: 0,
+    borderTopColor: '#ccc',
+  },
+  modalCancelButton: {
+    marginTop: 20,
+    backgroundColor: '#e74c3c',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  inputField: {
+    height: 40,
+    borderColor: '#ddd',
+    borderWidth: 1,
+    borderRadius: 5,
+    marginBottom: 10,
+    paddingLeft: 10,
+  },
+  infoText: {
+    fontSize: 18,
+    color: '#aaa',
+  },
+  editIcon: {
+    marginLeft: 10,
   },
 });
 

@@ -23,6 +23,7 @@ const AñadirMascota = ({ navigation }) => {
   const [successModalVisible, setSuccessModalVisible] = useState(false); // Estado para el modal de éxito
   const [errorModalVisible, setErrorModalVisible] = useState(false); // Estado para el modal de error
   const [errorMessage, setErrorMessage] = useState(''); // Mensaje de error
+  const [emptyFieldsModalVisible, setEmptyFieldsModalVisible] = useState(false); // Estado para el modal de campos vacíos
 
   const user = auth().currentUser;
   const userEmail = user ? user.email : '';
@@ -75,34 +76,37 @@ const AñadirMascota = ({ navigation }) => {
   };
 
   const registrarMascota = async () => {
-    if (userEmail && nombre && raza && fechaNacimiento && peso) {
-      const mascotasRef = firestore().collection(`usuarios/${userEmail}/mascotas`);
+    if (!userEmail || !nombre || !raza || !fechaNacimiento || !peso) {
+      setEmptyFieldsModalVisible(true);
+      return;
+    }
 
-      try {
-        const ultimaMascota = await mascotasRef.orderBy('id', 'desc').limit(1).get();
-        const ultimoID = ultimaMascota.docs.length > 0 ? ultimaMascota.docs[0].data().id : 0;
-        const nuevoID = ultimoID + 1;
+    const mascotasRef = firestore().collection(`usuarios/${userEmail}/mascotas`);
 
-        const edad = moment().diff(fechaNacimiento, 'years'); // Calcular la edad en años
+    try {
+      const ultimaMascota = await mascotasRef.orderBy('id', 'desc').limit(1).get();
+      const ultimoID = ultimaMascota.docs.length > 0 ? ultimaMascota.docs[0].data().id : 0;
+      const nuevoID = ultimoID + 1;
 
-        const nuevaMascota = {
-          id: nuevoID,
-          nombre,
-          raza,
-          fechaNacimiento,
-          peso,
-          descripcion,
-          tipo: tipoMascota,
-          edad, // Almacenar la edad en Firebase
-        };
+      const edad = moment().diff(fechaNacimiento, 'years'); // Calcular la edad en años
 
-        await mascotasRef.doc(nuevoID.toString()).set(nuevaMascota);
-        setSuccessModalVisible(true); // Mostrar modal de éxito
-      } catch (error) {
-        console.error('Error al registrar la mascota:', error);
-        setErrorMessage(error.message);
-        setErrorModalVisible(true); // Mostrar modal de error
-      }
+      const nuevaMascota = {
+        id: nuevoID,
+        nombre,
+        raza,
+        fechaNacimiento,
+        peso,
+        descripcion,
+        tipo: tipoMascota,
+        edad, // Almacenar la edad en Firebase
+      };
+
+      await mascotasRef.doc(nuevoID.toString()).set(nuevaMascota);
+      setSuccessModalVisible(true); // Mostrar modal de éxito
+    } catch (error) {
+      console.error('Error al registrar la mascota:', error);
+      setErrorMessage(error.message);
+      setErrorModalVisible(true); // Mostrar modal de error
     }
   };
 
@@ -157,17 +161,20 @@ const AñadirMascota = ({ navigation }) => {
             </Picker>
           </View>
 
-          <View style={styles.inputContainer}>
-            <Icon name="calendar" size={20} color="#FF6F61" style={styles.icon} />
-            <TouchableOpacity onPress={() => setOpenDatePicker(true)}>
-              <TextInput
-                style={styles.input}
-                placeholder="Seleccionar fecha de nacimiento"
-                value={fechaNacimiento ? moment(fechaNacimiento).format('DD/MM/YYYY') : ''}
-                editable={false}
-                placeholderTextColor="#888"
-              />
-            </TouchableOpacity>
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Fecha de nacimiento de la mascota</Text>
+            <View style={styles.inputContainer}>
+              <Icon name="calendar" size={20} color="#007BFF" style={styles.icon} />
+              <TouchableOpacity onPress={() => setOpenDatePicker(true)}>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Seleccionar fecha de nacimiento"
+                  value={fechaNacimiento ? moment(fechaNacimiento).format('DD/MM/YYYY') : ''}
+                  editable={false}
+                  placeholderTextColor="#888"
+                />
+              </TouchableOpacity>
+            </View>
           </View>
 
           <DatePicker
@@ -266,6 +273,31 @@ const AñadirMascota = ({ navigation }) => {
             </View>
           </View>
         </Modal>
+
+        {/* Modal de campos vacíos */}
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={emptyFieldsModalVisible}
+          onRequestClose={() => {
+            setEmptyFieldsModalVisible(false);
+          }}
+        >
+          <View style={styles.modalContainer}>
+            <View style={styles.modalView}>
+              <Icon name="times-circle" size={60} color="red" />
+              <Text style={styles.modalText}>Por favor, completa todos los campos</Text>
+              <TouchableOpacity
+                style={styles.modalButton}
+                onPress={() => {
+                  setEmptyFieldsModalVisible(false);
+                }}
+              >
+                <Text style={styles.modalButtonText}>Aceptar</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
       </ScrollView>
     </ImageBackground>
   );
@@ -287,73 +319,80 @@ const styles = StyleSheet.create({
     height: windowHeight,
   },
   formContainer: {
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-    padding: 20,
-    borderRadius: 10,
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    padding: 25,
+    borderRadius: 15,
     width: '90%',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
     elevation: 5,
   },
   title: {
-    fontSize: 28,
+    fontSize: 30,
     fontWeight: 'bold',
-    marginBottom: 20,
-    color: '#333',
+    marginBottom: 25,
+    color: '#007BFF',
     textAlign: 'center',
+    textShadowColor: '#87CEFA',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 2,
   },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 15,
+    backgroundColor: '#f0f8ff',
+    borderWidth: 1,
+    borderColor: '#87CEEB',
+    borderRadius: 10,
+    padding: 10,
   },
   input: {
     flex: 1,
-    fontSize: 18,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    padding: 10,
-    color: '#333',
-    backgroundColor: '#f9f9f9',
+    fontSize: 16,
+    color: 'black',
+    marginLeft: 10,
   },
   icon: {
-    marginRight: 10,
+    marginLeft: 5,
+    color: '#007BFF',
   },
   gradientButton: {
-    backgroundColor: '#FF6F61',
     alignItems: 'center',
     padding: 15,
-    borderRadius: 8,
+    borderRadius: 10,
     marginTop: 20,
+    backgroundColor: '#007BFF',
   },
   buttonText: {
     fontSize: 18,
     fontWeight: 'bold',
     color: 'white',
+    textTransform: 'uppercase',
+    letterSpacing: 1,
   },
   modalContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 22,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Fondo semitransparente
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalView: {
     margin: 20,
     backgroundColor: 'white',
     borderRadius: 20,
-    padding: 35,
+    padding: 25,
     alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
-      height: 2,
+      height: 3,
     },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
     elevation: 5,
   },
   modalText: {
@@ -363,9 +402,9 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   modalButton: {
-    backgroundColor: '#FF6F61',
+    backgroundColor: '#007BFF',
     borderRadius: 10,
-    padding: 10,
+    padding: 12,
     elevation: 2,
     marginTop: 10,
   },
@@ -373,8 +412,23 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: 'bold',
     textAlign: 'center',
-    fontSize: 18,
+    fontSize: 16,
+    textTransform: 'uppercase',
   },
+  inputGroup: {
+    marginBottom: 15,
+  },
+  label: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#007BFF',
+    marginBottom: 5,
+    textAlign: 'left',
+  },
+  
+  
 });
+
+
 
 export default AñadirMascota;

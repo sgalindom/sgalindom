@@ -73,17 +73,19 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 5,
+    color: 'black',  // Texto en negro
   },
   cuponSubtitle: {
     fontSize: 16,
     marginBottom: 5,
+    color: 'black',  // Texto en negro
   },
   listTitle: {
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 10,
     textAlign: 'center',
-    color: 'black',
+    color: 'black',  // Texto en negro
   },
   detailsButton: {
     flexDirection: 'row',
@@ -107,3 +109,4 @@ const styles = StyleSheet.create({
 });
 
 export default VerCupones;
+  

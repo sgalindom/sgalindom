@@ -169,11 +169,13 @@ const SolicitudPaseo = ({ route, navigation }) => {
             {mascotas.length > 0 ? (
               mascotas.map((mascota) => (
                 <View key={mascota.id} style={styles.mascota}>
-                  <CheckBox
-                    value={selectedMascotas.includes(mascota.nombre)}
-                    onValueChange={() => toggleMascota(mascota.nombre)}
-                  />
-                  <Text style={styles.mascotaNombre}>{mascota.nombre}</Text>
+                  <View style={styles.checkboxContainer}>
+                    <CheckBox
+                      value={selectedMascotas.includes(mascota.nombre)}
+                      onValueChange={() => toggleMascota(mascota.nombre)}
+                    />
+                    <Text style={styles.mascotaNombre}>{mascota.nombre}</Text>
+                  </View>
                 </View>
               ))
             ) : (
@@ -256,32 +258,36 @@ const styles = StyleSheet.create({
     textShadowRadius: 10,
   },
   panelContainer: {
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-    borderRadius: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    borderRadius: 15,
     padding: 20,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.8,
-    shadowRadius: 5,
-    elevation: 5,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 4,
   },
   sectionContainer: {
-    marginBottom: 20,
+    marginBottom: 25,
   },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 10,
-    color: '#1DA1F2',
+    color: '#007AFF',
   },
   pickerButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#1DA1F2',
     padding: 15,
-    borderRadius: 30,
+    borderRadius: 10,
     marginBottom: 10,
+    backgroundColor: 'linear-gradient(90deg, rgba(0,122,255,1) 0%, rgba(0,180,255,1) 100%)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
   },
   pickerText: {
     fontSize: 16,
@@ -299,14 +305,14 @@ const styles = StyleSheet.create({
   },
   noMascotasText: {
     fontSize: 16,
-    color: '#333',
+    color: '#666',
     marginBottom: 10,
   },
   registrarMascotaButton: {
-    backgroundColor: '#1DA1F2',
+    backgroundColor: '#007AFF',
     paddingVertical: 10,
     paddingHorizontal: 20,
-    borderRadius: 30,
+    borderRadius: 10,
     alignItems: 'center',
   },
   registrarMascotaButtonText: {
@@ -315,26 +321,27 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   observacionesInput: {
-    borderColor: '#1DA1F2',
-    borderWidth: 2,
+    borderColor: '#007AFF',
+    borderWidth: 1.5,
     borderRadius: 10,
     padding: 10,
     minHeight: 100,
     fontSize: 16,
-    backgroundColor: '#fff',
+    backgroundColor: '#f9f9f9',
     color: '#333',
   },
   paqueteOption: {
-    backgroundColor: 'rgba(29,161,242,0.1)',
     paddingVertical: 15,
     paddingHorizontal: 20,
-    borderRadius: 30,
+    borderRadius: 15,
     marginBottom: 10,
-    borderColor: '#1DA1F2',
-    borderWidth: 2,
+    borderColor: '#007AFF',
+    borderWidth: 1.5,
+    backgroundColor: 'rgba(0,122,255,0.1)',
   },
   selectedPaqueteOption: {
-    backgroundColor: '#1DA1F2',
+    backgroundColor: '#007AFF',
+    borderColor: '#005BBB',
   },
   paqueteOptionText: {
     fontSize: 16,
@@ -342,21 +349,33 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   submitContainer: {
-    marginTop: 20,
+    marginTop: 30,
     alignItems: 'center',
   },
   submitButton: {
-    backgroundColor: '#1DA1F2',
+    backgroundColor: '#007AFF',
     paddingVertical: 15,
     paddingHorizontal: 30,
-    borderRadius: 30,
+    borderRadius: 15,
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 4,
   },
   submitButtonText: {
     color: '#fff',
     fontSize: 18,
     fontWeight: 'bold',
   },
+  checkboxContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 5,
+    marginRight: 10,
+  },
 });
+
 
 export default SolicitudPaseo;

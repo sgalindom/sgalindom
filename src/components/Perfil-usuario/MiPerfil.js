@@ -71,7 +71,7 @@ const MiPerfil = ({ navigation }) => {
         <ScrollView contentContainerStyle={styles.contentContainer}>
           <View style={styles.innerContainer}>
             <Text style={styles.title}>Mi Perfil</Text>
-            {renderOption('user', 'Mi Información', goToMiInformacion, 'miInformacion')}
+            {renderOption('user-check', 'Mi Información', goToMiInformacion, 'miInformacion')}
             {renderOption('paw', 'Mis Mascotas', goToMisMascotas, 'misMascotas')}
             {renderOption('shopping-cart', 'Mis Pedidos', goToMisPedidos, 'misPedidos')}
             {renderOption('ticket-alt', 'Cupones', goToCupones, 'verCupones')}
