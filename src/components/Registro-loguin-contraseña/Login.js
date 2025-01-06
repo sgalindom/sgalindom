@@ -1,22 +1,42 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Image, ImageBackground, StyleSheet, Dimensions, ActivityIndicator, Animated, Modal } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ImageBackground, StyleSheet, Dimensions, ActivityIndicator, Animated, Modal } from 'react-native';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import Icon from 'react-native-vector-icons/FontAwesome';
-
-const backgroundImage = require('../imagenes/fondomain.jpg');
-const logoImage = require('../imagenes/logo_.png');
+import FastImage from 'react-native-fast-image';
+import storage from '@react-native-firebase/storage';
 
 function Login({ navigation }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [buttonScale] = useState(new Animated.Value(1));
-  const [hidePassword, setHidePassword] = useState(true);  // Estado para ocultar/mostrar la contraseña
+  const [hidePassword, setHidePassword] = useState(true);
   const [fadeAnim] = useState(new Animated.Value(0));
   const [modalVisible, setModalVisible] = useState(false);
   const [modalMessage, setModalMessage] = useState('');
+  const [images, setImages] = useState({});
+
+  useEffect(() => {
+    const fetchImages = async () => {
+      const imageNames = ['logo_.png'];
+
+      const storagePromises = imageNames.map(async (imageName) => {
+        const url = await storage().ref(`/imagenes/${imageName}`).getDownloadURL();
+        return { name: imageName.split('.')[0], url };
+      });
+
+      const imageUrls = await Promise.all(storagePromises);
+      const images = {};
+      imageUrls.forEach(({ name, url }) => {
+        images[name] = url;
+      });
+
+      setImages(images);
+    };
+
+    fetchImages();
+  }, []);
 
   useEffect(() => {
     const unsubscribe = auth().onAuthStateChanged(async (user) => {
@@ -46,7 +66,7 @@ function Login({ navigation }) {
         }
       } else {
         console.log('Usuario no autenticado, redirigiendo al Login');
-        navigation.navigate('Login');
+        //navigation.navigate('Login');
       }
 
       Animated.timing(fadeAnim, {
@@ -61,10 +81,7 @@ function Login({ navigation }) {
 
   const checkAdminStatus = async (userEmail) => {
     try {
-      const adminSnapshot = await firestore()
-        .collection('Administradores')
-        .doc(userEmail)
-        .get();
+      const adminSnapshot = await firestore().collection('Administradores').doc(userEmail).get();
 
       return adminSnapshot.exists;
     } catch (error) {
@@ -145,63 +162,52 @@ function Login({ navigation }) {
   }
 
   return (
-    <ImageBackground source={backgroundImage} style={styles.backgroundImage}>
+    <ImageBackground source={require('../imagenes/fondomain.jpg')} style={styles.backgroundImage}>
       <View style={styles.overlay}>
         <Animated.View style={{ ...styles.container, opacity: fadeAnim }}>
           <View style={styles.logoContainer}>
-            <Image source={logoImage} style={styles.logo} />
+            <FastImage
+              source={{
+                uri: images.logo_,
+                priority: FastImage.priority.normal,
+              }}
+              style={styles.logo}
+            />
           </View>
           <Text style={styles.welcomeText}>Inicia Sesión</Text>
           <View style={styles.inputContainer}>
             <Icon name="envelope" size={20} color="gray" style={styles.icon} />
-            
+
             <TextInput
               placeholder="Correo electrónico"
               onChangeText={(text) => setEmail(text)}
               value={email}
               style={styles.input}
               keyboardType="email-address"
-              placeholderTextColor="#000000"  // Establece el color del texto del placeholder a negro
+              placeholderTextColor="#000000"
             />
-
           </View>
           <View style={styles.inputContainer}>
             <Icon name="lock" size={20} color="gray" style={styles.icon} />
             <TextInput
               placeholder="Contraseña"
-              secureTextEntry={hidePassword}  // Muestra u oculta la contraseña
+              secureTextEntry={hidePassword}
               onChangeText={(text) => setPassword(text)}
               value={password}
               style={styles.input}
               placeholderTextColor="#000000"
             />
-            <TouchableOpacity
-              style={styles.eyeIconContainer}
-              onPress={() => setHidePassword(!hidePassword)}
-            >
-              <Icon
-                name={hidePassword ? 'eye-slash' : 'eye'}
-                size={27}
-                color="black"
-              />
+            <TouchableOpacity style={styles.eyeIconContainer} onPress={() => setHidePassword(!hidePassword)}>
+              <Icon name={hidePassword ? 'eye-slash' : 'eye'} size={27} color="black" />
             </TouchableOpacity>
           </View>
 
-          {/* Modal para errores */}
-          <Modal
-            animationType="slide"
-            transparent={true}
-            visible={modalVisible}
-            onRequestClose={() => setModalVisible(false)}
-          >
+          <Modal animationType="slide" transparent={true} visible={modalVisible} onRequestClose={() => setModalVisible(false)}>
             <View style={styles.modalContainer}>
               <View style={styles.modalContent}>
                 <Icon name="exclamation-circle" size={50} color="red" />
                 <Text style={styles.modalText}>{modalMessage}</Text>
-                <TouchableOpacity
-                  style={styles.modalButton}
-                  onPress={() => setModalVisible(false)}
-                >
+                <TouchableOpacity style={styles.modalButton} onPress={() => setModalVisible(false)}>
                   <Text style={styles.modalButtonText}>Aceptar</Text>
                 </TouchableOpacity>
               </View>
@@ -221,7 +227,6 @@ function Login({ navigation }) {
           <TouchableOpacity onPress={handleRegistrarse}>
             <Text style={styles.recuperarText}>Registrate aqui</Text>
           </TouchableOpacity>
-
         </Animated.View>
       </View>
     </ImageBackground>
@@ -232,10 +237,9 @@ const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 
 const styles = StyleSheet.create({
-
   eyeIconContainer: {
     position: 'absolute',
-    right: 10,  
+    right: 10,
   },
 
   backgroundImage: {
@@ -333,8 +337,8 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   eyeIconContainer: {
-    width: 48,   // Aumenta la anchura a 48dp
-    height: 48,  // Aumenta la altura a 48dp
+    width: 48, // Aumenta la anchura a 48dp
+    height: 48, // Aumenta la altura a 48dp
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -395,12 +399,10 @@ const styles = StyleSheet.create({
     fontSize: 20,
     color: 'black',
     marginVertical: 2, // Espaciado adecuado para accesibilidad
-    height: 48,  // Aseguramos que el texto también tenga una altura mínima de 48dp en la zona clicable
+    height: 48, // Aseguramos que el texto también tenga una altura mínima de 48dp en la zona clicable
     justifyContent: 'center',
     alignItems: 'center',
   },
-  
-
 });
 
 export default Login;

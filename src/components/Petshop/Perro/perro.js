@@ -47,7 +47,7 @@ const PerroScreen = ({ navigation }) => {
     return (
       <View style={[styles.container, styles.center]}>
         <ActivityIndicator size="large" color="#000" />
-        <Text style={styles.loadingText}>Cargando imágenes...</Text>
+        <Text style={styles.loadingText}>Cargando...</Text>
       </View>
     );
   }

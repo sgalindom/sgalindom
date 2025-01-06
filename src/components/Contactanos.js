@@ -7,7 +7,7 @@ const tuFoto = require('./imagenes/tu_foto.jpg');
 
 const ContactanosScreen = () => {
   const contactarWhatsApp = () => {
-    Linking.openURL('whatsapp://send?text=Hola, estoy contactándote desde Pet Services la app&phone=+123456789');
+    Linking.openURL('whatsapp://send?text=Hola, estoy contactándote desde Pet Services la app&phone=+573202212377');
   };
 
   const llamarDesarrollador = () => {

@@ -5,7 +5,7 @@ import PushNotification from 'react-native-push-notification';
 // Importa la imagen de fondo
 import FondoImage from '../imagenes/fondomain.jpg';
 // Importa el logo
-import LogoImage from '../imagenes/logo_.png';
+import LogoImage from '../imagenes/logo_2.png';
 
 const Notificaciones = () => {
   const [notificacionesActivas, setNotificacionesActivas] = useState(false);

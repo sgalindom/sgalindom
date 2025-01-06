@@ -332,7 +332,7 @@ const styles = StyleSheet.create({
     marginVertical: 20,
   },
   goBackButton: {
-    backgroundColor: '#6A0DAD',
+    backgroundColor: '#3498db',
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 20,
@@ -452,7 +452,7 @@ const styles = StyleSheet.create({
     color: '#000', // Cambiado a negro
   },
   botonHacerPedido: {
-    backgroundColor: '#6A0DAD',
+    backgroundColor: '#3498db',
     paddingVertical: 15,
     borderRadius: 10,
     alignItems: 'center',

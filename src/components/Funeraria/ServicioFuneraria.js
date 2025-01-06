@@ -29,7 +29,7 @@ const ServicioFuneraria = ({ navigation }) => {
 
       {/* Tarjeta del Plan Premium Mensual Mascota */}
       <View style={styles.planCard}>
-        <Image source={require('../imagenes/Premium.jpg')} style={styles.planImage} />
+        <Image source={require('../imagenes/Basico.jpg')} style={styles.planImage} />
         <View style={styles.planContent}>
           <Text style={styles.planTitle}>Plan Premium Mensual Mascota</Text>
           <Text style={styles.planDescription}>Accede a un plan completo con beneficios exclusivos para tu mascota.</Text>
