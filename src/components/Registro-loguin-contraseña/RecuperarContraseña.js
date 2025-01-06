@@ -8,7 +8,7 @@ import {
   Image,
   StyleSheet,
   Dimensions,
-  Alert,
+  Modal
 } from 'react-native';
 import auth from '@react-native-firebase/auth';
 import Icon from 'react-native-vector-icons/FontAwesome5';
@@ -19,11 +19,12 @@ const logoImage = require('../imagenes/logo_2.png');
 const RecuperarContraseña = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
+  const [modalVisible, setModalVisible] = useState(false);
 
   const handleRecuperarContraseña = async () => {
     try {
       if (!email) {
-        Alert.alert('Por favor, ingresa un correo electrónico');
+        setModalVisible(true);
         return;
       }
 
@@ -31,6 +32,7 @@ const RecuperarContraseña = ({ navigation }) => {
       await auth().sendPasswordResetEmail(email);
       console.log('Correo de restablecimiento de contraseña enviado con éxito.');
 
+      setModalVisible(false);
       Alert.alert(
         'Correo Enviado',
         'Se ha enviado un correo con instrucciones para restablecer tu contraseña.',
@@ -54,18 +56,29 @@ const RecuperarContraseña = ({ navigation }) => {
             onChangeText={(text) => setEmail(text)}
             style={styles.input}
             placeholderTextColor="black"
-            accessibilityLabel="Campo de correo electrónico"
           />
         </View>
         {error && <Text style={styles.errorText}>{error}</Text>}
         <TouchableOpacity
           onPress={handleRecuperarContraseña}
           style={styles.button}
-          accessibilityLabel="Botón para recuperar la contraseña con un enlace a tu correo electrónico"
+          accessibilityLabel="Recuperar contraseña"
         >
-          <Text style={styles.buttonText}>Enviar</Text>
+          <Text style={[styles.buttonText, { color: 'white' }]}>Enviar</Text>
         </TouchableOpacity>
       </View>
+
+      <Modal visible={modalVisible} animationType="fade" transparent={true}>
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Icon name="times-circle" size={40} color="red" style={styles.modalIcon} />
+            <Text style={styles.modalText}>Por favor, ingresa un correo electrónico</Text>
+            <TouchableOpacity style={styles.modalButton} onPress={() => setModalVisible(false)}>
+              <Text style={styles.modalButtonText}>OK</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </ImageBackground>
   );
 };
@@ -134,6 +147,40 @@ const styles = StyleSheet.create({
     width: 200,
     height: 200,
     marginBottom: 30,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)'
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    padding: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+    elevation: 5
+  },
+  modalIcon: {
+    marginBottom: 10,
+  },
+  modalText: {
+    fontSize: 16,
+    marginBottom: 20,
+    textAlign: 'center',
+    color: "black",
+  },
+  modalButton: {
+    backgroundColor: '#2196F3', // Cambiado a un azul más oscuro
+    padding: 15,
+    borderRadius: 25,
+    width: '80%',
+    alignItems: 'center',
+    elevation: 3
+  },
+  modalButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
   },
 });
 

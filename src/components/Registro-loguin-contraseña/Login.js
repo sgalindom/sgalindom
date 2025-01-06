@@ -1,10 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react'; 
 import { View, Text, TextInput, TouchableOpacity, ImageBackground, StyleSheet, Dimensions, ActivityIndicator, Animated, Modal } from 'react-native';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import FastImage from 'react-native-fast-image';
 import storage from '@react-native-firebase/storage';
+
+// Obtén la versión directamente desde el archivo package.json
+const appVersion = require('../../../package.json')
 
 function Login({ navigation }) {
   const [email, setEmail] = useState('');
@@ -64,9 +67,6 @@ function Login({ navigation }) {
         } finally {
           setIsLoading(false);
         }
-      } else {
-        console.log('Usuario no autenticado, redirigiendo al Login');
-        //navigation.navigate('Login');
       }
 
       Animated.timing(fadeAnim, {
@@ -175,6 +175,8 @@ function Login({ navigation }) {
             />
           </View>
           <Text style={styles.welcomeText}>Inicia Sesión</Text>
+          <Text style={styles.versionText}>Versión: {appVersion.version}</Text>
+
           <View style={styles.inputContainer}>
             <Icon name="envelope" size={20} color="gray" style={styles.icon} />
 
@@ -208,7 +210,7 @@ function Login({ navigation }) {
                 <Icon name="exclamation-circle" size={50} color="red" />
                 <Text style={styles.modalText}>{modalMessage}</Text>
                 <TouchableOpacity style={styles.modalButton} onPress={() => setModalVisible(false)}>
-                  <Text style={styles.modalButtonText}>Aceptar</Text>
+                  <Text style={[styles.modalButtonText, { color: 'white' }]}>Aceptar</Text> 
                 </TouchableOpacity>
               </View>
             </View>
@@ -237,6 +239,11 @@ const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 
 const styles = StyleSheet.create({
+  versionText: {
+    fontSize: 16,
+    color: '#000',
+    marginBottom: 10,
+  },
   eyeIconContainer: {
     position: 'absolute',
     right: 10,

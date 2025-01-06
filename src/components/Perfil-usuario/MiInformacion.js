@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ImageBackground, ScrollView, TouchableOpacity, Image, Modal, TextInput } from 'react-native';
+import { View, Text, StyleSheet, ImageBackground, TouchableOpacity, Image, Modal, TextInput } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
@@ -241,8 +241,8 @@ const MiInformacion = () => {
                 <View style={styles.card}>
                   <Icon name="birthday-cake" size={24} color="#3498db" style={styles.cardIcon} />
                   <Text style={styles.cardText}>
-                    Fecha de Nacimiento: 
-                    {userData.fechaNacimiento && userData.fechaNacimiento.seconds 
+                    Fecha de Nacimiento:
+                    {userData.fechaNacimiento && userData.fechaNacimiento.seconds
                       ? new Date(userData.fechaNacimiento.seconds * 1000).toLocaleDateString()
                       : 'No disponible'}
                   </Text>
@@ -250,13 +250,13 @@ const MiInformacion = () => {
                 <View style={styles.card}>
                   <Icon name="home" size={24} color="#3498db" style={styles.cardIcon} />
                   <Text style={styles.cardText}>
-                    Dirección: 
-                    {editingField === 'direccion' ? 
+                    Dirección:
+                    {editingField === 'direccion' ?
                       <TextInput
                         style={styles.inputField}
                         value={editableData.direccion}
                         onChangeText={(text) => setEditableData({ ...editableData, direccion: text })}
-                      /> 
+                      />
                       : userData.direccion
                     }
                   </Text>
@@ -270,6 +270,11 @@ const MiInformacion = () => {
                   <Icon name="phone" size={24} color="#3498db" style={styles.cardIcon} />
                   <Text style={styles.cardText}>Teléfono: {userData.telefono}</Text>
                 </View>
+                <View style={styles.card}> 
+                  <Icon name="map-marker-alt" size={24} color="#3498db" style={styles.cardIcon} />
+                  <Text style={styles.cardText}>Ciudad: {userData.ciudad}</Text>
+                </View>
+
                 {editingField && (
                   <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
                     <Text style={styles.saveButtonText}>Guardar Cambios</Text>

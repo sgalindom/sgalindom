@@ -39,7 +39,7 @@ const Inicio = () => {
     <View style={styles.container}>
       <FastImage
         style={styles.background}
-        source={require('../imagenes/MiPerfil.jpg')} // Cambia esta ruta al lugar donde está la imagen en tu proyecto
+        source={require('../imagenes/MiPerfil3.jpg')} // Cambia esta ruta al lugar donde está la imagen en tu proyecto
         resizeMode={FastImage.resizeMode.cover}
       >
         <View style={styles.buttonsContainer}>

@@ -8,14 +8,9 @@ import storage from '@react-native-firebase/storage';
 const { width } = Dimensions.get('window');
 
 const MainPanel = ({ navigation }) => {
-  const [currentServiceIndex, setCurrentServiceIndex] = useState(0);
   const [currentTipIndex, setCurrentTipIndex] = useState(0);
-  const [foodProducts, setFoodProducts] = useState([]);
-  const [accessoryProducts, setAccessoryProducts] = useState([]);
-  const [allProductProducts, setProductProducts] = useState([]);
   const [veterinarias, setVeterinarias] = useState([]);
   const [guarderias, setGuarderias] = useState([]);
-  const scrollViewRef = useRef(null);
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const [isLoading, setIsLoading] = useState(true);
   const [serviceImages, setServiceImages] = useState({});
@@ -72,34 +67,11 @@ const MainPanel = ({ navigation }) => {
     }, 3000);
 
     return () => clearInterval(tipIntervalId);
-  }, [tips]); // Dependency changed to tips
+  }, []);
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const fetchCategoryProducts = async (category) => {
-          const productRefs = [1, 2, 3].map(async (vetId) => {
-            const vetProductsRef = firestore()
-              .collection('Veterinarias')
-              .doc(vetId.toString())
-              .collection(category);
-
-            const snapshot = await vetProductsRef.get();
-            return snapshot.docs.map((doc) => ({
-              id: doc.id,
-              vetId: vetId,
-              ...doc.data(),
-            }));
-          });
-
-          const productsData = await Promise.all(productRefs);
-          return productsData.reduce((acc, val) => acc.concat(val), []);
-        };
-
-        setFoodProducts(await fetchCategoryProducts('Comida'));
-        setAccessoryProducts(await fetchCategoryProducts('Accesorios'));
-        setProductProducts(await fetchCategoryProducts('Productos'));
-
         const veterinariasRef = firestore().collection('Veterinarias');
         const veterinariasSnapshot = await veterinariasRef.get();
         setVeterinarias(
@@ -165,18 +137,6 @@ const MainPanel = ({ navigation }) => {
     { id: 10, text: 'Enseña a tu mascota comandos básicos para su seguridad.' },
   ];
 
-  useEffect(() => {
-    // This useEffect will only run after serviceImages has been populated
-    let intervalId;
-    if (Object.keys(serviceImages).length > 0 && services.length > 0) {
-      intervalId = setInterval(() => {
-        setCurrentServiceIndex((prevIndex) => (prevIndex + 1) % services.length);
-      }, 6000);
-    }
-
-    return () => clearInterval(intervalId);
-  }, [serviceImages]); // Now depends on serviceImages
-
   return (
     <View style={styles.backgroundContainer}>
       {isLoading ? (
@@ -202,10 +162,9 @@ const MainPanel = ({ navigation }) => {
             <Text style={styles.welcomeText}>¡Encuentra todo lo que tu mejor amigo necesita!</Text>
           </View>
 
-          {/* Ensure serviceImages is populated before rendering the carousel */}
+          {/* Carrusel de servicios */}
           {Object.keys(serviceImages).length > 0 && (
             <Animated.ScrollView
-              ref={scrollViewRef}
               horizontal
               pagingEnabled
               showsHorizontalScrollIndicator={false}
@@ -213,7 +172,7 @@ const MainPanel = ({ navigation }) => {
               decelerationRate="fast"
               contentContainerStyle={styles.carouselContainer}
             >
-              {services.map((service, index) => (
+              {services.map((service) => (
                 <Animated.View key={service.id} style={[styles.serviceCard, { opacity: fadeAnim }]}>
                   <TouchableOpacity onPress={() => navigation.navigate(service.route)}>
                     <ImageBackground source={{ uri: service.image }} style={styles.serviceImage}>
@@ -224,15 +183,6 @@ const MainPanel = ({ navigation }) => {
               ))}
             </Animated.ScrollView>
           )}
-
-          <View style={styles.indicatorContainer}>
-            {services.map((_, index) => (
-              <View
-                key={index}
-                style={[styles.indicator, { backgroundColor: currentServiceIndex === index ? '#E4784A' : '#ccc' }]}
-              />
-            ))}
-          </View>
 
           <View style={styles.tipContainer}>
             <View style={styles.tipCard}>
@@ -338,7 +288,6 @@ const MainPanel = ({ navigation }) => {
     </View>
   );
 };
-
 
 
 

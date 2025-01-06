@@ -15,6 +15,7 @@ import firestore from '@react-native-firebase/firestore';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import LinearGradient from 'react-native-linear-gradient';
 import Modal from 'react-native-modal';
+import { Picker } from '@react-native-picker/picker';
 
 const logoImage = require('../imagenes/fondoperfil.jpg');
 
@@ -24,9 +25,10 @@ const Registro = ({ navigation }) => {
     password: '',
     confirmPassword: '',
     nombreCompleto: '',
-    mascota: [], // Ajustado para permitir múltiples selecciones
+    mascota: [],
     direccion: '',
     telefono: '',
+    ciudad: 'Bucaramanga',
   };
 
   const [form, setForm] = useState(initialFormState);
@@ -100,6 +102,7 @@ const Registro = ({ navigation }) => {
           mascota: form.mascota,
           direccion: form.direccion,
           telefono: form.telefono,
+          ciudad: form.ciudad,
         };
 
         await firestore()
@@ -134,7 +137,7 @@ const Registro = ({ navigation }) => {
         <Image source={logoImage} style={styles.logo} />
       </View>
       <Text style={styles.title}>¡Registra a tu mascota en el mejor cuidado profesional!</Text>
-      <View style={styles.formContainer}>
+      <View style={styles.formContainer} accessibilityLabel="Formulario de registro">
         <View style={styles.inputContainer}>
           <Icon name="user" size={20} color="black" style={styles.icon} />
           <TextInput
@@ -196,39 +199,50 @@ const Registro = ({ navigation }) => {
           </TouchableOpacity>
         </View>
 
-        <Text style={[styles.passwordStrength, { color: passwordColor }]}>Fortaleza: {passwordStrength}</Text>
+        <Text style={[styles.passwordStrength, { color: passwordColor }, { color: 'black' }]}>Fortaleza: {passwordStrength}</Text>
 
-        <Text style={styles.mascotaLabel}>¿Qué mascota tienes?</Text>
         <View style={styles.checkboxWrapper}>
           <TouchableOpacity
-            style={[styles.checkbox, form.mascota.includes('Perro') && styles.checkboxSelected]}
+            style={[styles.checkbox, form.mascota.includes('Perro') && styles.checkboxSelected, { height: 48 }]}
             onPress={() => toggleMascota('Perro')}
           >
             <Text style={styles.checkboxText}>Perro</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={[styles.checkbox, form.mascota.includes('Gato') && styles.checkboxSelected]}
+            style={[styles.checkbox, form.mascota.includes('Gato') && styles.checkboxSelected, { height: 48 }]}
             onPress={() => toggleMascota('Gato')}
           >
             <Text style={styles.checkboxText}>Gato</Text>
           </TouchableOpacity>
         </View>
 
+        <View style={styles.inputContainer}>
+          <Icon name="map-marker" size={20} color="black" style={styles.icon} />
+          <Picker
+            selectedValue={form.ciudad}
+            style={styles.picker}
+            onValueChange={(itemValue) => setForm({ ...form, ciudad: itemValue })}
+          >
+            <Picker.Item label="Bucaramanga" value="Bucaramanga" />
+            {/* Agrega más ciudades aquí cuando sea necesario */}
+          </Picker>
+        </View>
+
         {loading ? (
-          <ActivityIndicator size="large" color="#2F9FFA" />
+          <ActivityIndicator size="large" color="#007BFF" />
         ) : (
           <TouchableOpacity onPress={handleRegistro} style={styles.gradientButton}>
-            <LinearGradient colors={["#6DD5FA", "#2980B9"]} style={styles.gradientButton}>
+            <LinearGradient colors={["#6DD5FA", "#007BFF"]} style={styles.gradientButton}>
               <Text style={styles.buttonText}>Crear cuenta</Text>
             </LinearGradient>
           </TouchableOpacity>
         )}
 
-        <Modal isVisible={isModalVisible}>
-          <View style={styles.modalContent}>
+        <Modal isVisible={isModalVisible} accessibilityLabel="Ventana emergente de mensajes">
+          <View style={styles.modalContent} accessibilityLabel="Mensaje de registro">
             <Icon name={modalSuccess ? 'check-circle' : 'times-circle'} size={60} color={modalSuccess ? 'green' : 'red'} />
             <Text style={styles.modalMessage}>{modalMessage}</Text>
-            <TouchableOpacity onPress={handleCloseModal} style={styles.modalButton}>
+            <TouchableOpacity onPress={handleCloseModal} style={[styles.modalButton, { height: 48 }]}>
               <Text style={styles.modalButtonText}>Cerrar</Text>
             </TouchableOpacity>
           </View>
@@ -241,6 +255,13 @@ const Registro = ({ navigation }) => {
 const windowWidth = Dimensions.get('window').width;
 
 const styles = StyleSheet.create({
+  // ... (otros estilos) ...
+  picker: {
+    flex: 1,
+    height: 50,
+    color: 'black',
+  },
+
   container: {
     flexGrow: 1,
     alignItems: 'center',
@@ -335,20 +356,20 @@ const styles = StyleSheet.create({
   },
   checkboxWrapper: {
     flexDirection: 'row',
-    justifyContent: 'center',
+    justifyContent: 'space-around', // Distribuye los botones uniformemente
     marginTop: 10,
+    marginBottom: 10, // Espacio inferior
   },
   checkbox: {
     borderWidth: 1,
     borderColor: '#ccc',
     borderRadius: 5,
     padding: 10,
-    marginHorizontal: 10,
     alignItems: 'center',
   },
   checkboxSelected: {
     backgroundColor: '#6DD5FA',
-    borderColor: '#2980B9',
+    borderColor: '#007BFF',
   },
   checkboxText: {
     fontSize: 14,
@@ -359,11 +380,11 @@ const styles = StyleSheet.create({
     color: 'black',
     fontWeight: 'bold',
     textAlign: 'center',
-    marginBottom: 10,
+    marginBottom: 5, // Reduce el espacio inferior
   },
   passwordStrength: {
     fontSize: 12,
-    marginTop: -10,
+    marginTop: -10, // Reduce el espacio superior
     marginBottom: 10,
   },
   passwordHint: {

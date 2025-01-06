@@ -9,7 +9,7 @@ GoogleSignin.configure({
 });
 
 // Importaciones relacionadas con Registro, Loguin y Contraseña
-import PreLogin from './components/Registro-loguin-contraseña/PreLogin';
+
 import Login from './components/Registro-loguin-contraseña/Login';
 import Registro from './components/Registro-loguin-contraseña/Registro';
 import RecuperarContraseña from './components/Registro-loguin-contraseña/RecuperarContraseña';
@@ -112,7 +112,7 @@ function App() {
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName="Inicio">
         <Stack.Screen name="Inicio" component={Inicio} />
-        <Stack.Screen name="PreLogin" component={PreLogin} />
+       
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="Registro" component={Registro} />
         <Stack.Screen name="MainPanel" component={MainPanel} />

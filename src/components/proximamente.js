@@ -1,12 +1,9 @@
-  import React from 'react';
-import { View, Text, Image, StyleSheet, ImageBackground } from 'react-native';
+import React from 'react';
+import { View, Text, Image, StyleSheet } from 'react-native'; // Elimina ImageBackground
 
 const ProximamentePanel = () => {
   return (
-    <ImageBackground
-      source={require('./imagenes/fondomain.jpg')}
-      style={styles.container}
-    >
+    <View style={styles.container}> 
       <View style={styles.content}>
         <Image
           source={require('./imagenes/logo_2.png')}
@@ -15,15 +12,16 @@ const ProximamentePanel = () => {
         <Text style={styles.title}>Próximamente</Text>
         <Text style={styles.subtitle}>Estamos trabajando para ti</Text>
       </View>
-    </ImageBackground>
+    </View> 
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  container: { 
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: '#f0f0f0' // Color de fondo sólido 
   },
   content: {
     alignItems: 'center',
